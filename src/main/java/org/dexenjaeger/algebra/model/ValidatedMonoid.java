@@ -16,8 +16,8 @@ public class ValidatedMonoid implements Monoid {
   }
   
   public static ValidatedMonoid createMonoid(
-    String identity, ValidatedBinaryOperator binaryOperator,
-    Function<ValidatedBinaryOperator, Semigroup> algebraicStructureConstructor
+    String identity, ValidatingBinaryOperator binaryOperator,
+    Function<ValidatingBinaryOperator, ValidatedSemigroup> algebraicStructureConstructor
   ) {
     
     if (!binaryOperator.isIdentity(identity)) {

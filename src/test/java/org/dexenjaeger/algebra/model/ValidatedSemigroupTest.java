@@ -23,7 +23,7 @@ class ValidatedSemigroupTest {
   void staticInitializerTest() {
     ValidatedSemigroup.createSemigroup(
       "*",
-      new ValidatedBinaryOperator(
+      new ValidatingBinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
@@ -36,7 +36,7 @@ class ValidatedSemigroupTest {
     String[] elements = MoreArrayUtils.createArray("I", "a");
     ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
       "*",
-      new ValidatedBinaryOperator(
+      new ValidatingBinaryOperator(
         elements,
         createReverseLookup(elements),
         (i, j) -> (i + j) % 2
@@ -72,7 +72,7 @@ class ValidatedSemigroupTest {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
     ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
       "+",
-      new ValidatedBinaryOperator(
+      new ValidatingBinaryOperator(
         elements,
         createReverseLookup(elements),
         (i, j) -> (i+j) % 3
@@ -96,7 +96,7 @@ class ValidatedSemigroupTest {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
     ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
       "+",
-      new ValidatedBinaryOperator(
+      new ValidatingBinaryOperator(
         elements,
         createReverseLookup(elements),
         (i, j) -> (i+j) % 3
@@ -121,7 +121,7 @@ class ValidatedSemigroupTest {
       put("x", 0);
       put("y", 1);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatedBinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatingBinaryOperator(
       elements, reverseLookup, (a, b) -> 2
     )));
     
@@ -143,7 +143,7 @@ class ValidatedSemigroupTest {
       put("y", 1);
       put("z", 2);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatedBinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatingBinaryOperator(
       elements, reverseLookup, (a, b) -> product[a][b]
     )));
     

@@ -14,12 +14,12 @@ class ValidatedMonoidTest {
   void staticInitializerTest() {
     ValidatedMonoid.createMonoid(
       "I",
-      new ValidatedBinaryOperator(
+      new ValidatingBinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
       ),
-      binOp -> mock(Semigroup.class)
+      binOp -> mock(ValidatedSemigroup.class)
     );
   }
   
@@ -38,7 +38,7 @@ class ValidatedMonoidTest {
         4,
         (i, j) -> product[i][j]
       ),
-      binOp -> mock(Semigroup.class)
+      binOp -> mock(ValidatedSemigroup.class)
     ));
     
     assertEquals(

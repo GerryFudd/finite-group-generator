@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
-public class ValidatedBinaryOperator {
+public class ValidatingBinaryOperator {
   @Getter
   private final String[] elements;
   private final Map<String, Integer> reverseLookup;

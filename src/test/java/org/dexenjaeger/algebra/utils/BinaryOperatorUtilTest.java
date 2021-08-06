@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.ValidatedBinaryOperator;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +15,7 @@ class BinaryOperatorUtilTest {
       {0, 1, 2, 3}
     };
     
-    ValidatedBinaryOperator result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+    ValidatingBinaryOperator result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> product[i][j]
     );
@@ -34,7 +34,7 @@ class BinaryOperatorUtilTest {
       {2, 3, 2, 3}
     };
     
-    ValidatedBinaryOperator result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+    ValidatingBinaryOperator result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> product[i][j]
     );

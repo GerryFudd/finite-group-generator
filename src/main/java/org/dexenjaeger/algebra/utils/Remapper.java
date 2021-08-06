@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
-import org.dexenjaeger.algebra.model.ValidatedBinaryOperator;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,8 +73,8 @@ public class Remapper {
     return Optional.empty();
   }
   
-  public ValidatedBinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
-    return new ValidatedBinaryOperator(
+  public ValidatingBinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
+    return new ValidatingBinaryOperator(
       elements,
       reverseLookup,
       (a, b) -> inverseRemap[binOp.apply(remap[a], remap[b])]

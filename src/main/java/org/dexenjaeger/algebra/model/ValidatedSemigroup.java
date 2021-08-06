@@ -10,17 +10,17 @@ import java.util.stream.Stream;
 public class ValidatedSemigroup implements Semigroup {
   @Getter
   private final String operatorSymbol;
-  private final ValidatedBinaryOperator binaryOperator;
+  private final ValidatingBinaryOperator binaryOperator;
   
   private ValidatedSemigroup(
     String operatorSymbol,
-    ValidatedBinaryOperator binaryOperator
+    ValidatingBinaryOperator binaryOperator
   ) {
     this.operatorSymbol = operatorSymbol;
     this.binaryOperator = binaryOperator;
   }
   
-  public static ValidatedSemigroup createSemigroup(String operatorSymbol, ValidatedBinaryOperator binaryOperator) {
+  public static ValidatedSemigroup createSemigroup(String operatorSymbol, ValidatingBinaryOperator binaryOperator) {
     if (!binaryOperator.isValid()) {
       throw new RuntimeException("Semigroups may only be created from valid binary operators.");
     }

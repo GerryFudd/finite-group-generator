@@ -15,12 +15,12 @@ class ValidatedGroupTest {
   void staticInitializerTest() {
     ValidatedGroup.createGroup(
       Collections.singletonMap("I", "I"),
-      new ValidatedBinaryOperator(
+      new ValidatingBinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
       ),
-      binOp -> mock(Monoid.class)
+      binOp -> mock(ValidatedMonoid.class)
     );
   }
   
@@ -39,7 +39,7 @@ class ValidatedGroupTest {
         4,
         (i, j) -> product[i][j]
       ),
-      binOp -> mock(Monoid.class)
+      binOp -> mock(ValidatedMonoid.class)
     ));
     
     assertEquals(

@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.ValidatedBinaryOperator;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
 
 public class BinaryOperatorUtil {
   
-  public static ValidatedBinaryOperator getSortedAndPrettifiedBinaryOperator(
+  public static ValidatingBinaryOperator getSortedAndPrettifiedBinaryOperator(
     int size,
     BiFunction<Integer, Integer, Integer> binOp
   ) {

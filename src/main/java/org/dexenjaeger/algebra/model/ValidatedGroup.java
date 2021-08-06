@@ -19,8 +19,8 @@ public class ValidatedGroup implements Group {
   
   public static ValidatedGroup createGroup(
     Map<String, String> inversesMap,
-    ValidatedBinaryOperator binaryOperator,
-    Function<ValidatedBinaryOperator, Monoid> withIdentityConstructor
+    ValidatingBinaryOperator binaryOperator,
+    Function<ValidatingBinaryOperator, ValidatedMonoid> withIdentityConstructor
   ) {
     if (!binaryOperator.isInverseMap(inversesMap)) {
       throw new RuntimeException("Monoids may only be created with valid inverses for all elements.");
