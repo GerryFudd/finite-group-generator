@@ -48,7 +48,7 @@ public class FiniteSemigroup {
   }
   
   private String padOperator(String operatorSymbol, char padSymbol) {
-    return String.format("%s   ", operatorSymbol).replace(' ', padSymbol).substring(0, 3);
+    return String.format("%s   ", operatorSymbol).replace(' ', padSymbol).substring(0, 4);
   }
   
   private void appendLine(StringBuilder sb, String a) {
@@ -66,7 +66,7 @@ public class FiniteSemigroup {
   public String getMultiplicationTable() {
     StringBuilder sb = new StringBuilder("\n_");
     sb.append(operatorSymbol);
-    sb.append("___|_");
+    sb.append("____|_");
     sb.append(Stream.of(binaryOperator.getElements())
                 .map(n -> padOperator(n, '_'))
                 .collect(Collectors.joining("_")));

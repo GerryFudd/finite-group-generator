@@ -47,9 +47,10 @@ public class Remapper {
   private static String getSymbolForNumber(int i) {
     int n = i;
     StringBuilder result = new StringBuilder();
-    while (n >= 0) {
-      result.append((char) (n % 26 + 97));
-      n -= 26;
+    result.insert(0, (char) (n % 26 + 97));
+    while (n / 26 > 0) {
+      n = n / 26;
+      result.insert(0, (char) ((n - 1) % 26 + 97));
     }
     return result.toString();
   }

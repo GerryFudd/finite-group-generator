@@ -20,6 +20,29 @@ public class RawBinaryOperatorSummary {
   private final Map<Integer, Set<List<Integer>>> cycles = new HashMap<>();
   
   public void addCycle(List<Integer> cycle) {
+    for (Integer i:cycles.keySet().stream()
+                     .filter(key -> key < cycle.size())
+                     .collect(Collectors.toSet())) {
+      if (i < cycle.size()) {
+        cycles.computeIfPresent(i, (n, nCycles) -> {
+          Set<List<Integer>> result = nCycles.stream()
+                                        .filter(nCycle -> !cycle.containsAll(nCycle))
+                                        .collect(Collectors.toSet());
+          if (result.size() == 0) {
+            return null;
+          }
+          return result;
+        });
+      }
+    }
+    
+    if (cycles.entrySet().stream()
+    .filter(entry -> cycle.size() <= entry.getKey())
+    .anyMatch(entry -> entry.getValue().stream()
+      .anyMatch(nCycle -> nCycle.containsAll(cycle)))) {
+      return;
+    }
+    
     cycles.compute(cycle.size(), (n, nCycles) -> {
       if (nCycles == null) {
         nCycles = new HashSet<>();
