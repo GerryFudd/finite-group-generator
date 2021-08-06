@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
-public class BinaryOperator {
+public class ValidatedBinaryOperator {
   @Getter
   private final String[] elements;
   private final Map<String, Integer> reverseLookup;
@@ -26,6 +26,7 @@ public class BinaryOperator {
     return elements[binaryOperator.apply(lookup(a),lookup(b))];
   }
   
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isValid() {
     if (elements.length != reverseLookup.entrySet().size()) {
       return false;
@@ -46,6 +47,7 @@ public class BinaryOperator {
     return true;
   }
   
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isAssociative() {
     for (int i = 0; i < elements.length; i++) {
       for (int j = 0; j < elements.length; j++) {
@@ -61,6 +63,7 @@ public class BinaryOperator {
     return true;
   }
   
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isIdentity(String id) {
     for (String element:elements) {
       if (!prod(id, element).equals(element) || !prod(element, id).equals(element)) {
@@ -70,6 +73,7 @@ public class BinaryOperator {
     return true;
   }
   
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isInverseMap(Map<String, String> inversesMap) {
     String identity = null;
     for (String element:elements) {

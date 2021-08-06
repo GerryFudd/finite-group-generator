@@ -10,12 +10,12 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-class BinOpWithInversesHolderTest {
+class ValidatedGroupTest {
   @Test
   void staticInitializerTest() {
-    BinOpWithInversesHolder.createGroup(
+    ValidatedGroup.createGroup(
       Collections.singletonMap("I", "I"),
-      new BinaryOperator(
+      new ValidatedBinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
@@ -33,7 +33,7 @@ class BinOpWithInversesHolderTest {
       {3, 1, 2, 0}
     };
     
-    RuntimeException e = assertThrows(RuntimeException.class, () -> BinOpWithInversesHolder.createGroup(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedGroup.createGroup(
       Map.of("I", "I", "a", "b", "b", "a", "c", "c"),
       BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
         4,
@@ -49,16 +49,16 @@ class BinOpWithInversesHolderTest {
   
   @Test
   void validInverses() {
-    BinOpWithInversesHolder result = BinOpWithInversesHolder.createGroup(
+    ValidatedGroup result = ValidatedGroup.createGroup(
       Map.of("I", "I", "a", "a3", "a2", "a2", "a3", "a"),
       BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
         4,
         (i, j) -> (i + j) % 4
       ),
-      binOp -> BinOpWithIdentityHolder.createMonoid(
+      binOp -> ValidatedMonoid.createMonoid(
         "I",
         binOp,
-        bop -> AssociativeBinOpHolder.createSemigroup("*", bop)
+        bop -> ValidatedSemigroup.createSemigroup("*", bop)
       )
     );
     

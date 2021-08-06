@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.generators;
 
-import org.dexenjaeger.algebra.model.AssociativeBinOpHolder;
+import org.dexenjaeger.algebra.model.ValidatedSemigroup;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -11,10 +11,10 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SymmetryBinOpWithInversesHolderGeneratorTest {
+class SymmetryGroupGeneratorTest {
   @Test
   void createS2() {
-    AssociativeBinOpHolder s2 = SymmetryGroupGenerator.createSymmetryGroup(2);
+    ValidatedSemigroup s2 = SymmetryGroupGenerator.createSymmetryGroup(2);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
       .append("_o____|_I____a____\n")
@@ -29,7 +29,7 @@ class SymmetryBinOpWithInversesHolderGeneratorTest {
   
   @Test
   void createS3() {
-    AssociativeBinOpHolder s3 = SymmetryGroupGenerator.createSymmetryGroup(3);
+    ValidatedSemigroup s3 = SymmetryGroupGenerator.createSymmetryGroup(3);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
       .append("_o____|_I____a____b____c____d____d2___\n")
@@ -48,7 +48,7 @@ class SymmetryBinOpWithInversesHolderGeneratorTest {
   
   @Test
   void createS4() {
-    AssociativeBinOpHolder s4 = SymmetryGroupGenerator.createSymmetryGroup(4);
+    ValidatedSemigroup s4 = SymmetryGroupGenerator.createSymmetryGroup(4);
     
     List<String> elements = s4.getElementsAsList();
     Map<Integer, Set<String>> groupOrderCount = new HashMap<>();

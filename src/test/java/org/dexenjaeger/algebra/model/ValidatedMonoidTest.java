@@ -9,12 +9,12 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-class BinOpWithIdentityHolderTest {
+class ValidatedMonoidTest {
   @Test
   void staticInitializerTest() {
-    BinOpWithIdentityHolder.createMonoid(
+    ValidatedMonoid.createMonoid(
       "I",
-      new BinaryOperator(
+      new ValidatedBinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
@@ -32,7 +32,7 @@ class BinOpWithIdentityHolderTest {
       {0, 1, 2, 3}
     };
   
-    RuntimeException e = assertThrows(RuntimeException.class, () -> BinOpWithIdentityHolder.createMonoid(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedMonoid.createMonoid(
       "L1",
       BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
         4,

@@ -7,20 +7,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AssociativeBinOpHolder implements Semigroup {
+public class ValidatedSemigroup implements Semigroup {
   @Getter
   private final String operatorSymbol;
-  private final BinaryOperator binaryOperator;
+  private final ValidatedBinaryOperator binaryOperator;
   
-  private AssociativeBinOpHolder(
+  private ValidatedSemigroup(
     String operatorSymbol,
-    BinaryOperator binaryOperator
+    ValidatedBinaryOperator binaryOperator
   ) {
     this.operatorSymbol = operatorSymbol;
     this.binaryOperator = binaryOperator;
   }
   
-  public static AssociativeBinOpHolder createSemigroup(String operatorSymbol, BinaryOperator binaryOperator) {
+  public static ValidatedSemigroup createSemigroup(String operatorSymbol, ValidatedBinaryOperator binaryOperator) {
     if (!binaryOperator.isValid()) {
       throw new RuntimeException("Semigroups may only be created from valid binary operators.");
     }
@@ -28,7 +28,7 @@ public class AssociativeBinOpHolder implements Semigroup {
     if (!binaryOperator.isAssociative()) {
       throw new RuntimeException("Semigroups may only be crated from associative binary operators.");
     }
-    return new AssociativeBinOpHolder(operatorSymbol, binaryOperator);
+    return new ValidatedSemigroup(operatorSymbol, binaryOperator);
   }
   
   public List<String> getElementsAsList() {

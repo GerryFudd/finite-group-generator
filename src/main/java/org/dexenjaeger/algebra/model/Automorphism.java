@@ -1,4 +1,5 @@
 package org.dexenjaeger.algebra.model;
 
-public class Automorphism {
+public interface Automorphism extends Homomorphism {
+  Automorphism getInverse();
 }

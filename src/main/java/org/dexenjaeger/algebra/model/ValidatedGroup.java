@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class BinOpWithInversesHolder implements Group {
+public class ValidatedGroup implements Group {
   private final Map<String, String> inversesMap;
   private final Monoid withIdentity;
   
-  private BinOpWithInversesHolder(
+  private ValidatedGroup(
     Map<String, String> inversesMap,
     Monoid withIdentity
     ) {
@@ -17,16 +17,16 @@ public class BinOpWithInversesHolder implements Group {
     this.withIdentity = withIdentity;
   }
   
-  public static BinOpWithInversesHolder createGroup(
+  public static ValidatedGroup createGroup(
     Map<String, String> inversesMap,
-    BinaryOperator binaryOperator,
-    Function<BinaryOperator, Monoid> withIdentityConstructor
+    ValidatedBinaryOperator binaryOperator,
+    Function<ValidatedBinaryOperator, Monoid> withIdentityConstructor
   ) {
     if (!binaryOperator.isInverseMap(inversesMap)) {
       throw new RuntimeException("Monoids may only be created with valid inverses for all elements.");
     }
     
-    return new BinOpWithInversesHolder(
+    return new ValidatedGroup(
       inversesMap,
       withIdentityConstructor.apply(binaryOperator)
     );

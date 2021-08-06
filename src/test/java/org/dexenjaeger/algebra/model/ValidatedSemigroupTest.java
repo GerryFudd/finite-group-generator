@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AssociativeBinOpHolderTest {
+class ValidatedSemigroupTest {
   private Map<String, Integer> createReverseLookup(String[] elements) {
     Map<String, Integer> result = new HashMap<>();
     for (int i = 0; i < elements.length; i++) {
@@ -21,9 +21,9 @@ class AssociativeBinOpHolderTest {
   
   @Test
   void staticInitializerTest() {
-    AssociativeBinOpHolder.createSemigroup(
+    ValidatedSemigroup.createSemigroup(
       "*",
-      new BinaryOperator(
+      new ValidatedBinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
@@ -34,9 +34,9 @@ class AssociativeBinOpHolderTest {
   @Test
   void getProductTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a");
-    AssociativeBinOpHolder testSemigroup = AssociativeBinOpHolder.createSemigroup(
+    ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
       "*",
-      new BinaryOperator(
+      new ValidatedBinaryOperator(
         elements,
         createReverseLookup(elements),
         (i, j) -> (i + j) % 2
@@ -70,9 +70,9 @@ class AssociativeBinOpHolderTest {
   @Test
   void getMultiplicationTableTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
-    AssociativeBinOpHolder testSemigroup = AssociativeBinOpHolder.createSemigroup(
+    ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
       "+",
-      new BinaryOperator(
+      new ValidatedBinaryOperator(
         elements,
         createReverseLookup(elements),
         (i, j) -> (i+j) % 3
@@ -94,9 +94,9 @@ class AssociativeBinOpHolderTest {
   @Test
   void getCyclicGroupTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
-    AssociativeBinOpHolder testSemigroup = AssociativeBinOpHolder.createSemigroup(
+    ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
       "+",
-      new BinaryOperator(
+      new ValidatedBinaryOperator(
         elements,
         createReverseLookup(elements),
         (i, j) -> (i+j) % 3
@@ -121,7 +121,7 @@ class AssociativeBinOpHolderTest {
       put("x", 0);
       put("y", 1);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> AssociativeBinOpHolder.createSemigroup("x", new BinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatedBinaryOperator(
       elements, reverseLookup, (a, b) -> 2
     )));
     
@@ -143,7 +143,7 @@ class AssociativeBinOpHolderTest {
       put("y", 1);
       put("z", 2);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> AssociativeBinOpHolder.createSemigroup("x", new BinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatedBinaryOperator(
       elements, reverseLookup, (a, b) -> product[a][b]
     )));
     
