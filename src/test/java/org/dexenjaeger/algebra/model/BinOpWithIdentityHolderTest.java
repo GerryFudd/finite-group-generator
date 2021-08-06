@@ -5,23 +5,21 @@ import org.dexenjaeger.algebra.utils.MoreArrayUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-class MonoidTest {
+class BinOpWithIdentityHolderTest {
   @Test
   void staticInitializerTest() {
-    Monoid.createMonoid(
+    BinOpWithIdentityHolder.createMonoid(
       "I",
       new BinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
       ),
-      binOp -> mock(AlgebraicStructure.class)
+      binOp -> mock(Semigroup.class)
     );
   }
   
@@ -34,13 +32,13 @@ class MonoidTest {
       {0, 1, 2, 3}
     };
   
-    RuntimeException e = assertThrows(RuntimeException.class, () -> Monoid.createMonoid(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> BinOpWithIdentityHolder.createMonoid(
       "L1",
       BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
         4,
         (i, j) -> product[i][j]
       ),
-      binOp -> mock(AlgebraicStructure.class)
+      binOp -> mock(Semigroup.class)
     ));
     
     assertEquals(

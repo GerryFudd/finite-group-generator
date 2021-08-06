@@ -5,23 +5,22 @@ import org.dexenjaeger.algebra.utils.MoreArrayUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-class GroupTest {
+class BinOpWithInversesHolderTest {
   @Test
   void staticInitializerTest() {
-    Group.createGroup(
+    BinOpWithInversesHolder.createGroup(
       Collections.singletonMap("I", "I"),
       new BinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
       ),
-      binOp -> mock(AlgebraicStructureWithIdentity.class)
+      binOp -> mock(Monoid.class)
     );
   }
   
@@ -34,13 +33,13 @@ class GroupTest {
       {3, 1, 2, 0}
     };
     
-    RuntimeException e = assertThrows(RuntimeException.class, () -> Group.createGroup(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> BinOpWithInversesHolder.createGroup(
       Map.of("I", "I", "a", "b", "b", "a", "c", "c"),
       BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
         4,
         (i, j) -> product[i][j]
       ),
-      binOp -> mock(AlgebraicStructureWithIdentity.class)
+      binOp -> mock(Monoid.class)
     ));
     
     assertEquals(
@@ -50,16 +49,16 @@ class GroupTest {
   
   @Test
   void validInverses() {
-    Group result = Group.createGroup(
+    BinOpWithInversesHolder result = BinOpWithInversesHolder.createGroup(
       Map.of("I", "I", "a", "a3", "a2", "a2", "a3", "a"),
       BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
         4,
         (i, j) -> (i + j) % 4
       ),
-      binOp -> Monoid.createMonoid(
+      binOp -> BinOpWithIdentityHolder.createMonoid(
         "I",
         binOp,
-        bop -> Semigroup.createSemigroup("*", bop)
+        bop -> AssociativeBinOpHolder.createSemigroup("*", bop)
       )
     );
     

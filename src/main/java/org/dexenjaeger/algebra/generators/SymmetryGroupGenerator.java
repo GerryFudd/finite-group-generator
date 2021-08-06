@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.generators;
 
-import org.dexenjaeger.algebra.model.Semigroup;
+import org.dexenjaeger.algebra.model.AssociativeBinOpHolder;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreMath;
 
@@ -56,7 +56,7 @@ public class SymmetryGroupGenerator {
     return getPermutationAsString(prod);
   }
   
-  public static Semigroup createSymmetryGroup(int n) {
+  public static AssociativeBinOpHolder createSymmetryGroup(int n) {
     int[][] permutations = getPermutationSet(n);
     Map<String, Integer> reverseLookup = new HashMap<>();
     for (int i = 0; i < permutations.length; i++) {
@@ -76,7 +76,7 @@ public class SymmetryGroupGenerator {
       }
     }
     
-    return Semigroup.createSemigroup(
+    return AssociativeBinOpHolder.createSemigroup(
       "o",
       BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
         permutations.length,

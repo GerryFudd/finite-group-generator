@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SemigroupTest {
+class AssociativeBinOpHolderTest {
   private Map<String, Integer> createReverseLookup(String[] elements) {
     Map<String, Integer> result = new HashMap<>();
     for (int i = 0; i < elements.length; i++) {
@@ -21,7 +21,7 @@ class SemigroupTest {
   
   @Test
   void staticInitializerTest() {
-    Semigroup.createSemigroup(
+    AssociativeBinOpHolder.createSemigroup(
       "*",
       new BinaryOperator(
         MoreArrayUtils.createArray("I"),
@@ -34,7 +34,7 @@ class SemigroupTest {
   @Test
   void getProductTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a");
-    Semigroup testSemigroup = Semigroup.createSemigroup(
+    AssociativeBinOpHolder testSemigroup = AssociativeBinOpHolder.createSemigroup(
       "*",
       new BinaryOperator(
         elements,
@@ -70,7 +70,7 @@ class SemigroupTest {
   @Test
   void getMultiplicationTableTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
-    Semigroup testSemigroup = Semigroup.createSemigroup(
+    AssociativeBinOpHolder testSemigroup = AssociativeBinOpHolder.createSemigroup(
       "+",
       new BinaryOperator(
         elements,
@@ -94,7 +94,7 @@ class SemigroupTest {
   @Test
   void getCyclicGroupTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
-    Semigroup testSemigroup = Semigroup.createSemigroup(
+    AssociativeBinOpHolder testSemigroup = AssociativeBinOpHolder.createSemigroup(
       "+",
       new BinaryOperator(
         elements,
@@ -121,7 +121,7 @@ class SemigroupTest {
       put("x", 0);
       put("y", 1);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> Semigroup.createSemigroup("x", new BinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> AssociativeBinOpHolder.createSemigroup("x", new BinaryOperator(
       elements, reverseLookup, (a, b) -> 2
     )));
     
@@ -143,7 +143,7 @@ class SemigroupTest {
       put("y", 1);
       put("z", 2);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> Semigroup.createSemigroup("x", new BinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> AssociativeBinOpHolder.createSemigroup("x", new BinaryOperator(
       elements, reverseLookup, (a, b) -> product[a][b]
     )));
     
