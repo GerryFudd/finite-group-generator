@@ -16,8 +16,9 @@ public class MoreMath {
       if (n == 0) {
         cache.put(0, 1);
       } else {
-        int result = n * factorial(n - 1);
-        if (result <= 0) {
+        int previous = factorial(n - 1);
+        int result = n * previous;
+        if (result < previous) {
           throw new RuntimeException(String.format(
             "Computing %d! overflowed max long %d",
             n, Integer.MAX_VALUE

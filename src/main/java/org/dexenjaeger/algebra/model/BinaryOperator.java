@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
@@ -13,9 +14,16 @@ public class BinaryOperator {
   private final Map<String, Integer> reverseLookup;
   private final BiFunction<Integer, Integer, Integer> binaryOperator;
   
+  private Integer lookup(String element) {
+    return Optional.ofNullable(reverseLookup.get(element))
+      .orElseThrow(() -> new RuntimeException(String.format(
+        "Element \"%s\" doesn't exist in %s",
+        element, String.join(", ", elements)
+      )));
+  }
+  
   public String prod(String a, String b) {
-    return elements[binaryOperator
-               .apply(reverseLookup.get(a),reverseLookup.get(b))];
+    return elements[binaryOperator.apply(lookup(a),lookup(b))];
   }
   
   public boolean isValid() {

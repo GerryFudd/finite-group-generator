@@ -99,10 +99,11 @@ class FiniteSemigroupTest {
       )
     );
     StringBuilder sb = new StringBuilder();
-    sb.append("\n_+_|_I_a_b_\n");
-    sb.append(" I | I a b \n");
-    sb.append(" a | a b I \n");
-    sb.append(" b | b I a \n");
+    sb.append("\n")
+      .append("_+____|_I____a____b____\n")
+      .append(" I    | I    a    b    \n")
+      .append(" a    | a    b    I    \n")
+      .append(" b    | b    I    a    \n");
     
     assertEquals(
       sb.toString(),
@@ -130,6 +131,44 @@ class FiniteSemigroupTest {
     assertEquals(
       List.of("b", "a", "I"),
       testSemigroup.getCyclicGroup("b")
+    );
+  }
+  
+  @Test
+  void invalidBinaryOperator() {
+    String[] elements = {"x", "y"};
+    Map<String, Integer> reverseLookup = new HashMap<>() {{
+      put("x", 0);
+      put("y", 1);
+    }};
+    RuntimeException e = assertThrows(RuntimeException.class, () -> FiniteSemigroup.createSemigroup("x", new BinaryOperator(
+      elements, reverseLookup, (a, b) -> 2
+    )));
+    
+    assertEquals(
+      "Semigroups may only be created from valid binary operators.", e.getMessage()
+    );
+  }
+  
+  @Test
+  void nonAssociativeBinaryOperator() {
+    String[] elements = {"x", "y", "z"};
+    int[][] product = {
+      {0, 1, 2},
+      {0, 0, 2},
+      {1, 0, 1}
+    };
+    Map<String, Integer> reverseLookup = new HashMap<>() {{
+      put("x", 0);
+      put("y", 1);
+      put("z", 2);
+    }};
+    RuntimeException e = assertThrows(RuntimeException.class, () -> FiniteSemigroup.createSemigroup("x", new BinaryOperator(
+      elements, reverseLookup, (a, b) -> product[a][b]
+    )));
+    
+    assertEquals(
+      "Semigroups may only be crated from associative binary operators.", e.getMessage()
     );
   }
 }
