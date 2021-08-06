@@ -1,22 +1,16 @@
 package org.dexenjaeger.algebra.model;
 
+import org.dexenjaeger.algebra.utils.MoreArrayUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FiniteSemigroupTest {
-  private String[] createArray(String...elements) {
-    return elements;
-  }
-  
+class SemigroupTest {
   private Map<String, Integer> createReverseLookup(String[] elements) {
     Map<String, Integer> result = new HashMap<>();
     for (int i = 0; i < elements.length; i++) {
@@ -27,10 +21,10 @@ class FiniteSemigroupTest {
   
   @Test
   void staticInitializerTest() {
-    FiniteSemigroup.createSemigroup(
+    Semigroup.createSemigroup(
       "*",
       new BinaryOperator(
-        createArray("I"),
+        MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
       )
@@ -38,23 +32,9 @@ class FiniteSemigroupTest {
   }
   
   @Test
-  void getElementsDisplayTest() {
-    String[] elements = createArray("I", "a");
-    FiniteSemigroup testSemigroup = FiniteSemigroup.createSemigroup(
-      "*",
-      new BinaryOperator(
-      elements,
-      createReverseLookup(elements),
-      (i, j) -> (i + j) % 2
-      )
-    );
-    assertEquals("I, a", testSemigroup.getElementsDisplay());
-  }
-  
-  @Test
   void getProductTest() {
-    String[] elements = createArray("I", "a");
-    FiniteSemigroup testSemigroup = FiniteSemigroup.createSemigroup(
+    String[] elements = MoreArrayUtils.createArray("I", "a");
+    Semigroup testSemigroup = Semigroup.createSemigroup(
       "*",
       new BinaryOperator(
         elements,
@@ -89,8 +69,8 @@ class FiniteSemigroupTest {
   
   @Test
   void getMultiplicationTableTest() {
-    String[] elements = createArray("I", "a", "b");
-    FiniteSemigroup testSemigroup = FiniteSemigroup.createSemigroup(
+    String[] elements = MoreArrayUtils.createArray("I", "a", "b");
+    Semigroup testSemigroup = Semigroup.createSemigroup(
       "+",
       new BinaryOperator(
         elements,
@@ -113,8 +93,8 @@ class FiniteSemigroupTest {
   
   @Test
   void getCyclicGroupTest() {
-    String[] elements = createArray("I", "a", "b");
-    FiniteSemigroup testSemigroup = FiniteSemigroup.createSemigroup(
+    String[] elements = MoreArrayUtils.createArray("I", "a", "b");
+    Semigroup testSemigroup = Semigroup.createSemigroup(
       "+",
       new BinaryOperator(
         elements,
@@ -141,7 +121,7 @@ class FiniteSemigroupTest {
       put("x", 0);
       put("y", 1);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> FiniteSemigroup.createSemigroup("x", new BinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> Semigroup.createSemigroup("x", new BinaryOperator(
       elements, reverseLookup, (a, b) -> 2
     )));
     
@@ -163,7 +143,7 @@ class FiniteSemigroupTest {
       put("y", 1);
       put("z", 2);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> FiniteSemigroup.createSemigroup("x", new BinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> Semigroup.createSemigroup("x", new BinaryOperator(
       elements, reverseLookup, (a, b) -> product[a][b]
     )));
     

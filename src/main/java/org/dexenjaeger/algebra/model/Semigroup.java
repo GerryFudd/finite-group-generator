@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FiniteSemigroup {
+public class Semigroup implements AlgebraicStructure {
   @Getter
   private final String operatorSymbol;
   private final BinaryOperator binaryOperator;
   
-  private FiniteSemigroup(
+  private Semigroup(
     String operatorSymbol,
     BinaryOperator binaryOperator
   ) {
@@ -20,7 +20,7 @@ public class FiniteSemigroup {
     this.binaryOperator = binaryOperator;
   }
   
-  public static FiniteSemigroup createSemigroup(String operatorSymbol, BinaryOperator binaryOperator) {
+  public static Semigroup createSemigroup(String operatorSymbol, BinaryOperator binaryOperator) {
     if (!binaryOperator.isValid()) {
       throw new RuntimeException("Semigroups may only be created from valid binary operators.");
     }
@@ -28,11 +28,7 @@ public class FiniteSemigroup {
     if (!binaryOperator.isAssociative()) {
       throw new RuntimeException("Semigroups may only be crated from associative binary operators.");
     }
-    return new FiniteSemigroup(operatorSymbol, binaryOperator);
-  }
-  
-  public String getElementsDisplay() {
-    return String.join(", ", binaryOperator.getElements());
+    return new Semigroup(operatorSymbol, binaryOperator);
   }
   
   public List<String> getElementsAsList() {

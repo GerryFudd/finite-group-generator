@@ -60,4 +60,42 @@ public class BinaryOperator {
     }
     return true;
   }
+  
+  public boolean isIdentity(String id) {
+    for (String element:elements) {
+      if (!prod(id, element).equals(element) || !prod(element, id).equals(element)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  public boolean isInverseMap(Map<String, String> inversesMap) {
+    String identity = null;
+    for (String element:elements) {
+      if (!inversesMap.containsKey(element)) {
+        return false;
+      }
+      String inverse;
+      try {
+        inverse = elements[lookup(inversesMap.get(element))];
+      } catch (RuntimeException e) {
+        return false;
+      }
+      if (identity == null) {
+        identity = prod(element, inverse);
+        if (!isIdentity(identity)) {
+          return false;
+        }
+      }
+      
+      if (
+        !identity.equals(prod(element, inverse))
+          || !identity.equals(prod(inverse, element))
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
