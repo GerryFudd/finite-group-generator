@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.generators;
 
-import org.dexenjaeger.algebra.model.ValidatedSemigroup;
+import org.dexenjaeger.algebra.categories.objects.ValidatedSemigroup;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

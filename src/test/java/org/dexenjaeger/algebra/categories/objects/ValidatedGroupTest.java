@@ -1,5 +1,7 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.categories.objects;
 
+import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreArrayUtils;
 import org.junit.jupiter.api.Test;

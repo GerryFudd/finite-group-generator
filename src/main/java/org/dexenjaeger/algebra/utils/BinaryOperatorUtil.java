@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.Group;
-import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.categories.objects.Group;
+import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 
 import java.util.LinkedList;
 import java.util.List;

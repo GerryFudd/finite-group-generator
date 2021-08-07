@@ -1,12 +1,10 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.categories.objects;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 
 @RequiredArgsConstructor
 public class UnsafeSemigroup implements Semigroup {

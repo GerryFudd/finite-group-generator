@@ -1,10 +1,10 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.Group;
+import org.dexenjaeger.algebra.categories.objects.Group;
 import org.dexenjaeger.algebra.model.OrderedPair;
-import org.dexenjaeger.algebra.model.UnsafeGroup;
-import org.dexenjaeger.algebra.model.UnsafeMonoid;
-import org.dexenjaeger.algebra.model.UnsafeSemigroup;
+import org.dexenjaeger.algebra.categories.objects.UnsafeGroup;
+import org.dexenjaeger.algebra.categories.objects.UnsafeMonoid;
+import org.dexenjaeger.algebra.categories.objects.UnsafeSemigroup;
 
 import java.util.HashMap;
 import java.util.LinkedList;

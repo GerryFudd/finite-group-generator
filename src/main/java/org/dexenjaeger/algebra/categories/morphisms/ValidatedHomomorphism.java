@@ -1,6 +1,10 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.categories.morphisms;
 
 import lombok.Getter;
+import org.dexenjaeger.algebra.categories.objects.Group;
+import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
+import org.dexenjaeger.algebra.model.OrderedPair;
+import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.HomomorphismUtil;
 

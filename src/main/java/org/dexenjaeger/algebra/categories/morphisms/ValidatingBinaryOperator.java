@@ -1,4 +1,4 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.categories.morphisms;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 
 @RequiredArgsConstructor
 public class ValidatingBinaryOperator {

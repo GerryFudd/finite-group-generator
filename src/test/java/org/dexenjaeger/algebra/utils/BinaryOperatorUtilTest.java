@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,4 +1,4 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.categories.objects;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

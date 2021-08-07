@@ -1,11 +1,10 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.categories.objects;
 
 import lombok.Getter;
+import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
+import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ValidatedSemigroup implements Semigroup {
   @Getter

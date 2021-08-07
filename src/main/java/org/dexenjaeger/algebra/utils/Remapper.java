@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
-import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 
 import java.util.HashMap;
 import java.util.HashSet;
