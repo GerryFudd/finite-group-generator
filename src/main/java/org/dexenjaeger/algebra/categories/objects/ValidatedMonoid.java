@@ -23,7 +23,9 @@ public class ValidatedMonoid implements Monoid {
   ) {
     return createMonoid(
       spec,
-      binOp -> ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec(binOp))
+      binOp -> ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec(
+        spec.getOperatorSymbol(), binOp
+      ))
     );
   }
   

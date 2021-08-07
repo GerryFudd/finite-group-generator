@@ -7,6 +7,8 @@ import org.dexenjaeger.algebra.categories.objects.UnsafeGroup;
 import java.util.Map;
 
 public interface Automorphism extends Homomorphism {
+  String unApply(String b);
+  
   Automorphism getInverse();
   
   @Override

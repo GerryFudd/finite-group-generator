@@ -39,7 +39,7 @@ class ValidatedMonoidTest {
         BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
           4,
           (i, j) -> product[i][j]
-        )
+        ).getBinaryOperator()
       ),
       binOp -> mock(ValidatedSemigroup.class)
     ));

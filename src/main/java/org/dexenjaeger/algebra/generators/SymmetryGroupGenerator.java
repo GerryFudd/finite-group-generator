@@ -1,6 +1,11 @@
 package org.dexenjaeger.algebra.generators;
 
+import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.categories.objects.SafeGroup;
+import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
 import org.dexenjaeger.algebra.categories.objects.ValidatedSemigroup;
+import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
 import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreMath;
@@ -57,7 +62,7 @@ public class SymmetryGroupGenerator {
     return getPermutationAsString(prod);
   }
   
-  public static ValidatedSemigroup createSymmetryGroup(int n) {
+  public static SafeGroup createSymmetryGroup(int n) {
     int[][] permutations = getPermutationSet(n);
     Map<String, Integer> reverseLookup = new HashMap<>();
     for (int i = 0; i < permutations.length; i++) {
@@ -76,13 +81,18 @@ public class SymmetryGroupGenerator {
         ));
       }
     }
+  
+    BinaryOperatorSummary summary = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+        permutations.length,
+        (a,b) -> binOp[a][b]
+      );
     
-    return ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec(
+    return ValidatedGroup.createGroup(
+      new ValidatedGroupSpec(
         "o",
-        BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-          permutations.length,
-          (a,b) -> binOp[a][b]
-        )
+        "I",
+        summary.getInverseMap(),
+        summary.getBinaryOperator()
       )
     );
   }

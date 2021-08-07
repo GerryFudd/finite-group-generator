@@ -64,7 +64,7 @@ class ValidatedHomomorphismTest {
     );
     
     assertEquals(
-      "A Homomorphism must be constructed from a valid homomorphism function.", e.getMessage()
+      "Function is not a homomorphism.", e.getMessage()
     );
   }
   
@@ -114,7 +114,7 @@ class ValidatedHomomorphismTest {
     );
     
     assertEquals(
-      "A Homomorphism's kernel must be the inverse image of the range's identity.", e.getMessage()
+      "Subset is not the inverse image of the identity.", e.getMessage()
     );
   }
   
@@ -161,7 +161,7 @@ class ValidatedHomomorphismTest {
     );
     
     assertEquals(
-      "A Homomorphism's kernel must be a subgroup of the domain.", e.getMessage()
+      "Subset is not a subgroup.", e.getMessage()
     );
   }
 }

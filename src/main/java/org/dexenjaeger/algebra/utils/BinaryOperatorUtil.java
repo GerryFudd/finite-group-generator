@@ -2,19 +2,24 @@ package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.categories.objects.Group;
 import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class BinaryOperatorUtil {
   
-  public static ValidatingBinaryOperator getSortedAndPrettifiedBinaryOperator(
+  public static BinaryOperatorSummary getSortedAndPrettifiedBinaryOperator(
     int size,
     BiFunction<Integer, Integer, Integer> binOp
   ) {
+    BinaryOperatorSummary.BinaryOperatorSummaryBuilder resultBuilder = BinaryOperatorSummary.builder();
     Remapper remapper = Remapper.init(size);
     
     RawBinaryOperatorSummary summary = new RawBinaryOperatorSummary();
@@ -42,10 +47,11 @@ public class BinaryOperatorUtil {
       summary.addCycle(cycle);
     }
     Optional<Integer> identity = summary.getIdentity();
+    Map<String, String> inverseMap = new HashMap<>();
     if (identity.isPresent()) {
-      remapper.map("I", identity.get()).orElseThrow(() ->
-        new RuntimeException("The identity disappeared before it was set.")
-      );
+      inverseMap.put("I", "I");
+      resultBuilder.identity("I").inverseMap(inverseMap);
+      remapper.map("I", identity.get()).orElseThrow();
     } else {
       int l = 1;
       int r = 1;
@@ -62,19 +68,28 @@ public class BinaryOperatorUtil {
     }
     for (int cycleSize: summary.getCycleSizes()) {
       summary.getNCycles(cycleSize).forEach(cycle -> {
-        Optional<String> baseValue = remapper.map(cycle.get(0));
-        if (baseValue.isEmpty()) {
-          return;
-        }
+        LinkedList<String> cycleVals = new LinkedList<>();
+        String baseValue = remapper.map(cycle.get(0)).orElseThrow();
+        cycleVals.add(baseValue);
         int i = 1;
-        while (i < cycle.size()) {
-          remapper.map(baseValue.get() + (i + 1), cycle.get(i));
+        while (i < cycle.size() - 1) {
+          cycleVals.add(remapper.map(baseValue + (i + 1), cycle.get(i)).orElseThrow());
           i++;
+        }
+        while (!cycleVals.isEmpty()) {
+          String val = cycleVals.removeFirst();
+          String inv = cycleVals.isEmpty() ? val : cycleVals.removeLast();
+          inverseMap.put(val, inv);
+          inverseMap.put(inv, val);
         }
       });
     }
-    remapper.getAvailable().forEach(remapper::map);
-    return remapper.createBinaryOperator(binOp);
+    if (!remapper.getAvailable().isEmpty()) {
+      throw new RuntimeException("All permutations should exist in some cycle.");
+    }
+    return resultBuilder
+             .binaryOperator(remapper.createBinaryOperator(binOp))
+             .build();
   }
   
   private static String padOperator(String operatorSymbol) {
@@ -88,7 +103,7 @@ public class BinaryOperatorUtil {
   private static void appendLine(
     StringBuilder sb, String a,
     List<String> products
-    ) {
+  ) {
     sb.append(" ")
       .append(padOperator(a))
       .append(" |");
@@ -133,18 +148,18 @@ public class BinaryOperatorUtil {
     return cycle;
   }
   
-  public static boolean isSubgroup(Group domain, Group kernel) {
+  public static void validateSubgroup(Group domain, Group kernel) {
+    RuntimeException e = new RuntimeException("Subset is not a subgroup.");
     for (String a:kernel.getElementsAsList()) {
       for (String b:kernel.getElementsAsList()) {
         String c = domain.getProduct(a, b);
         if (!kernel.getElementsAsList().contains(c)) {
-          return false;
+          throw e;
         }
         if (!c.equals(kernel.getProduct(a, b))) {
-          return false;
+          throw e;
         }
       }
     }
-    return true;
   }
 }

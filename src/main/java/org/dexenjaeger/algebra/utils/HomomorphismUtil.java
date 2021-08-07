@@ -6,10 +6,14 @@ import org.dexenjaeger.algebra.categories.objects.UnsafeGroup;
 import org.dexenjaeger.algebra.categories.objects.UnsafeMonoid;
 import org.dexenjaeger.algebra.categories.objects.UnsafeSemigroup;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,11 +34,13 @@ public class HomomorphismUtil {
         String inverseX = domain.getInverse(x);
         String inverseY = act.apply(inverseX);
         rangeInversesMap.put(y, inverseY);
-        rangeInversesMap.put(inverseY, y);
         domainLookupMap.put(y, x);
-        domainLookupMap.put(inverseY, inverseX);
         rangeElements.add(y);
-        rangeElements.add(inverseY);
+        if (!y.equals(inverseY)) {
+          rangeInversesMap.put(inverseY, y);
+          domainLookupMap.put(inverseY, inverseX);
+          rangeElements.add(inverseY);
+        }
       }
       if (y.equals(rangeIdentity)) {
         kernelElements.add(x);
@@ -73,7 +79,7 @@ public class HomomorphismUtil {
     );
   }
   
-  public static boolean isHomomorphism(
+  public static void validateHomomorphism(
     Group domain,
     Group range,
     Function<String, String> act
@@ -82,19 +88,43 @@ public class HomomorphismUtil {
       for (String b:domain.getElementsAsList()) {
         if (!range.getProduct(act.apply(a), act.apply(b))
                .equals(act.apply(domain.getProduct(a, b)))) {
-          return false;
+          throw new RuntimeException("Function is not a homomorphism.");
         }
       }
     }
-    return true;
   }
   
-  public static boolean isInverseImageOfId(Group domain, Group kernel, String identity, Function<String, String> act) {
-    for (String a:domain.getElementsAsList()) {
-      if (kernel.getElementsAsList().contains(a) != act.apply(a).equals(identity)) {
-        return false;
+  public static <T,U> void validateBijection(
+    Collection<T> domain, Collection<U> range, Function<T, U> func
+  ) {
+    RuntimeException e = new RuntimeException("Function is not a bijection");
+    if (domain.size() != range.size()) {
+      throw e;
+    }
+    Set<U> image = new HashSet<>();
+    for (T x:domain) {
+      U y = func.apply(x);
+      if (!range.contains(y) || !image.add(y)) {
+        throw e;
       }
     }
-    return true;
+  }
+  
+  public static <T,U> void validateLeftInverse(
+    Collection<T> domain, Function<T, U> func, Function<U, T> inverse
+  ) {
+    for (T x:domain) {
+      if (!x.equals(inverse.apply(func.apply(x)))) {
+        throw new RuntimeException("Function is not a left inverse.");
+      }
+    }
+  }
+  
+  public static void validateInverseImageOfId(Group domain, Group kernel, String identity, Function<String, String> act) {
+    for (String a:domain.getElementsAsList()) {
+      if (kernel.getElementsAsList().contains(a) != act.apply(a).equals(identity)) {
+        throw new RuntimeException("Subset is not the inverse image of the identity.");
+      }
+    }
   }
 }

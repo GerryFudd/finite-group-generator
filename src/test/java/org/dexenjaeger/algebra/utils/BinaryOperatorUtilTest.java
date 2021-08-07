@@ -1,7 +1,10 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,16 +18,20 @@ class BinaryOperatorUtilTest {
       {0, 1, 2, 3}
     };
     
-    ValidatingBinaryOperator result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+    BinaryOperatorSummary result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> product[i][j]
     );
     
     assertEquals(
       "L1, L2, a, b",
-      String.join(", ", result.getElements())
+      String.join(", ", result.getBinaryOperator().getElements())
     );
+    
+    assertNull(result.getIdentity());
+    assertNull(result.getInverseMap());
   }
+  
   @Test
   void getSortedAndPrettifiedBinaryOperatorTest_withRightIdentity() {
     int[][] product = {
@@ -34,14 +41,43 @@ class BinaryOperatorUtilTest {
       {2, 3, 2, 3}
     };
     
-    ValidatingBinaryOperator result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+    BinaryOperatorSummary result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> product[i][j]
     );
     
     assertEquals(
       "R1, R2, a, b",
-      String.join(", ", result.getElements())
+      String.join(", ", result.getBinaryOperator().getElements())
+    );
+  
+    assertNull(result.getIdentity());
+    assertNull(result.getInverseMap());
+  }
+  
+  @Test
+  void getSortedAndPrettifiedBinaryOperatorTest_withIdentityAndInerses() {
+    int[][] product = {
+      {0, 1, 2, 3},
+      {1, 0, 3, 2},
+      {2, 3, 0, 1},
+      {3, 2, 1, 0}
+    };
+    
+    BinaryOperatorSummary result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+      4,
+      (i, j) -> product[i][j]
+    );
+    
+    assertEquals(
+      "I, a, b, c",
+      String.join(", ", result.getBinaryOperator().getElements())
+    );
+  
+    assertEquals("I", result.getIdentity());
+    assertEquals(
+      Map.of("I", "I", "a", "a", "b", "b", "c", "c"),
+      result.getInverseMap()
     );
   }
 }

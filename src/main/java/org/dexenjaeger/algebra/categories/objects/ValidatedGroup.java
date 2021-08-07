@@ -24,7 +24,7 @@ public class ValidatedGroup implements SafeGroup {
   public static ValidatedGroup createGroup(ValidatedGroupSpec spec) {
     return createGroup(
       spec,
-      (identity, binOp) -> ValidatedMonoid.createMonoid(new ValidatedMonoidSpec(identity, binOp))
+      (identity, binOp) -> ValidatedMonoid.createMonoid(new ValidatedMonoidSpec(spec.getOperatorSymbol(), identity, binOp))
     );
   }
   

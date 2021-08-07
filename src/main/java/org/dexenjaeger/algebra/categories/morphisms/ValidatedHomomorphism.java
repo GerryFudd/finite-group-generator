@@ -41,17 +41,11 @@ public class ValidatedHomomorphism implements Homomorphism {
   private static ValidatedHomomorphism doCreateHomomorphism(
     Group domain, Group range, Group kernel, Function<String, String> act
   ) {
-    if (!HomomorphismUtil.isHomomorphism(domain, range, act)) {
-      throw new RuntimeException("A Homomorphism must be constructed from a valid homomorphism function.");
-    }
+    HomomorphismUtil.validateHomomorphism(domain, range, act);
     
-    if (!HomomorphismUtil.isInverseImageOfId(domain, kernel, range.getIdentity(), act)) {
-      throw new RuntimeException("A Homomorphism's kernel must be the inverse image of the range's identity.");
-    }
+    HomomorphismUtil.validateInverseImageOfId(domain, kernel, range.getIdentity(), act);
     
-    if (!BinaryOperatorUtil.isSubgroup(domain, kernel)) {
-      throw new RuntimeException("A Homomorphism's kernel must be a subgroup of the domain.");
-    }
+    BinaryOperatorUtil.validateSubgroup(domain, kernel);
     
     return new ValidatedHomomorphism(
       domain, range, kernel, act
@@ -63,8 +57,16 @@ public class ValidatedHomomorphism implements Homomorphism {
     Function<ValidatedGroupSpec, ValidatedGroup> validatedGroupConstructor,
     Function<String, String> act
   ) {
-    Group domain = validatedGroupConstructor.apply(domainSpec);
-    
+    return createHomomorphism(
+      validatedGroupConstructor.apply(domainSpec),
+      act
+    );
+  }
+  
+  public static ValidatedHomomorphism createHomomorphism(
+    SafeGroup domain,
+    Function<String, String> act
+  ) {
     OrderedPair<Group, Group> rangeAndKernel = HomomorphismUtil.constructRangeAndKernel(
       domain, act
     );

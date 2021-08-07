@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.categories.objects;
 
 import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreArrayUtils;
@@ -36,14 +37,16 @@ class ValidatedGroupTest {
       {2, 2, 2, 2},
       {3, 1, 2, 0}
     };
+  
+    BinaryOperatorSummary summary = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+      4,
+      (i, j) -> product[i][j]
+    );
     
     RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedGroup.createGroup(
       new ValidatedGroupSpec(
         Map.of("I", "I", "a", "b", "b", "a", "c", "c"),
-        BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-          4,
-          (i, j) -> product[i][j]
-        )
+        summary.getBinaryOperator()
       ),
       (id, binOp) -> mock(ValidatedMonoid.class)
     ));
@@ -55,13 +58,15 @@ class ValidatedGroupTest {
   
   @Test
   void validInverses() {
+    BinaryOperatorSummary summary = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+      4,
+      (i, j) -> (i + j) % 4
+    );
+    
     ValidatedGroup result = ValidatedGroup.createGroup(
       new ValidatedGroupSpec(
-        Map.of("I", "I", "a", "a3", "a2", "a2", "a3", "a"),
-        BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-          4,
-          (i, j) -> (i + j) % 4
-        )
+        summary.getInverseMap(),
+        summary.getBinaryOperator()
       )
     );
     

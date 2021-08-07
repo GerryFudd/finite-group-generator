@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.generators;
 
+import org.dexenjaeger.algebra.categories.objects.Group;
 import org.dexenjaeger.algebra.categories.objects.ValidatedSemigroup;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SymmetryGroupGeneratorTest {
   @Test
   void createS2() {
-    ValidatedSemigroup s2 = SymmetryGroupGenerator.createSymmetryGroup(2);
+    Group s2 = SymmetryGroupGenerator.createSymmetryGroup(2);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
       .append("_o____|_I____a____\n")
@@ -29,7 +30,7 @@ class SymmetryGroupGeneratorTest {
   
   @Test
   void createS3() {
-    ValidatedSemigroup s3 = SymmetryGroupGenerator.createSymmetryGroup(3);
+    Group s3 = SymmetryGroupGenerator.createSymmetryGroup(3);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
       .append("_o____|_I____a____b____c____d____d2___\n")
@@ -48,7 +49,7 @@ class SymmetryGroupGeneratorTest {
   
   @Test
   void createS4() {
-    ValidatedSemigroup s4 = SymmetryGroupGenerator.createSymmetryGroup(4);
+    Group s4 = SymmetryGroupGenerator.createSymmetryGroup(4);
     
     List<String> elements = s4.getElementsAsList();
     Map<Integer, Set<String>> groupOrderCount = new HashMap<>();
