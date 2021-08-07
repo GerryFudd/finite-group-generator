@@ -49,7 +49,7 @@ class ValidatedGroupTest {
     ));
     
     assertEquals(
-      "Monoids may only be created with valid inverses for all elements.", e.getMessage()
+      "Groups may only be created with valid inverses for all elements.", e.getMessage()
     );
   }
   

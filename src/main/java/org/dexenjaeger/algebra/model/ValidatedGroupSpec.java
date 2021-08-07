@@ -9,6 +9,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public class ValidatedGroupSpec {
+  private final String operatorSymbol;
   private final String identity;
   private final Map<String, String> inversesMap;
   private final ValidatingBinaryOperator binaryOperator;
@@ -18,5 +19,13 @@ public class ValidatedGroupSpec {
     ValidatingBinaryOperator binaryOperator
   ) {
     this("I", inversesMap, binaryOperator);
+  }
+  
+  public ValidatedGroupSpec(
+    String identity,
+    Map<String, String> inversesMap,
+    ValidatingBinaryOperator binaryOperator
+  ) {
+    this("*", identity, inversesMap, binaryOperator);
   }
 }

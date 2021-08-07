@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.categories.objects.Group;
+import org.dexenjaeger.algebra.categories.objects.SafeGroup;
 import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
 import org.dexenjaeger.algebra.model.OrderedPair;
 import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
@@ -32,9 +33,14 @@ public class ValidatedHomomorphism implements Homomorphism {
   }
   
   public static ValidatedHomomorphism createHomomorphism(
+    SafeGroup domain, SafeGroup range, SafeGroup kernel, Function<String, String> act
+  ) {
+    return doCreateHomomorphism(domain, range, kernel, act);
+  }
+  
+  private static ValidatedHomomorphism doCreateHomomorphism(
     Group domain, Group range, Group kernel, Function<String, String> act
   ) {
-    
     if (!HomomorphismUtil.isHomomorphism(domain, range, act)) {
       throw new RuntimeException("A Homomorphism must be constructed from a valid homomorphism function.");
     }
@@ -63,7 +69,7 @@ public class ValidatedHomomorphism implements Homomorphism {
       domain, act
     );
     
-    return createHomomorphism(
+    return doCreateHomomorphism(
       domain, rangeAndKernel.getLeft(), rangeAndKernel.getRight(), act
     );
   }

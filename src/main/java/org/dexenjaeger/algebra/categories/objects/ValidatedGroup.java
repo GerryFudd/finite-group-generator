@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-public class ValidatedGroup implements Group {
+public class ValidatedGroup implements SafeGroup {
   private final Map<String, String> inversesMap;
   private final Monoid monoid;
   
@@ -33,7 +33,7 @@ public class ValidatedGroup implements Group {
     BiFunction<String, ValidatingBinaryOperator, ValidatedMonoid> validatedMonoidConstructor
   ) {
     if (!spec.getBinaryOperator().isInverseMap(spec.getIdentity(), spec.getInversesMap())) {
-      throw new RuntimeException("Monoids may only be created with valid inverses for all elements.");
+      throw new RuntimeException("Groups may only be created with valid inverses for all elements.");
     }
     
     return new ValidatedGroup(

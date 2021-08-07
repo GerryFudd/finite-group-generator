@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
+import org.dexenjaeger.algebra.categories.objects.TrivialGroup;
 import org.dexenjaeger.algebra.categories.objects.UnsafeGroup;
 import org.dexenjaeger.algebra.categories.objects.UnsafeMonoid;
 import org.dexenjaeger.algebra.categories.objects.UnsafeSemigroup;
@@ -82,33 +83,29 @@ class ValidatedHomomorphismTest {
     RuntimeException e = assertThrows(
       RuntimeException.class,
       () -> ValidatedHomomorphism.createHomomorphism(
-        new UnsafeGroup(
-          Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"),
-          new UnsafeMonoid(
-            "I",
-            new UnsafeSemigroup(
-              "*", List.of(elements),
-              (a, b) -> elements[(lookup.get(a) + lookup.get(b)) % 6]
+        ValidatedGroup.createGroup(
+          new ValidatedGroupSpec(
+            Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"),
+            new ValidatingBinaryOperator(
+              elements, lookup, (a, b) -> (a + b) % 6
             )
           )
         ),
-        new UnsafeGroup(
-          Map.of("E", "E", "C", "C"),
-          new UnsafeMonoid(
+        ValidatedGroup.createGroup(
+          new ValidatedGroupSpec(
             "E",
-            new UnsafeSemigroup(
-              "x", List.of(rangeElements),
-              (a, b) -> rangeElements[(rangeLookup.get(a) + rangeLookup.get(b)) % 2]
+            Map.of("E", "E", "C", "C"),
+            new ValidatingBinaryOperator(
+              rangeElements, rangeLookup, (a, b) -> (a + b) % 2
             )
           )
         ),
-        new UnsafeGroup(
+        ValidatedGroup.createGroup(
+          new ValidatedGroupSpec(
           Map.of("I", "I", "d", "e", "e", "d"),
-          new UnsafeMonoid(
-            "I",
-            new UnsafeSemigroup(
-              "*", List.of(kernelElements),
-              (a, b) -> kernelElements[(kernelLookup.get(a) + kernelLookup.get(b)) % 3]
+          new ValidatingBinaryOperator(
+            kernelElements, kernelLookup,
+              (a, b) -> (a + b) % 3
             )
           )
         ),
@@ -130,46 +127,33 @@ class ValidatedHomomorphismTest {
     String[] rangeElements = {"E"};
     Map<String, Integer> rangeLookup = Map.of("E", 0);
     
-    String[][] kernelMult = {
-      {"I", "a", "b", "c", "d", "e"},
-      {"a", "I", "e", "d", "c", "b"},
-      {"b", "d", "I", "e", "a", "c"},
-      {"c", "e", "d", "I", "b", "a"},
-      {"d", "b", "c", "a", "e", "I"},
-      {"e", "c", "a", "b", "I", "d"}
+    int[][] kernelMult = {
+      {0, 1, 2, 3, 4, 5},
+      {1, 0, 5, 4, 3, 2},
+      {2, 4, 0, 5, 1, 3},
+      {3, 5, 4, 0, 2, 1},
+      {4, 2, 3, 1, 5, 0},
+      {5, 3, 1, 2, 0, 4}
     };
   
     RuntimeException e = assertThrows(
       RuntimeException.class,
       () -> ValidatedHomomorphism.createHomomorphism(
-        new UnsafeGroup(
-          Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"),
-          new UnsafeMonoid(
-            "I",
-            new UnsafeSemigroup(
-              "*", List.of(elements),
-              (a, b) -> elements[(lookup.get(a) + lookup.get(b)) % 6]
+        ValidatedGroup.createGroup(
+          new ValidatedGroupSpec(
+            Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"),
+            new ValidatingBinaryOperator(
+              elements, lookup, (a, b) -> (a + b) % 6
             )
           )
         ),
-        new UnsafeGroup(
-          Map.of("E", "E"),
-          new UnsafeMonoid(
-            "E",
-            new UnsafeSemigroup(
-              "x", List.of(rangeElements),
-              (a, b) -> "E"
-            )
+        new TrivialGroup("E"),
+        ValidatedGroup.createGroup(
+          new ValidatedGroupSpec(
+          Map.of("I", "I", "a", "a", "b", "b", "c", "c", "d", "e", "e", "d"),
+          new ValidatingBinaryOperator(
+            elements, lookup, (a, b) -> kernelMult[a][b]
           )
-        ),
-        new UnsafeGroup(
-          Map.of("I", "I", "a", "a", "b", "b", "c", "c", "d", "e"),
-          new UnsafeMonoid(
-            "I",
-            new UnsafeSemigroup(
-              "*", List.of(elements),
-              (a, b) -> kernelMult[lookup.get(a)][lookup.get(b)]
-            )
           )
         ),
         (a) -> "E"
