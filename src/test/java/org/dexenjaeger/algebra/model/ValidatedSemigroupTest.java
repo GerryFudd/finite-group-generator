@@ -21,12 +21,12 @@ class ValidatedSemigroupTest {
   
   @Test
   void staticInitializerTest() {
-    ValidatedSemigroup.createSemigroup(
-      "*",
-      new ValidatingBinaryOperator(
-        MoreArrayUtils.createArray("I"),
-        Collections.singletonMap("I", 0),
-        (i, j) -> 0
+    ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec(
+        new ValidatingBinaryOperator(
+          MoreArrayUtils.createArray("I"),
+          Collections.singletonMap("I", 0),
+          (i, j) -> 0
+        )
       )
     );
   }
@@ -35,11 +35,12 @@ class ValidatedSemigroupTest {
   void getProductTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a");
     ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
-      "*",
-      new ValidatingBinaryOperator(
-        elements,
-        createReverseLookup(elements),
-        (i, j) -> (i + j) % 2
+      new ValidatedSemigroupSpec(
+        new ValidatingBinaryOperator(
+          elements,
+          createReverseLookup(elements),
+          (i, j) -> (i + j) % 2
+        )
       )
     );
     
@@ -71,11 +72,13 @@ class ValidatedSemigroupTest {
   void getMultiplicationTableTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
     ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
-      "+",
-      new ValidatingBinaryOperator(
-        elements,
-        createReverseLookup(elements),
-        (i, j) -> (i+j) % 3
+      new ValidatedSemigroupSpec(
+        "+",
+        new ValidatingBinaryOperator(
+          elements,
+          createReverseLookup(elements),
+          (i, j) -> (i+j) % 3
+        )
       )
     );
     StringBuilder sb = new StringBuilder();
@@ -95,11 +98,13 @@ class ValidatedSemigroupTest {
   void getCyclicGroupTest() {
     String[] elements = MoreArrayUtils.createArray("I", "a", "b");
     ValidatedSemigroup testSemigroup = ValidatedSemigroup.createSemigroup(
-      "+",
-      new ValidatingBinaryOperator(
-        elements,
-        createReverseLookup(elements),
-        (i, j) -> (i+j) % 3
+      new ValidatedSemigroupSpec(
+        "+",
+        new ValidatingBinaryOperator(
+          elements,
+          createReverseLookup(elements),
+          (i, j) -> (i+j) % 3
+        )
       )
     );
     
@@ -121,9 +126,9 @@ class ValidatedSemigroupTest {
       put("x", 0);
       put("y", 1);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatingBinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec("x", new ValidatingBinaryOperator(
       elements, reverseLookup, (a, b) -> 2
-    )));
+    ))));
     
     assertEquals(
       "Semigroups may only be created from valid binary operators.", e.getMessage()
@@ -143,9 +148,9 @@ class ValidatedSemigroupTest {
       put("y", 1);
       put("z", 2);
     }};
-    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup("x", new ValidatingBinaryOperator(
+    RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec("x", new ValidatingBinaryOperator(
       elements, reverseLookup, (a, b) -> product[a][b]
-    )));
+    ))));
     
     assertEquals(
       "Semigroups may only be crated from associative binary operators.", e.getMessage()

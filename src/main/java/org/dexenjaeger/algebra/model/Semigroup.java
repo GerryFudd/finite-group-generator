@@ -1,9 +1,21 @@
 package org.dexenjaeger.algebra.model;
 
+import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+
 import java.util.List;
 
 public interface Semigroup {
+  String getOperatorSymbol();
   List<String> getElementsAsList();
   String getProduct(String a, String b);
-  String getMultiplicationTable();
+  default String getMultiplicationTable() {
+    return BinaryOperatorUtil.getMultiplicationTable(
+      getOperatorSymbol(),
+      getElementsAsList(),
+      this::getProduct
+    );
+  }
+  default List<String> getCyclicGroup(String element) {
+    return BinaryOperatorUtil.getCyclicGroup(element, this::getProduct);
+  }
 }

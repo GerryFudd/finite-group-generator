@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.generators;
 
 import org.dexenjaeger.algebra.model.ValidatedSemigroup;
+import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreMath;
 
@@ -76,11 +77,12 @@ public class SymmetryGroupGenerator {
       }
     }
     
-    return ValidatedSemigroup.createSemigroup(
-      "o",
-      BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-        permutations.length,
-        (a,b) -> binOp[a][b]
+    return ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec(
+        "o",
+        BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+          permutations.length,
+          (a,b) -> binOp[a][b]
+        )
       )
     );
   }

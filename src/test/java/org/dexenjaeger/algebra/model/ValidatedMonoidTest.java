@@ -13,12 +13,11 @@ class ValidatedMonoidTest {
   @Test
   void staticInitializerTest() {
     ValidatedMonoid.createMonoid(
-      "I",
-      new ValidatingBinaryOperator(
+      new ValidatedMonoidSpec("I", new ValidatingBinaryOperator(
         MoreArrayUtils.createArray("I"),
         Collections.singletonMap("I", 0),
         (i, j) -> 0
-      ),
+      )),
       binOp -> mock(ValidatedSemigroup.class)
     );
   }
@@ -31,12 +30,14 @@ class ValidatedMonoidTest {
       {1, 0, 3, 2},
       {0, 1, 2, 3}
     };
-  
+    
     RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedMonoid.createMonoid(
-      "L1",
-      BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-        4,
-        (i, j) -> product[i][j]
+      new ValidatedMonoidSpec(
+        "L1",
+        BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+          4,
+          (i, j) -> product[i][j]
+        )
       ),
       binOp -> mock(ValidatedSemigroup.class)
     ));

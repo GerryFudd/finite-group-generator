@@ -1,11 +1,13 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.model.Group;
 import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class BinaryOperatorUtil {
   
@@ -73,5 +75,76 @@ public class BinaryOperatorUtil {
     }
     remapper.getAvailable().forEach(remapper::map);
     return remapper.createBinaryOperator(binOp);
+  }
+  
+  private static String padOperator(String operatorSymbol) {
+    return padOperator(operatorSymbol, ' ');
+  }
+  
+  private static String padOperator(String operatorSymbol, char padSymbol) {
+    return String.format("%s   ", operatorSymbol).replace(' ', padSymbol).substring(0, 4);
+  }
+  
+  private static void appendLine(
+    StringBuilder sb, String a,
+    List<String> products
+    ) {
+    sb.append(" ")
+      .append(padOperator(a))
+      .append(" |");
+    
+    for (String b:products) {
+      sb.append(" ")
+        .append(padOperator(b));
+    }
+    sb.append(" \n");
+  }
+  
+  public static String getMultiplicationTable(
+    String operatorSymbol,
+    List<String> elementsList,
+    BiFunction<String, String, String> binaryOperator
+  ) {
+    StringBuilder sb = new StringBuilder("\n_");
+    sb.append(operatorSymbol);
+    sb.append("____|_");
+    sb.append(elementsList.stream()
+                .map(n -> padOperator(n, '_'))
+                .collect(Collectors.joining("_")));
+    sb.append("_\n");
+    for (String a: elementsList) {
+      appendLine(
+        sb, a, elementsList.stream()
+                 .map(b -> binaryOperator.apply(a, b))
+                 .collect(Collectors.toList())
+      );
+    }
+    return sb.toString();
+  }
+  
+  public static List<String> getCyclicGroup(String element, BiFunction<String, String, String> binaryOperator) {
+    List<String> cycle = new LinkedList<>();
+    cycle.add(element);
+    String current = binaryOperator.apply(element, element);
+    while (!current.equals(element)) {
+      cycle.add(current);
+      current = binaryOperator.apply(current, element);
+    }
+    return cycle;
+  }
+  
+  public static boolean isSubgroup(Group domain, Group kernel) {
+    for (String a:kernel.getElementsAsList()) {
+      for (String b:kernel.getElementsAsList()) {
+        String c = domain.getProduct(a, b);
+        if (!kernel.getElementsAsList().contains(c)) {
+          return false;
+        }
+        if (!c.equals(kernel.getProduct(a, b))) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 }

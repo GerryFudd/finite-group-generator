@@ -14,13 +14,15 @@ class ValidatedGroupTest {
   @Test
   void staticInitializerTest() {
     ValidatedGroup.createGroup(
-      Collections.singletonMap("I", "I"),
-      new ValidatingBinaryOperator(
-        MoreArrayUtils.createArray("I"),
-        Collections.singletonMap("I", 0),
-        (i, j) -> 0
+      new ValidatedGroupSpec(
+        Collections.singletonMap("I", "I"),
+        new ValidatingBinaryOperator(
+          MoreArrayUtils.createArray("I"),
+          Collections.singletonMap("I", 0),
+          (i, j) -> 0
+        )
       ),
-      binOp -> mock(ValidatedMonoid.class)
+      (id, binOp) -> mock(ValidatedMonoid.class)
     );
   }
   
@@ -34,12 +36,14 @@ class ValidatedGroupTest {
     };
     
     RuntimeException e = assertThrows(RuntimeException.class, () -> ValidatedGroup.createGroup(
-      Map.of("I", "I", "a", "b", "b", "a", "c", "c"),
-      BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-        4,
-        (i, j) -> product[i][j]
+      new ValidatedGroupSpec(
+        Map.of("I", "I", "a", "b", "b", "a", "c", "c"),
+        BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+          4,
+          (i, j) -> product[i][j]
+        )
       ),
-      binOp -> mock(ValidatedMonoid.class)
+      (id, binOp) -> mock(ValidatedMonoid.class)
     ));
     
     assertEquals(
@@ -50,15 +54,12 @@ class ValidatedGroupTest {
   @Test
   void validInverses() {
     ValidatedGroup result = ValidatedGroup.createGroup(
-      Map.of("I", "I", "a", "a3", "a2", "a2", "a3", "a"),
-      BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-        4,
-        (i, j) -> (i + j) % 4
-      ),
-      binOp -> ValidatedMonoid.createMonoid(
-        "I",
-        binOp,
-        bop -> ValidatedSemigroup.createSemigroup("*", bop)
+      new ValidatedGroupSpec(
+        Map.of("I", "I", "a", "a3", "a2", "a2", "a3", "a"),
+        BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+          4,
+          (i, j) -> (i + j) % 4
+        )
       )
     );
     

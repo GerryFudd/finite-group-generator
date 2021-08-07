@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
 public class MoreArrayUtils {
-  public static <T> T[] createArray(T... elements) {
+  public static String[] createArray(String... elements) {
     return elements;
   }
 }

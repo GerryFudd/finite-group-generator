@@ -8,41 +8,49 @@ import java.util.function.Function;
 public class ValidatedMonoid implements Monoid {
   @Getter
   private final String identity;
-  private final Semigroup algebraicStructure;
+  private final Semigroup semigroup;
   
-  private ValidatedMonoid(String identity, Semigroup algebraicStructure) {
+  private ValidatedMonoid(String identity, Semigroup semigroup) {
     this.identity = identity;
-    this.algebraicStructure = algebraicStructure;
+    this.semigroup = semigroup;
   }
   
   public static ValidatedMonoid createMonoid(
-    String identity, ValidatingBinaryOperator binaryOperator,
-    Function<ValidatingBinaryOperator, ValidatedSemigroup> algebraicStructureConstructor
+    ValidatedMonoidSpec spec
+  ) {
+    return createMonoid(
+      spec,
+      binOp -> ValidatedSemigroup.createSemigroup(new ValidatedSemigroupSpec(binOp))
+    );
+  }
+  
+  public static ValidatedMonoid createMonoid(
+    ValidatedMonoidSpec spec,
+    Function<ValidatingBinaryOperator, ValidatedSemigroup> makeSemigroup
   ) {
     
-    if (!binaryOperator.isIdentity(identity)) {
+    if (!spec.getBinaryOperator().isIdentity(spec.getIdentity())) {
       throw new RuntimeException("Monoids may only be created with valid identity elements.");
     }
     
     return new ValidatedMonoid(
-      identity,
-      algebraicStructureConstructor.apply(binaryOperator)
+      spec.getIdentity(),
+      makeSemigroup.apply(spec.getBinaryOperator())
     );
   }
   
   @Override
+  public String getOperatorSymbol() {
+    return semigroup.getOperatorSymbol();
+  }
+  
+  @Override
   public List<String> getElementsAsList() {
-    return algebraicStructure.getElementsAsList();
+    return semigroup.getElementsAsList();
   }
   
   @Override
   public String getProduct(String a, String b) {
-    return algebraicStructure.getProduct(a, b);
+    return semigroup.getProduct(a, b);
   }
-  
-  @Override
-  public String getMultiplicationTable() {
-    return algebraicStructure.getMultiplicationTable();
-  }
-  
 }

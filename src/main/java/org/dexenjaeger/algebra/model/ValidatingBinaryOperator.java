@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 @RequiredArgsConstructor
 public class ValidatingBinaryOperator {
@@ -74,8 +75,7 @@ public class ValidatingBinaryOperator {
   }
   
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  public boolean isInverseMap(Map<String, String> inversesMap) {
-    String identity = null;
+  public boolean isInverseMap(String identity, Map<String, String> inversesMap) {
     for (String element:elements) {
       if (!inversesMap.containsKey(element)) {
         return false;
@@ -85,12 +85,6 @@ public class ValidatingBinaryOperator {
         inverse = elements[lookup(inversesMap.get(element))];
       } catch (RuntimeException e) {
         return false;
-      }
-      if (identity == null) {
-        identity = prod(element, inverse);
-        if (!isIdentity(identity)) {
-          return false;
-        }
       }
       
       if (
