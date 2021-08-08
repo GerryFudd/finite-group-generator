@@ -1,15 +1,16 @@
-package org.dexenjaeger.algebra.categories.objects.semigroup;
+package org.dexenjaeger.algebra.model.binaryoperator;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 import java.util.function.BiFunction;
 
-@RequiredArgsConstructor
-public class UnsafeSemigroup implements Semigroup {
+@Builder
+public class ConcreteBinaryOperator implements BinaryOperator {
   @Getter
-  private final String operatorSymbol;
+  @Builder.Default
+  private final String operatorSymbol = "*";
   @Getter
   private final Set<String> elements;
   private final BiFunction<String, String, String> operator;

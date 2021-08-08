@@ -1,7 +1,10 @@
 package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
-import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
+import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
+import org.dexenjaeger.algebra.validators.ValidationException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +14,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public class Remapper {
+  private final BinaryOperatorValidator validator = new BinaryOperatorValidator();
   private int currentIndex = 0;
   private int defaultIndicesUsed = 0;
   private final String[] elements;
@@ -73,11 +77,22 @@ public class Remapper {
     return Optional.empty();
   }
   
-  public ValidatingBinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
-    return new ValidatingBinaryOperator(
-      elements,
-      reverseLookup,
-      (a, b) -> inverseRemap[binOp.apply(remap[a], remap[b])]
-    );
+  public BinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
+    BinaryOperator result = ConcreteBinaryOperator.builder()
+             .elements(Set.of(elements))
+             .operator((a, b) -> elements[inverseRemap[binOp.apply(
+               remap[reverseLookup.get(a)],
+               remap[reverseLookup.get(b)]
+             )]])
+      .build();
+    try {
+      validator.validate(result);
+      return result;
+    } catch (ValidationException e) {
+      throw new RuntimeException(
+        "Binary operator failed to validate",
+        e
+      );
+    }
   }
 }

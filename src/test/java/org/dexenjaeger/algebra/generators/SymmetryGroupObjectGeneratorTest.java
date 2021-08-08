@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SymmetryGroupGeneratorTest {
+class SymmetryGroupObjectGeneratorTest {
   @Test
   void createS2() {
     Group s2 = SymmetryGroupGenerator.createSymmetryGroup(2);

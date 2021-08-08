@@ -1,11 +1,17 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.categories.morphisms.ConcreteHomomorphism;
+import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
+import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
-import org.dexenjaeger.algebra.categories.objects.group.UnsafeGroup;
-import org.dexenjaeger.algebra.categories.objects.monoid.UnsafeMonoid;
-import org.dexenjaeger.algebra.categories.objects.semigroup.UnsafeSemigroup;
 import org.dexenjaeger.algebra.model.OrderedPair;
+import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
+import org.dexenjaeger.algebra.validators.GroupValidator;
+import org.dexenjaeger.algebra.validators.HomomorphismValidator;
+import org.dexenjaeger.algebra.validators.MonoidValidator;
+import org.dexenjaeger.algebra.validators.SemigroupValidator;
+import org.dexenjaeger.algebra.validators.ValidationException;
+import org.dexenjaeger.algebra.validators.Validator;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,12 +24,20 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class HomomorphismUtil {
+  private static Validator<Homomorphism> homomorphismValidator;
+  private static Validator<Group> groupValidator;
+  
+  private static void initValidators() {
+    homomorphismValidator = new HomomorphismValidator();
+    groupValidator = new GroupValidator(new MonoidValidator(new SemigroupValidator(new BinaryOperatorValidator())));
+  }
+  
   private static RuntimeException getInvalidCycleException(List<String> cycle) {
     return new RuntimeException(String.format(
       "Cycle is not valid: %s", String.join(", ", cycle)
     ));
   }
-  public static OrderedPair<Group, Group> constructRangeAndKernel(SafeGroup domain, Function<String, String> act) {
+  public static OrderedPair<Group, Group> constructRangeAndKernel(Group domain, Function<String, String> act) {
     Map<String, String> rangeInversesMap = new HashMap<>();
     Map<String, String> domainLookupMap = new HashMap<>();
     Set<String> rangeElements = new HashSet<>();
@@ -33,9 +47,13 @@ public class HomomorphismUtil {
   
     String rangeIdentity = act.apply(domain.getIdentity());
     
+    rangeInversesMap.put(rangeIdentity, rangeIdentity);
+    
     rangeElements.add(rangeIdentity);
     kernelElements.add(domain.getIdentity());
+    
     domainLookupMap.put(rangeIdentity, domain.getIdentity());
+    
     rangeCycles.put(1, Set.of(List.of(rangeIdentity)));
     kernelCycles.put(1, Set.of(List.of(domain.getIdentity())));
   
@@ -64,6 +82,7 @@ public class HomomorphismUtil {
                 throw getInvalidCycleException(cycle);
               }
               String inverseY = act.apply(inverseX);
+              rangeInversesMap.put(y, inverseY);
               rangeInversesMap.put(inverseY, y);
               domainLookupMap.put(inverseY, inverseX);
               rangeElements.add(inverseY);
@@ -121,76 +140,29 @@ public class HomomorphismUtil {
     }
   
     return new OrderedPair<>(
-      new UnsafeGroup(
-        rangeInversesMap,
-        rangeCycles,
-        new UnsafeMonoid(
-          rangeIdentity,
-          new UnsafeSemigroup(
-            "x",
-            rangeElements,
-            (a, b) -> act.apply(domain.prod(
-              domainLookupMap.get(a),
-              domainLookupMap.get(b)
-            ))
-          )
-        )
-      ),
-      new UnsafeGroup(
-        kernelElements.stream().collect(Collectors.toMap(
-          Function.identity(),
-          domain::getInverse
-        )),
-        kernelCycles,
-        new UnsafeMonoid(
-          domain.getIdentity(),
-          new UnsafeSemigroup(
-            domain.getOperatorSymbol(),
-            kernelElements,
-            domain::prod
-          )
-        )
-      )
+      ConcreteGroup.builder()
+      .inversesMap(rangeInversesMap)
+      .cyclesMap(rangeCycles)
+      .identity(rangeIdentity)
+      .operatorSymbol("x")
+      .elements(rangeElements)
+      .operator((a, b) -> act.apply(domain.prod(
+        domainLookupMap.get(a),
+        domainLookupMap.get(b)
+      )))
+      .build(),
+      ConcreteGroup.builder()
+      .inversesMap(kernelElements.stream().collect(Collectors.toMap(
+        Function.identity(),
+        domain::getInverse
+      )))
+      .cyclesMap(kernelCycles)
+      .identity(domain.getIdentity())
+      .operatorSymbol(domain.getOperatorSymbol())
+      .elements(kernelElements)
+      .operator(domain::prod)
+      .build()
     );
-  }
-  
-  private static RuntimeException getNotFunctionException(
-    Collection<String> rangeElements, String identity, String output, String input) {
-    return new RuntimeException(String.format(
-      "Range %s doesn't contain image %s of %s.",
-      BinaryOperatorUtil.getSortedElements(rangeElements, identity),
-      output, input
-    ));
-  }
-  
-  public static void validateHomomorphism(
-    Group domain,
-    Group range,
-    Function<String, String> act
-  ) {
-    Set<String> rangeElements = range.getElements();
-    for (String a:domain.getElements()) {
-      String fa = act.apply(a);
-      if (!rangeElements.contains(fa)) {
-        throw getNotFunctionException(rangeElements, range.getIdentity(), fa, a);
-      }
-      for (String b:domain.getElements()) {
-        String fb = act.apply(b);
-        if (!rangeElements.contains(fb)) {
-          throw getNotFunctionException(rangeElements, range.getIdentity(), fb, b);
-        }
-        if (!rangeElements.contains(range.prod(fa, fb))) {
-          throw new RuntimeException(String.format(
-            "Range %s isn't closed under %s.",
-            String.join(", ", rangeElements), range.getOperatorSymbol()
-          ));
-        }
-        if (!range.prod(act.apply(a), act.apply(b))
-               .equals(act.apply(domain.prod(a, b)))) {
-          throw new RuntimeException("Function is not a homomorphism.");
-        }
-      }
-    }
   }
   
   public static <T,U> void validateBijection(
@@ -219,11 +191,43 @@ public class HomomorphismUtil {
     }
   }
   
-  public static void validateInverseImageOfId(Group domain, Group kernel, String identity, Function<String, String> act) {
-    for (String a:domain.getElements()) {
-      if (kernel.getElements().contains(a) != act.apply(a).equals(identity)) {
-        throw new RuntimeException("Subset is not the inverse image of the identity.");
-      }
-    }
+  private static Homomorphism doCreateHomomorphism(
+    Group domain, Group range, Group kernel, Function<String, String> act
+  ) throws ValidationException {
+    Homomorphism result = ConcreteHomomorphism.builder()
+      .domain(domain)
+      .range(range)
+      .kernel(kernel)
+      .act(act)
+      .build();
+    homomorphismValidator.validate(result);
+    return result;
+  }
+  
+  public static Homomorphism createHomomorphism(
+    Group domain, Group range, Group kernel, Function<String, String> act
+  ) throws ValidationException {
+    initValidators();
+    groupValidator.validate(domain);
+    groupValidator.validate(range);
+    groupValidator.validate(kernel);
+    return doCreateHomomorphism(domain, range, kernel, act);
+  }
+  
+  public static Homomorphism createHomomorphism(
+    Group domain,
+    Function<String, String> act
+  ) throws ValidationException {
+    initValidators();
+    groupValidator.validate(domain);
+    OrderedPair<Group, Group> rangeAndKernel = HomomorphismUtil.constructRangeAndKernel(
+      domain, act
+    );
+    
+    groupValidator.validate(rangeAndKernel.getLeft());
+    groupValidator.validate(rangeAndKernel.getRight());
+    return doCreateHomomorphism(
+      domain, rangeAndKernel.getLeft(), rangeAndKernel.getRight(), act
+    );
   }
 }

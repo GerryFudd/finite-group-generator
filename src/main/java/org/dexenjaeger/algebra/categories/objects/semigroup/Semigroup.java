@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.categories.objects.semigroup;
 
-import org.dexenjaeger.algebra.model.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.model.binaryoperator;
 
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 

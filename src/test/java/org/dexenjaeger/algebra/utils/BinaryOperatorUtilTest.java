@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BinaryOperatorUtilTest {
+  private String getElements(BinaryOperatorSummary summary) {
+    return String.join(", ", BinaryOperatorUtil.getSortedElements(summary.getBinaryOperator().getElements(), summary.getIdentity()));
+  }
   @Test
   void getSortedAndPrettifiedBinaryOperatorTest_withLeftIdentity() {
     int[][] product = {
@@ -25,7 +28,7 @@ class BinaryOperatorUtilTest {
     
     assertEquals(
       "L1, L2, a, b",
-      String.join(", ", result.getBinaryOperator().getElementsArray())
+      getElements(result)
     );
     
     assertNull(result.getIdentity());
@@ -48,7 +51,7 @@ class BinaryOperatorUtilTest {
     
     assertEquals(
       "R1, R2, a, b",
-      String.join(", ", result.getBinaryOperator().getElementsArray())
+      getElements(result)
     );
   
     assertNull(result.getIdentity());
@@ -71,7 +74,7 @@ class BinaryOperatorUtilTest {
     
     assertEquals(
       "I, a, b, c",
-      String.join(", ", result.getBinaryOperator().getElementsArray())
+      getElements(result)
     );
   
     assertEquals("I", result.getIdentity());

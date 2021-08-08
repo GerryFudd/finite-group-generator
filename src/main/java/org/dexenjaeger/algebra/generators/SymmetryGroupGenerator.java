@@ -1,11 +1,16 @@
 package org.dexenjaeger.algebra.generators;
 
-import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
-import org.dexenjaeger.algebra.categories.objects.group.ValidatedGroup;
+import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreMath;
+import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
+import org.dexenjaeger.algebra.validators.GroupValidator;
+import org.dexenjaeger.algebra.validators.MonoidValidator;
+import org.dexenjaeger.algebra.validators.SemigroupValidator;
+import org.dexenjaeger.algebra.validators.ValidationException;
+import org.dexenjaeger.algebra.validators.Validator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +64,7 @@ public class SymmetryGroupGenerator {
     return getPermutationAsString(prod);
   }
   
-  public static SafeGroup createSymmetryGroup(int n) {
+  public static Group createSymmetryGroup(int n) {
     int[][] permutations = getPermutationSet(n);
     Map<String, Integer> reverseLookup = new HashMap<>();
     for (int i = 0; i < permutations.length; i++) {
@@ -78,20 +83,30 @@ public class SymmetryGroupGenerator {
         ));
       }
     }
-  
-    BinaryOperatorSummary summary = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-        permutations.length,
-        (a,b) -> binOp[a][b]
-      );
     
-    return ValidatedGroup.createGroup(
-      ValidatedGroupSpec.builder()
-        .operatorSymbol("o")
-        .identity("I")
-        .inversesMap(summary.getInverseMap())
-        .binaryOperator(summary.getBinaryOperator())
-        .cyclesMap(summary.getCyclesMap())
-        .build()
+    BinaryOperatorSummary summary = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+      permutations.length,
+      (a,b) -> binOp[a][b]
     );
+    
+    Group result = ConcreteGroup.builder()
+                     .operatorSymbol("o")
+                     .identity("I")
+                     .inversesMap(summary.getInverseMap())
+                     .elements(summary.getBinaryOperator().getElements())
+                     .operator(summary.getBinaryOperator()::prod)
+                     .cyclesMap(summary.getCyclesMap())
+                     .build();
+  
+    Validator<Group> validator = new GroupValidator(new MonoidValidator(new SemigroupValidator(new BinaryOperatorValidator())));
+    try {
+      validator.validate(result);
+    } catch (ValidationException e) {
+      throw new RuntimeException(
+        "Generated group didn't validate", e
+      );
+    }
+  
+    return result;
   }
 }

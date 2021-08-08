@@ -1,8 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.BinaryOperator;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -184,18 +183,13 @@ public class BinaryOperatorUtil {
     return cycle;
   }
   
-  public static void validateSubgroup(Group domain, Group kernel) {
-    RuntimeException e = new RuntimeException("Subset is not a subgroup.");
-    for (String a:kernel.getElements()) {
-      for (String b:kernel.getElements()) {
-        String c = domain.prod(a, b);
-        if (!kernel.getElements().contains(c)) {
-          throw e;
-        }
-        if (!c.equals(kernel.prod(a, b))) {
-          throw e;
-        }
-      }
+  public static BiFunction<String, String, String> createOperator(
+    String[] elements, BiFunction<Integer, Integer, Integer> intOp
+  ) {
+    Map<String, Integer> lookup = new HashMap<>();
+    for (int i = 0; i < elements.length; i++) {
+      lookup.put(elements[i], i);
     }
+    return (a, b) -> elements[intOp.apply(lookup.get(a), lookup.get(b))];
   }
 }

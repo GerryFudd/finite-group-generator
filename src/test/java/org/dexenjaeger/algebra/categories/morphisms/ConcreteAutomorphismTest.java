@@ -1,17 +1,19 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.dexenjaeger.algebra.utils.HomomorphismUtil;
+import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ValidatedAutomorphismTest {
+class ConcreteAutomorphismTest {
   @Test
-  void createAutomorphismTest() {
-    SafeGroup s3 = SymmetryGroupGenerator.createSymmetryGroup(3);
+  void createAutomorphismTest() throws ValidationException {
+    Group s3 = SymmetryGroupGenerator.createSymmetryGroup(3);
     Function<String, String> act = a -> {
       if (a.equals("d")) {
         return "d2";
@@ -22,11 +24,16 @@ class ValidatedAutomorphismTest {
       return a;
     };
     
-    Automorphism result = ValidatedAutomorphism.createAutomorphism(
-      ValidatedHomomorphism.createHomomorphism(
-        s3, act
-      ), act
+    Homomorphism homomorphism = HomomorphismUtil.createHomomorphism(
+      s3, act
     );
+    
+    Automorphism result = ConcreteAutomorphism.builder()
+      .domain(homomorphism.getDomain())
+      .range(homomorphism.getRange())
+      .act(act)
+      .inverseAct(act)
+      .build();
     
     assertEquals(
       "\n" +

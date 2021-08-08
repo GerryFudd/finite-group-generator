@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class TrivialGroup implements SafeGroup {
+public class TrivialGroup implements Group {
   @Getter
   private final String operatorSymbol;
   @Getter
@@ -32,7 +32,7 @@ public class TrivialGroup implements SafeGroup {
   
   @Override
   public Set<List<String>> getNCycles(Integer n) {
-    return n == 1 ? Set.of(List.of("I")) : Set.of();
+    return n == 1 ? Set.of(List.of(identity)) : Set.of();
   }
   
   @Override
