@@ -209,6 +209,63 @@ public class BinaryOperatorUtil {
     return cycle;
   }
   
+  public static Group getGroupFromElementsAndIntTable(
+    String[] elements,
+    int[][] table
+  ) {
+    if (elements.length != table.length) {
+      throw new RuntimeException("No.");
+    }
+    Map<String, String> inversesMap = new HashMap<>();
+    inversesMap.put(elements[0], elements[0]);
+    
+    Set<List<String>> cycles = new HashSet<>();
+    for (int i = 1; i < elements.length; i++) {
+      String element = elements[i];
+      if (cycles.stream().noneMatch(otherCycle -> otherCycle.contains(element))) {
+        LinkedList<String> cycle = new LinkedList<>();
+        cycle.addLast(elements[i]);
+        int newEl = table[i][i];
+        while (!cycle.contains(elements[newEl])) {
+          cycle.addLast(elements[newEl]);
+          newEl = table[i][newEl];
+        }
+        cycles.removeIf(cycle::containsAll);
+        cycles.add(List.copyOf(cycle));
+        cycle.removeLast();
+        while (!cycle.isEmpty()) {
+          String x = cycle.removeFirst();
+          if (!cycle.isEmpty()) {
+            String inverseX = cycle.removeLast();
+            inversesMap.put(x, inverseX);
+            inversesMap.put(inverseX, x);
+          } else {
+            inversesMap.put(x, x);
+          }
+        }
+      }
+    }
+    Map<Integer, Set<List<String>>> cyclesMap = new HashMap<>();
+    for (List<String> cycle:cycles) {
+      cyclesMap.compute(cycle.size(), (n, nCycles) -> {
+        if (nCycles == null) {
+          nCycles = new HashSet<>();
+        }
+        nCycles.add(cycle);
+        return nCycles;
+      });
+    }
+    return ConcreteGroup.builder()
+      .identity(elements[0])
+      .inversesMap(inversesMap)
+      .cyclesMap(cyclesMap)
+      .elements(Set.of(elements))
+      .operator(createOperator(
+        elements, (a, b) -> table[a][b]
+      ))
+      .build();
+  }
+  
   public static BiFunction<String, String, String> createOperator(
     String[] elements, BiFunction<Integer, Integer, Integer> intOp
   ) {

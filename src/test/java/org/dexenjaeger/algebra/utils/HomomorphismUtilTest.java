@@ -1,13 +1,11 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
-import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,24 +95,15 @@ class HomomorphismUtilTest {
       () -> HomomorphismUtil.createHomomorphism(
         BinaryOperatorUtil.getCyclicGroup(elements),
         new TrivialGroup("E"),
-        ConcreteGroup.builder()
-          .inversesMap(Map.of("I", "I", "a", "a", "b", "b", "c", "c", "d", "e", "e", "d"))
-          .cyclesMap(Map.of(
-            1, Set.of(List.of("I")),
-            2, Set.of(List.of("a", "I"), List.of("b", "I"), List.of("c", "I")),
-            3, Set.of(List.of("d", "e", "I"))
-          ))
-          .elements(Set.of(elements))
-          .operator(BinaryOperatorUtil.createOperator(
-            elements, (a, b) -> kernelMult[a][b]
-          ))
-          .build(),
+        BinaryOperatorUtil.getGroupFromElementsAndIntTable(
+          elements, kernelMult
+        ),
         (a) -> "E"
       )
     );
     
     assertEquals(
-      "Kernel is not a subgroup.", e.getMessage()
+      "Kernel binary operator doesn't match group binary operator.", e.getMessage()
     );
   }
   

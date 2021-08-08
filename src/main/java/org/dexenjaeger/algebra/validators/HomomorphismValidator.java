@@ -54,15 +54,14 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
   
   
   public static void validateSubgroup(Homomorphism item) throws ValidationException {
-    ValidationException e = new ValidationException("Kernel is not a subgroup.");
     for (String a:item.getKernel().getElements()) {
       for (String b:item.getKernel().getElements()) {
         String c = item.getDomain().prod(a, b);
         if (!item.getKernel().getElements().contains(c)) {
-          throw e;
+          throw new ValidationException("Kernel is not closed under the group operation.");
         }
         if (!c.equals(item.getKernel().prod(a, b))) {
-          throw e;
+          throw new ValidationException("Kernel binary operator doesn't match group binary operator.");
         }
       }
     }
