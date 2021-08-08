@@ -1,31 +1,24 @@
 package org.dexenjaeger.algebra.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
-@AllArgsConstructor
+@Builder
 public class ValidatedGroupSpec {
-  private final String operatorSymbol;
-  private final String identity;
+  @Builder.Default
+  private final String operatorSymbol = "*";
+  @Builder.Default
+  private final String identity = "I";
+  @Builder.Default
+  private final Map<Integer, Set<List<String>>> cyclesMap = null;
   private final Map<String, String> inversesMap;
   private final ValidatingBinaryOperator binaryOperator;
-  
-  public ValidatedGroupSpec(
-    Map<String, String> inversesMap,
-    ValidatingBinaryOperator binaryOperator
-  ) {
-    this("I", inversesMap, binaryOperator);
-  }
-  
-  public ValidatedGroupSpec(
-    String identity,
-    Map<String, String> inversesMap,
-    ValidatingBinaryOperator binaryOperator
-  ) {
-    this("*", identity, inversesMap, binaryOperator);
-  }
 }

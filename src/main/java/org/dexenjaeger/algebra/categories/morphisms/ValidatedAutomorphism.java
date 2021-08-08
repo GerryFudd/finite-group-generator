@@ -28,15 +28,6 @@ public class ValidatedAutomorphism implements Automorphism {
   }
   
   public static ValidatedAutomorphism createAutomorphism(
-    SafeGroup domain,
-    SafeGroup range,
-    Function<String, String> act,
-    Function<String, String> inverseAct
-  ) {
-    return doCreateAutomorphism(domain, range, act, inverseAct);
-  }
-  
-  public static ValidatedAutomorphism createAutomorphism(
     ValidatedHomomorphism homomorphism,
     Function<String, String> inverseAct
   ) {

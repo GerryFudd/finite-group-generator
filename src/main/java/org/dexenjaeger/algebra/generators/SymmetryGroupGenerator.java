@@ -88,12 +88,13 @@ public class SymmetryGroupGenerator {
       );
     
     return ValidatedGroup.createGroup(
-      new ValidatedGroupSpec(
-        "o",
-        "I",
-        summary.getInverseMap(),
-        summary.getBinaryOperator()
-      )
+      ValidatedGroupSpec.builder()
+        .operatorSymbol("o")
+        .identity("I")
+        .inversesMap(summary.getInverseMap())
+        .binaryOperator(summary.getBinaryOperator())
+        .cyclesMap(summary.getCyclesMap())
+        .build()
     );
   }
 }

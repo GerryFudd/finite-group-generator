@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class TrivialGroup implements SafeGroup {
@@ -22,6 +25,16 @@ public class TrivialGroup implements SafeGroup {
   @Override
   public String getInverse(String element) {
     return identity;
+  }
+  
+  @Override
+  public List<Integer> getCycleSizes() {
+    return List.of(1);
+  }
+  
+  @Override
+  public Set<List<String>> getNCycles(Integer n) {
+    return n == 1 ? Set.of(List.of("I")) : Set.of();
   }
   
   @Override

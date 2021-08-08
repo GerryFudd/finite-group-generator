@@ -37,13 +37,13 @@ class ValidatedAutomorphismTest {
     
     assertEquals(
       "\n" +
-        "_x____|_I____a____b____c____d2___d____\n" +
-        " I    | I    a    b    c    d2   d    \n" +
-        " a    | a    I    d    d2   c    b    \n" +
-        " b    | b    d2   I    d    a    c    \n" +
-        " c    | c    d    d2   I    b    a    \n" +
-        " d2   | d2   b    c    a    d    I    \n" +
-        " d    | d    c    a    b    I    d2   \n",
+        "_x____|_I____a____b____c____d____d2___\n" +
+        " I    | I    a    b    c    d    d2   \n" +
+        " a    | a    I    d    d2   b    c    \n" +
+        " b    | b    d2   I    d    c    a    \n" +
+        " c    | c    d    d2   I    a    b    \n" +
+        " d    | d    c    a    b    d2   I    \n" +
+        " d2   | d2   b    c    a    I    d    \n",
       result.getRange().getMultiplicationTable()
     );
   }

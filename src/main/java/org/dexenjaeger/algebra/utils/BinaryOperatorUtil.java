@@ -6,10 +6,12 @@ import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -66,16 +68,22 @@ public class BinaryOperatorUtil {
         }
       }
     }
+    Map<Integer, Set<List<String>>> cyclesMap = new HashMap<>();
     for (int cycleSize: summary.getCycleSizes()) {
       summary.getNCycles(cycleSize).forEach(cycle -> {
-        LinkedList<String> cycleVals = new LinkedList<>();
+        cyclesMap.computeIfAbsent(cycleSize, (acc) -> new HashSet<>());
+        List<String> resultCycle = new LinkedList<>();
         String baseValue = remapper.map(cycle.get(0)).orElseThrow();
-        cycleVals.add(baseValue);
+        resultCycle.add(baseValue);
         int i = 1;
         while (i < cycle.size() - 1) {
-          cycleVals.add(remapper.map(baseValue + (i + 1), cycle.get(i)).orElseThrow());
+          resultCycle.add(remapper.map(baseValue + (i + 1), cycle.get(i)).orElseThrow());
           i++;
         }
+  
+        LinkedList<String> cycleVals = new LinkedList<>(resultCycle);
+        resultCycle.add("I");
+        cyclesMap.get(cycleSize).add(resultCycle);
         while (!cycleVals.isEmpty()) {
           String val = cycleVals.removeFirst();
           String inv = cycleVals.isEmpty() ? val : cycleVals.removeLast();
@@ -84,6 +92,7 @@ public class BinaryOperatorUtil {
         }
       });
     }
+    resultBuilder.cyclesMap(cyclesMap);
     if (!remapper.getAvailable().isEmpty()) {
       throw new RuntimeException("All permutations should exist in some cycle.");
     }

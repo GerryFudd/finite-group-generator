@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,15 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ValidatedHomomorphismTest {
   @Test
   void createHomomorphismTest() {
-    String[] elements = {"I"};
     ValidatedHomomorphism validatedHomomorphism = ValidatedHomomorphism.createHomomorphism(
-      new ValidatedGroupSpec(
-        Collections.singletonMap("I" ,"I"),
-        new ValidatingBinaryOperator(
-          elements, Collections.singletonMap("I", 0), (a, b) -> 0
-        )
-      ),
-      ValidatedGroup::createGroup,
+      new TrivialGroup(),
       a -> "E"
     );
     
@@ -50,21 +44,27 @@ class ValidatedHomomorphismTest {
     RuntimeException e = assertThrows(
       RuntimeException.class,
       () -> ValidatedHomomorphism.createHomomorphism(
-        new ValidatedGroupSpec(
-          Map.of("I", "I", "a", "b", "b", "a"),
-          new ValidatingBinaryOperator(
-            elements,
-            Map.of("I", 0, "a", 1, "b", 2),
-            (a, b) -> (a + b) % 3
-          )
+        ValidatedGroup.createGroup(
+          ValidatedGroupSpec.builder()
+            .inversesMap(Map.of("I", "I", "a", "b", "b", "a"))
+            .cyclesMap(Map.of(
+              1, Set.of(List.of("I")),
+              3, Set.of(List.of("a", "b", "I"))
+            ))
+            .binaryOperator(new ValidatingBinaryOperator(
+              elements,
+              Map.of("I", 0, "a", 1, "b", 2),
+              (a, b) -> (a + b) % 3
+            ))
+            .build()
         ),
-        ValidatedGroup::createGroup,
         (a) -> "b".equals(a) ? "B" : "E"
       )
     );
     
     assertEquals(
-      "Function is not a homomorphism.", e.getMessage()
+      "Invalid homomorphism. Kernel is not a subgroup since a is in the kernel but its inverse b is not.",
+      e.getMessage()
     );
   }
   
@@ -84,30 +84,42 @@ class ValidatedHomomorphismTest {
       RuntimeException.class,
       () -> ValidatedHomomorphism.createHomomorphism(
         ValidatedGroup.createGroup(
-          new ValidatedGroupSpec(
-            Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"),
-            new ValidatingBinaryOperator(
+          ValidatedGroupSpec.builder()
+            .inversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
+            .cyclesMap(Map.of(
+              1, Set.of(List.of("I")),
+              6, Set.of(List.of("a", "b", "c", "d", "e", "I"))
+            ))
+            .binaryOperator(new ValidatingBinaryOperator(
               elements, lookup, (a, b) -> (a + b) % 6
-            )
-          )
+            ))
+            .build()
         ),
         ValidatedGroup.createGroup(
-          new ValidatedGroupSpec(
-            "E",
-            Map.of("E", "E", "C", "C"),
-            new ValidatingBinaryOperator(
+          ValidatedGroupSpec.builder()
+            .identity("E")
+            .inversesMap(Map.of("E", "E", "C", "C"))
+            .cyclesMap(Map.of(
+              1, Set.of(List.of("E")),
+              2, Set.of(List.of("C", "E"))
+            ))
+            .binaryOperator(new ValidatingBinaryOperator(
               rangeElements, rangeLookup, (a, b) -> (a + b) % 2
-            )
-          )
+            ))
+            .build()
         ),
         ValidatedGroup.createGroup(
-          new ValidatedGroupSpec(
-          Map.of("I", "I", "d", "e", "e", "d"),
-          new ValidatingBinaryOperator(
-            kernelElements, kernelLookup,
+          ValidatedGroupSpec.builder()
+            .inversesMap(Map.of("I", "I", "d", "e", "e", "d"))
+            .cyclesMap(Map.of(
+              1, Set.of(List.of("I")),
+              3, Set.of(List.of("d", "e", "I"))
+            ))
+            .binaryOperator(new ValidatingBinaryOperator(
+              kernelElements, kernelLookup,
               (a, b) -> (a + b) % 3
-            )
-          )
+            ))
+            .build()
         ),
         (a) -> rangeElements[lookup.get(a) % 2]
       )
@@ -124,9 +136,6 @@ class ValidatedHomomorphismTest {
     Map<String, Integer> lookup =
       Map.of("I", 0, "a", 1, "b", 2, "c", 3, "d", 4, "e", 5);
     
-    String[] rangeElements = {"E"};
-    Map<String, Integer> rangeLookup = Map.of("E", 0);
-    
     int[][] kernelMult = {
       {0, 1, 2, 3, 4, 5},
       {1, 0, 5, 4, 3, 2},
@@ -135,26 +144,35 @@ class ValidatedHomomorphismTest {
       {4, 2, 3, 1, 5, 0},
       {5, 3, 1, 2, 0, 4}
     };
-  
+    
     RuntimeException e = assertThrows(
       RuntimeException.class,
       () -> ValidatedHomomorphism.createHomomorphism(
         ValidatedGroup.createGroup(
-          new ValidatedGroupSpec(
-            Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"),
-            new ValidatingBinaryOperator(
+          ValidatedGroupSpec.builder()
+            .inversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
+            .cyclesMap(Map.of(
+              1, Set.of(List.of("I")),
+              6, Set.of(List.of("a", "b", "c", "d", "e", "I"))
+            ))
+            .binaryOperator(new ValidatingBinaryOperator(
               elements, lookup, (a, b) -> (a + b) % 6
-            )
-          )
+            ))
+            .build()
         ),
         new TrivialGroup("E"),
         ValidatedGroup.createGroup(
-          new ValidatedGroupSpec(
-          Map.of("I", "I", "a", "a", "b", "b", "c", "c", "d", "e", "e", "d"),
-          new ValidatingBinaryOperator(
-            elements, lookup, (a, b) -> kernelMult[a][b]
-          )
-          )
+          ValidatedGroupSpec.builder()
+            .inversesMap(Map.of("I", "I", "a", "a", "b", "b", "c", "c", "d", "e", "e", "d"))
+            .cyclesMap(Map.of(
+              1, Set.of(List.of("I")),
+              2, Set.of(List.of("a", "I"), List.of("b", "I"), List.of("c", "I")),
+              3, Set.of(List.of("d", "e", "I"))
+            ))
+            .binaryOperator(new ValidatingBinaryOperator(
+              elements, lookup, (a, b) -> kernelMult[a][b]
+            ))
+            .build()
         ),
         (a) -> "E"
       )
