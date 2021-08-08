@@ -5,21 +5,12 @@ import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ConcreteSemigroupTest {
-  private Map<String, Integer> createReverseLookup(String[] elements) {
-    Map<String, Integer> result = new HashMap<>();
-    for (int i = 0; i < elements.length; i++) {
-      result.put(elements[i], i);
-    }
-    return result;
-  }
   
   @Test
   void getProductTest() {
@@ -52,7 +43,6 @@ class ConcreteSemigroupTest {
   @Test
   void getMultiplicationTableTest() {
     String[] elements = {"a", "b", "c"};
-    Map<String, Integer> lookup = createReverseLookup(elements);
     
     Semigroup testSemigroup = ConcreteSemigroup.builder()
       .operatorSymbol("+")
@@ -75,7 +65,7 @@ class ConcreteSemigroupTest {
   }
   
   @Test
-  void getCyclicGroupTest() {
+  void getCycleTest() {
     String[] elements = {"a", "b", "c"};
     Semigroup testSemigroup = ConcreteSemigroup.builder()
       .elements(Set.of(elements))
@@ -86,17 +76,17 @@ class ConcreteSemigroupTest {
     
     assertEquals(
       List.of("b", "c", "a"),
-      testSemigroup.getCyclicGroup("b")
+      testSemigroup.getCycle("b")
     );
     
     assertEquals(
       List.of("c", "b", "a"),
-      testSemigroup.getCyclicGroup("c")
+      testSemigroup.getCycle("c")
     );
     
     assertEquals(
       List.of("a"),
-      testSemigroup.getCyclicGroup("a")
+      testSemigroup.getCycle("a")
     );
   }
 }

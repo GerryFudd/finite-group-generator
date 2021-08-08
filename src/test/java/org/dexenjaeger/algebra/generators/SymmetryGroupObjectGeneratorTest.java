@@ -53,7 +53,7 @@ class SymmetryGroupObjectGeneratorTest {
     Set<String> elements = s4.getElements();
     Map<Integer, Set<String>> groupOrderCount = new HashMap<>();
     for (String element:elements) {
-      List<String> cycle = s4.getCyclicGroup(element);
+      List<String> cycle = s4.getCycle(element);
       groupOrderCount.compute(cycle.size(), (key, set) -> {
         if (set == null) {
           set = new HashSet<>();

@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -36,21 +37,10 @@ class HomomorphismUtilTest {
   
   @Test
   void createHomomorphismTest_InvalidHomomorphismFunction() {
-    String[] elements = {"I", "a", "b"};
     RuntimeException e = assertThrows(
       RuntimeException.class,
       () -> HomomorphismUtil.createHomomorphism(
-        ConcreteGroup.builder()
-          .inversesMap(Map.of("I", "I", "a", "b", "b", "a"))
-          .cyclesMap(Map.of(
-            1, Set.of(List.of("I")),
-            3, Set.of(List.of("a", "b", "I"))
-          ))
-          .elements(Set.of(elements))
-          .operator(BinaryOperatorUtil.createOperator(
-            elements, (a, b) -> (a + b) % 3
-          ))
-          .build(),
+        BinaryOperatorUtil.getCyclicGroup("I", "a", "b"),
         (a) -> "b".equals(a) ? "B" : "E"
       )
     );
@@ -63,53 +53,23 @@ class HomomorphismUtilTest {
   
   @Test
   void createHomomorphismTest_InvalidKernel() {
-    String[] elements = {"I", "a", "b", "c", "d", "e"};
     Map<String, Integer> lookup =
       Map.of("I", 0, "a", 1, "b", 2, "c", 3, "d", 4, "e", 5);
     
     String[] rangeElements = {"E", "C"};
-    Map<String, Integer> rangeLookup = Map.of("E", 0, "C", 1);
-    
-    String[] kernelElements = {"I", "d", "e"};
-    Map<String, Integer> kernelLookup = Map.of("I", 0, "d", 1, "e", 2);
     
     RuntimeException e = assertThrows(
       RuntimeException.class,
       () -> HomomorphismUtil.createHomomorphism(
-        ConcreteGroup.builder()
-          .inversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
-          .cyclesMap(Map.of(
-            1, Set.of(List.of("I")),
-            6, Set.of(List.of("a", "b", "c", "d", "e", "I"))
-          ))
-          .elements(Set.of(elements))
-          .operator(BinaryOperatorUtil.createOperator(
-            elements, (a, b) -> (a + b) % 6
-          ))
-          .build(),
-        ConcreteGroup.builder()
-          .identity("E")
-          .inversesMap(Map.of("E", "E", "C", "C"))
-          .cyclesMap(Map.of(
-            1, Set.of(List.of("E")),
-            2, Set.of(List.of("C", "E"))
-          ))
-          .elements(Set.of(rangeElements))
-          .operator(BinaryOperatorUtil.createOperator(
-            rangeElements, (a, b) -> (a + b) % 2
-          ))
-          .build(),
-        ConcreteGroup.builder()
-          .inversesMap(Map.of("I", "I", "d", "e", "e", "d"))
-          .cyclesMap(Map.of(
-            1, Set.of(List.of("I")),
-            3, Set.of(List.of("d", "e", "I"))
-          ))
-          .elements(Set.of(kernelElements))
-          .operator(BinaryOperatorUtil.createOperator(
-            kernelElements, (a, b) -> (a + b) % 3
-          ))
-          .build(),
+        BinaryOperatorUtil.getCyclicGroup(
+          "I", "a", "b", "c", "d", "e"
+        ),
+        BinaryOperatorUtil.getCyclicGroup(
+          "E", "C"
+        ),
+        BinaryOperatorUtil.getCyclicGroup(
+          "I", "d", "e"
+        ),
         (a) -> rangeElements[lookup.get(a) % 2]
       )
     );
@@ -135,17 +95,7 @@ class HomomorphismUtilTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> HomomorphismUtil.createHomomorphism(
-        ConcreteGroup.builder()
-          .inversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
-          .cyclesMap(Map.of(
-            1, Set.of(List.of("I")),
-            6, Set.of(List.of("a", "b", "c", "d", "e", "I"))
-          ))
-          .elements(Set.of(elements))
-          .operator(BinaryOperatorUtil.createOperator(
-            elements, (a, b) -> (a + b) % 6
-          ))
-          .build(),
+        BinaryOperatorUtil.getCyclicGroup(elements),
         new TrivialGroup("E"),
         ConcreteGroup.builder()
           .inversesMap(Map.of("I", "I", "a", "a", "b", "b", "c", "c", "d", "e", "e", "d"))
@@ -165,6 +115,21 @@ class HomomorphismUtilTest {
     
     assertEquals(
       "Kernel is not a subgroup.", e.getMessage()
+    );
+  }
+  
+  @Test
+  void trivialHomomorphismCreatesKernelThatEqualsGroup() throws ValidationException {
+    Group group = BinaryOperatorUtil.getCyclicGroup(
+      "I", "a", "b"
+    );
+    Homomorphism result = HomomorphismUtil.createHomomorphism(
+      group, (a) -> "E"
+    );
+    
+    assertEquals(
+      group.getMultiplicationTable(),
+      result.getKernel().getMultiplicationTable()
     );
   }
 }

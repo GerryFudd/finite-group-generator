@@ -1,5 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 
@@ -172,7 +174,31 @@ public class BinaryOperatorUtil {
     return sb.toString();
   }
   
-  public static List<String> getCyclicGroup(String element, BiFunction<String, String, String> binaryOperator) {
+  public static Group getCyclicGroup(String... elements) {
+    int n = elements.length;
+    LinkedList<String> cycle = new LinkedList<>();
+    Map<String, String> inverses = new HashMap<>();
+    for (int i = 1; i < n; i++) {
+      inverses.put(elements[i], elements[n-i]);
+      cycle.addLast(elements[i]);
+    }
+    inverses.put(elements[0], elements[0]);
+    cycle.addLast(elements[0]);
+    return ConcreteGroup.builder()
+             .identity(elements[0])
+             .inversesMap(inverses)
+             .cyclesMap(Map.of(
+               1, Set.of(List.of(elements[0])),
+               n, Set.of(cycle)
+             ))
+             .elements(Set.of(elements))
+             .operator(createOperator(
+               elements, (a, b) -> (a + b) % n
+             ))
+             .build();
+  }
+  
+  public static List<String> getCycle(String element, BiFunction<String, String, String> binaryOperator) {
     List<String> cycle = new LinkedList<>();
     cycle.add(element);
     String current = binaryOperator.apply(element, element);

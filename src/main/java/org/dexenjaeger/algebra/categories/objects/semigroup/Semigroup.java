@@ -6,7 +6,7 @@ import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import java.util.List;
 
 public interface Semigroup extends BinaryOperator {
-  default List<String> getCyclicGroup(String element) {
-    return BinaryOperatorUtil.getCyclicGroup(element, this::prod);
+  default List<String> getCycle(String element) {
+    return BinaryOperatorUtil.getCycle(element, this::prod);
   }
 }
