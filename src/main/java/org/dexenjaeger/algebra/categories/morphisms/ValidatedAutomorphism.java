@@ -1,12 +1,8 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import org.dexenjaeger.algebra.categories.objects.Group;
-import org.dexenjaeger.algebra.categories.objects.SafeGroup;
-import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.utils.HomomorphismUtil;
 
-import java.util.List;
 import java.util.function.Function;
 
 public class ValidatedAutomorphism implements Automorphism {

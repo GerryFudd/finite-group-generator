@@ -1,8 +1,8 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
 import lombok.Getter;
-import org.dexenjaeger.algebra.categories.objects.Group;
-import org.dexenjaeger.algebra.categories.objects.SafeGroup;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
 import org.dexenjaeger.algebra.model.OrderedPair;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.HomomorphismUtil;

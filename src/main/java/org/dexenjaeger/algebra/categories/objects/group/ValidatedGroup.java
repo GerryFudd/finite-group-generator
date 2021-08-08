@@ -1,8 +1,10 @@
-package org.dexenjaeger.algebra.categories.objects;
+package org.dexenjaeger.algebra.categories.objects.group;
 
+import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
+import org.dexenjaeger.algebra.categories.objects.monoid.ValidatedMonoid;
 import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
 import org.dexenjaeger.algebra.model.ValidatedMonoidSpec;
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 
 import java.util.List;
 import java.util.Map;

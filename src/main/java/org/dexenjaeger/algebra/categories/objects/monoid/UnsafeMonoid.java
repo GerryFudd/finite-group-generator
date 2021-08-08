@@ -1,7 +1,8 @@
-package org.dexenjaeger.algebra.categories.objects;
+package org.dexenjaeger.algebra.categories.objects.monoid;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 
 import java.util.List;
 

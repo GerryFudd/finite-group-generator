@@ -1,4 +1,4 @@
-package org.dexenjaeger.algebra.categories.objects;
+package org.dexenjaeger.algebra.categories.objects.semigroup;
 
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 

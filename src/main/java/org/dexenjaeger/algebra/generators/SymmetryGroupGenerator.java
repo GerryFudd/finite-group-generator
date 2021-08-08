@@ -1,12 +1,9 @@
 package org.dexenjaeger.algebra.generators;
 
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
-import org.dexenjaeger.algebra.categories.objects.SafeGroup;
-import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
-import org.dexenjaeger.algebra.categories.objects.ValidatedSemigroup;
+import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
+import org.dexenjaeger.algebra.categories.objects.group.ValidatedGroup;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
-import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreMath;
 

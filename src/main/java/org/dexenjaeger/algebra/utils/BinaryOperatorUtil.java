@@ -1,10 +1,8 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.categories.objects.Group;
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;

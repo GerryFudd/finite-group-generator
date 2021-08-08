@@ -1,14 +1,11 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import org.dexenjaeger.algebra.categories.objects.TrivialGroup;
-import org.dexenjaeger.algebra.categories.objects.UnsafeGroup;
-import org.dexenjaeger.algebra.categories.objects.UnsafeMonoid;
-import org.dexenjaeger.algebra.categories.objects.UnsafeSemigroup;
-import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
+import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
+import org.dexenjaeger.algebra.categories.objects.group.ValidatedGroup;
 import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

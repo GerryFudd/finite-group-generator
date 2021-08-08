@@ -1,12 +1,12 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BinaryOperatorUtilTest {
   @Test

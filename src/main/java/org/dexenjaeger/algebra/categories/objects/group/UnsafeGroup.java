@@ -1,10 +1,10 @@
-package org.dexenjaeger.algebra.categories.objects;
+package org.dexenjaeger.algebra.categories.objects.group;
 
 import lombok.RequiredArgsConstructor;
+import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 

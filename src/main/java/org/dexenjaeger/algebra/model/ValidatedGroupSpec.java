@@ -1,11 +1,8 @@
 package org.dexenjaeger.algebra.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

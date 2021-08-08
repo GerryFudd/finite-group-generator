@@ -1,19 +1,21 @@
 package org.dexenjaeger.algebra.categories.objects;
 
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
+import org.dexenjaeger.algebra.categories.objects.group.ValidatedGroup;
+import org.dexenjaeger.algebra.categories.objects.monoid.ValidatedMonoid;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreArrayUtils;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 class ValidatedGroupTest {

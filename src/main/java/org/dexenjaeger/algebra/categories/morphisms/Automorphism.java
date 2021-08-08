@@ -1,10 +1,7 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import org.dexenjaeger.algebra.categories.objects.Group;
-import org.dexenjaeger.algebra.categories.objects.TrivialGroup;
-import org.dexenjaeger.algebra.categories.objects.UnsafeGroup;
-
-import java.util.Map;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 
 public interface Automorphism extends Homomorphism {
   String unApply(String b);

@@ -1,7 +1,6 @@
 package org.dexenjaeger.algebra.generators;
 
-import org.dexenjaeger.algebra.categories.objects.Group;
-import org.dexenjaeger.algebra.categories.objects.ValidatedSemigroup;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SymmetryGroupGeneratorTest {
   @Test

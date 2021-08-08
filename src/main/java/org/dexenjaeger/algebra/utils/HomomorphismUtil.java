@@ -1,14 +1,13 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.categories.objects.Group;
-import org.dexenjaeger.algebra.categories.objects.SafeGroup;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
+import org.dexenjaeger.algebra.categories.objects.group.UnsafeGroup;
+import org.dexenjaeger.algebra.categories.objects.monoid.UnsafeMonoid;
+import org.dexenjaeger.algebra.categories.objects.semigroup.UnsafeSemigroup;
 import org.dexenjaeger.algebra.model.OrderedPair;
-import org.dexenjaeger.algebra.categories.objects.UnsafeGroup;
-import org.dexenjaeger.algebra.categories.objects.UnsafeMonoid;
-import org.dexenjaeger.algebra.categories.objects.UnsafeSemigroup;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;

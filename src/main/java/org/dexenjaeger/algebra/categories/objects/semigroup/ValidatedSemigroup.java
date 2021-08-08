@@ -1,8 +1,8 @@
-package org.dexenjaeger.algebra.categories.objects;
+package org.dexenjaeger.algebra.categories.objects.semigroup;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 
 import java.util.List;
 

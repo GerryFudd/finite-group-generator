@@ -1,14 +1,17 @@
 package org.dexenjaeger.algebra.categories.objects;
 
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
+import org.dexenjaeger.algebra.categories.objects.monoid.ValidatedMonoid;
+import org.dexenjaeger.algebra.categories.objects.semigroup.ValidatedSemigroup;
 import org.dexenjaeger.algebra.model.ValidatedMonoidSpec;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreArrayUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 class ValidatedMonoidTest {

@@ -1,8 +1,8 @@
 package org.dexenjaeger.algebra.categories.objects;
 
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
-import org.dexenjaeger.algebra.categories.objects.ValidatedSemigroup;
+import org.dexenjaeger.algebra.categories.objects.semigroup.ValidatedSemigroup;
 import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
+import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 import org.dexenjaeger.algebra.utils.MoreArrayUtils;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ValidatedSemigroupTest {
   private Map<String, Integer> createReverseLookup(String[] elements) {

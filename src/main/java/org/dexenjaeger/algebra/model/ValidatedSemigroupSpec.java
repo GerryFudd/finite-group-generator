@@ -2,7 +2,6 @@ package org.dexenjaeger.algebra.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.dexenjaeger.algebra.categories.morphisms.ValidatingBinaryOperator;
 
 @Getter
 @AllArgsConstructor

@@ -1,19 +1,12 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import org.dexenjaeger.algebra.categories.objects.SafeGroup;
-import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
+import org.dexenjaeger.algebra.categories.objects.group.SafeGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
-import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ValidatedAutomorphismTest {
   @Test
