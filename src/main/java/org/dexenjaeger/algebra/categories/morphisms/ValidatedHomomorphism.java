@@ -3,9 +3,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 import lombok.Getter;
 import org.dexenjaeger.algebra.categories.objects.Group;
 import org.dexenjaeger.algebra.categories.objects.SafeGroup;
-import org.dexenjaeger.algebra.categories.objects.ValidatedGroup;
 import org.dexenjaeger.algebra.model.OrderedPair;
-import org.dexenjaeger.algebra.model.ValidatedGroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.HomomorphismUtil;
 
@@ -49,17 +47,6 @@ public class ValidatedHomomorphism implements Homomorphism {
     
     return new ValidatedHomomorphism(
       domain, range, kernel, act
-    );
-  }
-  
-  public static ValidatedHomomorphism createHomomorphism(
-    ValidatedGroupSpec domainSpec,
-    Function<ValidatedGroupSpec, ValidatedGroup> validatedGroupConstructor,
-    Function<String, String> act
-  ) {
-    return createHomomorphism(
-      validatedGroupConstructor.apply(domainSpec),
-      act
     );
   }
   
