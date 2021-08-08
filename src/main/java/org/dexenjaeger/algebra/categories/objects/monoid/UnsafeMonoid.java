@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 
-import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class UnsafeMonoid implements Monoid {
@@ -18,12 +18,12 @@ public class UnsafeMonoid implements Monoid {
   }
   
   @Override
-  public List<String> getElementsAsList() {
-    return semigroup.getElementsAsList();
+  public Set<String> getElements() {
+    return semigroup.getElements();
   }
   
   @Override
-  public String getProduct(String a, String b) {
-    return semigroup.getProduct(a, b);
+  public String prod(String a, String b) {
+    return semigroup.prod(a, b);
   }
 }

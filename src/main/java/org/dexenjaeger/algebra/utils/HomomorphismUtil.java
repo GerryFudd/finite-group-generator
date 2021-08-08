@@ -26,9 +26,9 @@ public class HomomorphismUtil {
   public static OrderedPair<Group, Group> constructRangeAndKernel(SafeGroup domain, Function<String, String> act) {
     Map<String, String> rangeInversesMap = new HashMap<>();
     Map<String, String> domainLookupMap = new HashMap<>();
-    List<String> rangeElements = new LinkedList<>();
+    Set<String> rangeElements = new HashSet<>();
     Map<Integer, Set<List<String>>> rangeCycles = new HashMap<>();
-    List<String> kernelElements = new LinkedList<>();
+    Set<String> kernelElements = new HashSet<>();
     Map<Integer, Set<List<String>>> kernelCycles = new HashMap<>();
   
     String rangeIdentity = act.apply(domain.getIdentity());
@@ -128,8 +128,8 @@ public class HomomorphismUtil {
           rangeIdentity,
           new UnsafeSemigroup(
             "x",
-            rangeElements.stream().sorted().collect(Collectors.toList()),
-            (a, b) -> act.apply(domain.getProduct(
+            rangeElements,
+            (a, b) -> act.apply(domain.prod(
               domainLookupMap.get(a),
               domainLookupMap.get(b)
             ))
@@ -147,17 +147,18 @@ public class HomomorphismUtil {
           new UnsafeSemigroup(
             domain.getOperatorSymbol(),
             kernelElements,
-            domain::getProduct
+            domain::prod
           )
         )
       )
     );
   }
   
-  private static RuntimeException getNotFunctionException(List<String> rangeElements, String output, String input) {
+  private static RuntimeException getNotFunctionException(
+    Collection<String> rangeElements, String identity, String output, String input) {
     return new RuntimeException(String.format(
       "Range %s doesn't contain image %s of %s.",
-      String.join(", ", rangeElements),
+      BinaryOperatorUtil.getSortedElements(rangeElements, identity),
       output, input
     ));
   }
@@ -167,25 +168,25 @@ public class HomomorphismUtil {
     Group range,
     Function<String, String> act
   ) {
-    List<String> rangeElements = range.getElementsAsList();
-    for (String a:domain.getElementsAsList()) {
+    Set<String> rangeElements = range.getElements();
+    for (String a:domain.getElements()) {
       String fa = act.apply(a);
       if (!rangeElements.contains(fa)) {
-        throw getNotFunctionException(rangeElements, fa, a);
+        throw getNotFunctionException(rangeElements, range.getIdentity(), fa, a);
       }
-      for (String b:domain.getElementsAsList()) {
+      for (String b:domain.getElements()) {
         String fb = act.apply(b);
         if (!rangeElements.contains(fb)) {
-          throw getNotFunctionException(rangeElements, fb, b);
+          throw getNotFunctionException(rangeElements, range.getIdentity(), fb, b);
         }
-        if (!rangeElements.contains(range.getProduct(fa, fb))) {
+        if (!rangeElements.contains(range.prod(fa, fb))) {
           throw new RuntimeException(String.format(
             "Range %s isn't closed under %s.",
             String.join(", ", rangeElements), range.getOperatorSymbol()
           ));
         }
-        if (!range.getProduct(act.apply(a), act.apply(b))
-               .equals(act.apply(domain.getProduct(a, b)))) {
+        if (!range.prod(act.apply(a), act.apply(b))
+               .equals(act.apply(domain.prod(a, b)))) {
           throw new RuntimeException("Function is not a homomorphism.");
         }
       }
@@ -219,8 +220,8 @@ public class HomomorphismUtil {
   }
   
   public static void validateInverseImageOfId(Group domain, Group kernel, String identity, Function<String, String> act) {
-    for (String a:domain.getElementsAsList()) {
-      if (kernel.getElementsAsList().contains(a) != act.apply(a).equals(identity)) {
+    for (String a:domain.getElements()) {
+      if (kernel.getElements().contains(a) != act.apply(a).equals(identity)) {
         throw new RuntimeException("Subset is not the inverse image of the identity.");
       }
     }

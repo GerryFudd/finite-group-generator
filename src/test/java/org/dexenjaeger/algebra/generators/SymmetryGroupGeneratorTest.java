@@ -50,7 +50,7 @@ class SymmetryGroupGeneratorTest {
   void createS4() {
     Group s4 = SymmetryGroupGenerator.createSymmetryGroup(4);
     
-    List<String> elements = s4.getElementsAsList();
+    Set<String> elements = s4.getElements();
     Map<Integer, Set<String>> groupOrderCount = new HashMap<>();
     for (String element:elements) {
       List<String> cycle = s4.getCyclicGroup(element);

@@ -95,9 +95,9 @@ class ValidatedGroupTest {
         .build()
     );
     
-    result.getElementsAsList().forEach(element -> assertEquals(
+    result.getElements().forEach(element -> assertEquals(
       result.getIdentity(),
-      result.getProduct(
+      result.prod(
         element,
         result.getInverse(element)
       )

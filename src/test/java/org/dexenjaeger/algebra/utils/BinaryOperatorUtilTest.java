@@ -25,7 +25,7 @@ class BinaryOperatorUtilTest {
     
     assertEquals(
       "L1, L2, a, b",
-      String.join(", ", result.getBinaryOperator().getElements())
+      String.join(", ", result.getBinaryOperator().getElementsArray())
     );
     
     assertNull(result.getIdentity());
@@ -48,7 +48,7 @@ class BinaryOperatorUtilTest {
     
     assertEquals(
       "R1, R2, a, b",
-      String.join(", ", result.getBinaryOperator().getElements())
+      String.join(", ", result.getBinaryOperator().getElementsArray())
     );
   
     assertNull(result.getIdentity());
@@ -71,7 +71,7 @@ class BinaryOperatorUtilTest {
     
     assertEquals(
       "I, a, b, c",
-      String.join(", ", result.getBinaryOperator().getElements())
+      String.join(", ", result.getBinaryOperator().getElementsArray())
     );
   
     assertEquals("I", result.getIdentity());

@@ -42,8 +42,8 @@ public class ValidatedAutomorphism implements Automorphism {
     Function<String, String> inverseAct
   ) {
     HomomorphismUtil.validateHomomorphism(domain, range, act);
-    HomomorphismUtil.validateBijection(domain.getElementsAsList(), range.getElementsAsList(), act);
-    HomomorphismUtil.validateLeftInverse(domain.getElementsAsList(), act, inverseAct);
+    HomomorphismUtil.validateBijection(domain.getElements(), range.getElements(), act);
+    HomomorphismUtil.validateLeftInverse(domain.getElements(), act, inverseAct);
     
     return new ValidatedAutomorphism(
       domain, range, act, inverseAct

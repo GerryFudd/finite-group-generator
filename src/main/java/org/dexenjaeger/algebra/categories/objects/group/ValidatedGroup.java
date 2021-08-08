@@ -55,13 +55,13 @@ public class ValidatedGroup implements SafeGroup {
   }
   
   @Override
-  public List<String> getElementsAsList() {
-    return monoid.getElementsAsList();
+  public Set<String> getElements() {
+    return monoid.getElements();
   }
   
   @Override
-  public String getProduct(String a, String b) {
-    return monoid.getProduct(a, b);
+  public String prod(String a, String b) {
+    return monoid.prod(a, b);
   }
   
   @Override

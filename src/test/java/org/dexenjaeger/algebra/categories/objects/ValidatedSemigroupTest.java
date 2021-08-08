@@ -50,25 +50,25 @@ class ValidatedSemigroupTest {
     
     assertEquals(
       "I",
-      testSemigroup.getProduct("I", "I")
+      testSemigroup.prod("I", "I")
     );
     
     assertEquals(
       "I",
-      testSemigroup.getProduct("a", "a")
+      testSemigroup.prod("a", "a")
     );
     
     assertEquals(
       "a",
-      testSemigroup.getProduct("I", "a")
+      testSemigroup.prod("I", "a")
     );
     
     assertEquals(
       "a",
-      testSemigroup.getProduct("a", "I")
+      testSemigroup.prod("a", "I")
     );
     
-    RuntimeException e = assertThrows(RuntimeException.class, () -> testSemigroup.getProduct("I", "b"));
+    RuntimeException e = assertThrows(RuntimeException.class, () -> testSemigroup.prod("I", "b"));
     assertEquals("Element \"b\" doesn't exist in I, a", e.getMessage());
   }
   

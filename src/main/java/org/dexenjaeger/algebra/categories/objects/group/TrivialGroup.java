@@ -36,12 +36,12 @@ public class TrivialGroup implements SafeGroup {
   }
   
   @Override
-  public List<String> getElementsAsList() {
-    return List.of(identity);
+  public Set<String> getElements() {
+    return Set.of(identity);
   }
   
   @Override
-  public String getProduct(String a, String b) {
+  public String prod(String a, String b) {
     return identity;
   }
 }

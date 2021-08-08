@@ -11,9 +11,11 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
-public class ValidatingBinaryOperator {
+public class ValidatingBinaryOperator implements BinaryOperator {
   @Getter
-  private final String[] elements;
+  private final String operatorSymbol = "*";
+  @Getter
+  private final String[] elementsArray;
   private final Map<String, Integer> reverseLookup;
   private final BiFunction<Integer, Integer, Integer> binaryOperator;
   
@@ -21,27 +23,32 @@ public class ValidatingBinaryOperator {
     return Optional.ofNullable(reverseLookup.get(element))
       .orElseThrow(() -> new RuntimeException(String.format(
         "Element \"%s\" doesn't exist in %s",
-        element, String.join(", ", elements)
+        element, String.join(", ", elementsArray)
       )));
   }
   
+  @Override
+  public Set<String> getElements() {
+    return Set.of(elementsArray);
+  }
+  
   public String prod(String a, String b) {
-    return elements[binaryOperator.apply(lookup(a),lookup(b))];
+    return elementsArray[binaryOperator.apply(lookup(a),lookup(b))];
   }
   
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isValid() {
-    if (elements.length != reverseLookup.entrySet().size()) {
+    if (elementsArray.length != reverseLookup.entrySet().size()) {
       return false;
     }
     
-    for (int i = 0; i < elements.length; i++) {
-      if (i != reverseLookup.get(elements[i])) {
+    for (int i = 0; i < elementsArray.length; i++) {
+      if (i != reverseLookup.get(elementsArray[i])) {
         return false;
       }
-      for (int j = 0; j < elements.length; j++) {
+      for (int j = 0; j < elementsArray.length; j++) {
         int product = binaryOperator.apply(i, j);
-        if (product < 0 || elements.length <= product) {
+        if (product < 0 || elementsArray.length <= product) {
           return false;
         }
       }
@@ -52,9 +59,9 @@ public class ValidatingBinaryOperator {
   
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isAssociative() {
-    for (int i = 0; i < elements.length; i++) {
-      for (int j = 0; j < elements.length; j++) {
-        for (int k = 0; k < elements.length; k++) {
+    for (int i = 0; i < elementsArray.length; i++) {
+      for (int j = 0; j < elementsArray.length; j++) {
+        for (int k = 0; k < elementsArray.length; k++) {
           if (
             !binaryOperator.apply(binaryOperator.apply(i, j), k).equals(binaryOperator.apply(i, binaryOperator.apply(j, k)))
           ) {
@@ -68,7 +75,7 @@ public class ValidatingBinaryOperator {
   
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isIdentity(String id) {
-    for (String element:elements) {
+    for (String element: elementsArray) {
       if (!prod(id, element).equals(element) || !prod(element, id).equals(element)) {
         return false;
       }
@@ -76,28 +83,28 @@ public class ValidatingBinaryOperator {
     return true;
   }
   
-  private RuntimeException getInerseMapNotValidException(Exception e) {
+  private RuntimeException getInevrseMapNotValidException(Exception e) {
     return new RuntimeException("Inverse map is not valid.", e);
   }
   
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public void validateInverseMap(String identity, Map<String, String> inversesMap) {
-    for (String element:elements) {
+    for (String element: elementsArray) {
       if (!inversesMap.containsKey(element)) {
-        throw getInerseMapNotValidException(null);
+        throw getInevrseMapNotValidException(null);
       }
       String inverse;
       try {
-        inverse = elements[lookup(inversesMap.get(element))];
+        inverse = elementsArray[lookup(inversesMap.get(element))];
       } catch (RuntimeException e) {
-        throw getInerseMapNotValidException(e);
+        throw getInevrseMapNotValidException(e);
       }
       
       if (
         !identity.equals(prod(element, inverse))
           || !identity.equals(prod(inverse, element))
       ) {
-        throw getInerseMapNotValidException(null);
+        throw getInevrseMapNotValidException(null);
       }
     }
   }

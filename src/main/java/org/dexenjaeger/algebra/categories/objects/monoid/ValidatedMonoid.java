@@ -7,7 +7,7 @@ import org.dexenjaeger.algebra.model.ValidatedMonoidSpec;
 import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
 import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 
-import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class ValidatedMonoid implements Monoid {
@@ -52,12 +52,12 @@ public class ValidatedMonoid implements Monoid {
   }
   
   @Override
-  public List<String> getElementsAsList() {
-    return semigroup.getElementsAsList();
+  public Set<String> getElements() {
+    return semigroup.getElements();
   }
   
   @Override
-  public String getProduct(String a, String b) {
-    return semigroup.getProduct(a, b);
+  public String prod(String a, String b) {
+    return semigroup.prod(a, b);
   }
 }

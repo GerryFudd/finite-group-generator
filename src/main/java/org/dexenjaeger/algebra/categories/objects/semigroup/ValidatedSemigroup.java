@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.dexenjaeger.algebra.model.ValidatedSemigroupSpec;
 import org.dexenjaeger.algebra.model.ValidatingBinaryOperator;
 
-import java.util.List;
+import java.util.Set;
 
 public class ValidatedSemigroup implements Semigroup {
   @Getter
@@ -34,11 +34,13 @@ public class ValidatedSemigroup implements Semigroup {
     );
   }
   
-  public List<String> getElementsAsList() {
-    return List.of(binaryOperator.getElements());
+  @Override
+  public Set<String> getElements() {
+    return binaryOperator.getElements();
   }
   
-  public String getProduct(String a, String b) {
+  @Override
+  public String prod(String a, String b) {
     return binaryOperator.prod(a, b);
   }
 }

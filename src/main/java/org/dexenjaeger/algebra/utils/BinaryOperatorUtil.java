@@ -1,8 +1,11 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.BinaryOperator;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -122,13 +125,39 @@ public class BinaryOperatorUtil {
     sb.append(" \n");
   }
   
+  private static Comparator<String> getElementComparator(String identity) {
+    if (identity == null) {
+      return Comparator.naturalOrder();
+    }
+    return  (a, b) -> {
+      if (a.equals(identity) && !b.equals(identity)) {
+        return -1;
+      }
+      if (b.equals(identity) && !a.equals(identity)) {
+        return 1;
+      }
+      return a.compareTo(b);
+    };
+  }
+  
+  public static List<String> getSortedElements(Collection<String> elements, String identity) {
+    return elements.stream()
+             .sorted(getElementComparator(identity)).collect(Collectors.toList());
+  }
+  
   public static String getMultiplicationTable(
-    String operatorSymbol,
-    List<String> elementsList,
-    BiFunction<String, String, String> binaryOperator
+    BinaryOperator binaryOperator
   ) {
+    return getMultiplicationTable(binaryOperator, null);
+  }
+  public static String getMultiplicationTable(
+    BinaryOperator binaryOperator,
+    String identity
+  ) {
+    List<String> elementsList = getSortedElements(binaryOperator.getElements(), identity);
+    
     StringBuilder sb = new StringBuilder("\n_");
-    sb.append(operatorSymbol);
+    sb.append(binaryOperator.getOperatorSymbol());
     sb.append("____|_");
     sb.append(elementsList.stream()
                 .map(n -> padOperator(n, '_'))
@@ -137,7 +166,7 @@ public class BinaryOperatorUtil {
     for (String a: elementsList) {
       appendLine(
         sb, a, elementsList.stream()
-                 .map(b -> binaryOperator.apply(a, b))
+                 .map(b -> binaryOperator.prod(a, b))
                  .collect(Collectors.toList())
       );
     }
@@ -157,13 +186,13 @@ public class BinaryOperatorUtil {
   
   public static void validateSubgroup(Group domain, Group kernel) {
     RuntimeException e = new RuntimeException("Subset is not a subgroup.");
-    for (String a:kernel.getElementsAsList()) {
-      for (String b:kernel.getElementsAsList()) {
-        String c = domain.getProduct(a, b);
-        if (!kernel.getElementsAsList().contains(c)) {
+    for (String a:kernel.getElements()) {
+      for (String b:kernel.getElements()) {
+        String c = domain.prod(a, b);
+        if (!kernel.getElements().contains(c)) {
           throw e;
         }
-        if (!c.equals(kernel.getProduct(a, b))) {
+        if (!c.equals(kernel.prod(a, b))) {
           throw e;
         }
       }

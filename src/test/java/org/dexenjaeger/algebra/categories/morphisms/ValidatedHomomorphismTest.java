@@ -31,7 +31,7 @@ class ValidatedHomomorphismTest {
     );
     
     assertEquals(
-      List.of("E"), validatedHomomorphism.getRange().getElementsAsList()
+      Set.of("E"), validatedHomomorphism.getRange().getElements()
     );
   }
   
