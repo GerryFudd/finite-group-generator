@@ -9,7 +9,8 @@ public class BinaryOperatorValidator implements Validator<BinaryOperator>{
       for (String b:item.getElements()) {
         if (!item.getElements().contains(item.prod(a, b))) {
           throw new ValidationException(String.format(
-            "This set is not closed under this function\n%s", item
+            "This set is not closed under %s\n%s",
+            item.getOperatorSymbol(), item.getMultiplicationTable()
           ));
         }
       }
