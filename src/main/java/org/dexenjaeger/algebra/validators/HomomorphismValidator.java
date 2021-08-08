@@ -51,8 +51,6 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
     }
   }
   
-  
-  
   public static void validateSubgroup(Homomorphism item) throws ValidationException {
     for (String a:item.getKernel().getElements()) {
       for (String b:item.getKernel().getElements()) {
