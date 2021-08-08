@@ -175,6 +175,9 @@ public class BinaryOperatorUtil {
   }
   
   public static Group getCyclicGroup(String... elements) {
+    return getCyclicGroup(elements, "*");
+  }
+  public static Group getCyclicGroup(String[] elements, String operatorSymbol) {
     int n = elements.length;
     LinkedList<String> cycle = new LinkedList<>();
     Map<String, String> inverses = new HashMap<>();
@@ -185,6 +188,7 @@ public class BinaryOperatorUtil {
     inverses.put(elements[0], elements[0]);
     cycle.addLast(elements[0]);
     return ConcreteGroup.builder()
+             .operatorSymbol(operatorSymbol)
              .identity(elements[0])
              .inversesMap(inverses)
              .cyclesMap(Map.of(

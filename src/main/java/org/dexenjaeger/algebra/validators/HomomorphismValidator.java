@@ -29,15 +29,15 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
         if (!rangeElements.contains(fb)) {
           throw getNotFunctionException(rangeElements, item.getRange().getIdentity(), fb, b);
         }
-        if (!rangeElements.contains(item.getRange().prod(fa, fb))) {
-          throw new RuntimeException(String.format(
-            "Range %s isn't closed under %s.",
-            String.join(", ", rangeElements), item.getRange().getOperatorSymbol()
-          ));
-        }
-        if (!item.getRange().prod(item.apply(a), item.apply(b))
+        if (!item.getRange().prod(fa, fb)
                .equals(item.apply(item.getDomain().prod(a, b)))) {
-          throw new RuntimeException("Function is not a homomorphism.");
+          throw new ValidationException(String.format(
+            "Function is not a homomorphism, f(%s)%sf(%s)=%s, but f(%s%s%s)=%s.",
+            a, item.getRange().getOperatorSymbol(),
+            b, item.getRange().prod(fa, fb),
+            a, item.getDomain().getOperatorSymbol(), b,
+            item.apply(item.getDomain().prod(a, b))
+          ));
         }
       }
     }
@@ -55,9 +55,6 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
     for (String a:item.getKernel().getElements()) {
       for (String b:item.getKernel().getElements()) {
         String c = item.getDomain().prod(a, b);
-        if (!item.getKernel().getElements().contains(c)) {
-          throw new ValidationException("Kernel is not closed under the group operation.");
-        }
         if (!c.equals(item.getKernel().prod(a, b))) {
           throw new ValidationException("Kernel binary operator doesn't match group binary operator.");
         }

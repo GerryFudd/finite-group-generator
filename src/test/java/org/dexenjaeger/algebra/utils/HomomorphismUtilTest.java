@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -119,6 +120,36 @@ class HomomorphismUtilTest {
     assertEquals(
       group.getMultiplicationTable(),
       result.getKernel().getMultiplicationTable()
+    );
+  }
+  
+  @Test
+  void functionImageOutsideRange() {
+    Group domain = BinaryOperatorUtil.getCyclicGroup("I", "a");
+    ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createHomomorphism(
+      domain,
+      new TrivialGroup("I"),
+      domain,
+      Function.identity()
+    ));
+    
+    assertEquals(
+      "Range [I] doesn't contain image a of a.", e.getMessage()
+    );
+  }
+  
+  @Test
+  void functionImageNotGroup() {
+    String[] rangeElements = {"I", "a", "b"};
+    ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createHomomorphism(
+      BinaryOperatorUtil.getCyclicGroup("I", "a"),
+      BinaryOperatorUtil.getCyclicGroup(rangeElements, "x"),
+      new TrivialGroup("I"),
+      Function.identity()
+    ));
+    
+    assertEquals(
+      "Function is not a homomorphism, f(a)xf(a)=b, but f(a*a)=I.", e.getMessage()
     );
   }
 }
