@@ -1,9 +1,12 @@
 package org.dexenjaeger.algebra.utils;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
+import org.dexenjaeger.algebra.service.GroupService;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +19,9 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 class HomomorphismUtilTest {
+  private final Injector injector = Guice.createInjector();
+  private final GroupService groupService = injector.getInstance(GroupService.class);
+  
   @Test
   void createHomomorphismTest() throws ValidationException {
     Homomorphism validatedHomomorphism = HomomorphismUtil.createHomomorphism(
@@ -42,7 +48,7 @@ class HomomorphismUtilTest {
     RuntimeException e = assertThrows(
       RuntimeException.class,
       () -> HomomorphismUtil.createHomomorphism(
-        BinaryOperatorUtil.getCyclicGroup("I", "a", "b"),
+        groupService.getCyclicGroup("I", "a", "b"),
         (a) -> "b".equals(a) ? "B" : "E"
       )
     );
@@ -63,13 +69,13 @@ class HomomorphismUtilTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> HomomorphismUtil.createHomomorphism(
-        BinaryOperatorUtil.getCyclicGroup(
+        groupService.getCyclicGroup(
           "I", "a", "b", "c", "d", "e"
         ),
-        BinaryOperatorUtil.getCyclicGroup(
+        groupService.getCyclicGroup(
           "E", "C"
         ),
-        BinaryOperatorUtil.getCyclicGroup(
+        groupService.getCyclicGroup(
           "I", "d", "e"
         ),
         (a) -> rangeElements[lookup.get(a) % 2]
@@ -97,9 +103,9 @@ class HomomorphismUtilTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> HomomorphismUtil.createHomomorphism(
-        BinaryOperatorUtil.getCyclicGroup(elements),
+        groupService.getCyclicGroup(elements),
         new TrivialGroup("E"),
-        BinaryOperatorUtil.getGroupFromElementsAndIntTable(
+        groupService.getGroupFromElementsAndIntTable(
           elements, kernelMult
         ),
         (a) -> "E"
@@ -113,7 +119,7 @@ class HomomorphismUtilTest {
   
   @Test
   void trivialHomomorphismCreatesKernelThatEqualsGroup() throws ValidationException {
-    Group group = BinaryOperatorUtil.getCyclicGroup(
+    Group group = groupService.getCyclicGroup(
       "I", "a", "b"
     );
     Homomorphism result = HomomorphismUtil.createHomomorphism(
@@ -128,7 +134,7 @@ class HomomorphismUtilTest {
   
   @Test
   void functionImageOutsideRange() {
-    Group domain = BinaryOperatorUtil.getCyclicGroup("I", "a");
+    Group domain = groupService.getCyclicGroup("I", "a");
     ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createHomomorphism(
       domain,
       new TrivialGroup("I"),
@@ -145,8 +151,8 @@ class HomomorphismUtilTest {
   void functionImageNotGroup() {
     String[] rangeElements = {"I", "a", "b"};
     ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createHomomorphism(
-      BinaryOperatorUtil.getCyclicGroup("I", "a"),
-      BinaryOperatorUtil.getCyclicGroup(rangeElements, "x"),
+      groupService.getCyclicGroup("I", "a"),
+      groupService.getCyclicGroup(rangeElements, "x"),
       new TrivialGroup("I"),
       Function.identity()
     ));
@@ -165,7 +171,7 @@ class HomomorphismUtilTest {
       "c", "z"
     );
     Automorphism automorphism = HomomorphismUtil.createAutomorphism(
-      BinaryOperatorUtil.getCyclicGroup("I", "a", "b", "c"),
+      groupService.getCyclicGroup("I", "a", "b", "c"),
       functionMap::get
     );
     
@@ -184,7 +190,7 @@ class HomomorphismUtilTest {
   void createAutomorphismTest_InvalidDomainAndRange() {
     ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createAutomorphism(
       new TrivialGroup("I"),
-      BinaryOperatorUtil.getCyclicGroup("E", "a"),
+      groupService.getCyclicGroup("E", "a"),
       x -> "E",
       y -> "I"
     ));
@@ -197,8 +203,8 @@ class HomomorphismUtilTest {
   @Test
   void createAutomorphismTest_InvalidInverse() {
     ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createAutomorphism(
-      BinaryOperatorUtil.getCyclicGroup("I", "a"),
-      BinaryOperatorUtil.getCyclicGroup("E", "x"),
+      groupService.getCyclicGroup("I", "a"),
+      groupService.getCyclicGroup("E", "x"),
       x -> {
         switch(x) {
           case "I":
@@ -220,8 +226,8 @@ class HomomorphismUtilTest {
   @Test
   void createAutomorphismTest_notInjection() {
     ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createAutomorphism(
-      BinaryOperatorUtil.getCyclicGroup("I", "a"),
-      BinaryOperatorUtil.getCyclicGroup("E", "x"),
+      groupService.getCyclicGroup("I", "a"),
+      groupService.getCyclicGroup("E", "x"),
       x -> "E",
       y -> "I"
     ));

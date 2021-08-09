@@ -174,34 +174,6 @@ public class BinaryOperatorUtil {
     return sb.toString();
   }
   
-  public static Group getCyclicGroup(String... elements) {
-    return getCyclicGroup(elements, "*");
-  }
-  public static Group getCyclicGroup(String[] elements, String operatorSymbol) {
-    int n = elements.length;
-    LinkedList<String> cycle = new LinkedList<>();
-    Map<String, String> inverses = new HashMap<>();
-    for (int i = 1; i < n; i++) {
-      inverses.put(elements[i], elements[n-i]);
-      cycle.addLast(elements[i]);
-    }
-    inverses.put(elements[0], elements[0]);
-    cycle.addLast(elements[0]);
-    return ConcreteGroup.builder()
-             .operatorSymbol(operatorSymbol)
-             .identity(elements[0])
-             .inversesMap(inverses)
-             .cyclesMap(Map.of(
-               1, Set.of(List.of(elements[0])),
-               n, Set.of(cycle)
-             ))
-             .elements(Set.of(elements))
-             .operator(createOperator(
-               elements, (a, b) -> (a + b) % n
-             ))
-             .build();
-  }
-  
   public static List<String> getCycle(String element, BiFunction<String, String, String> binaryOperator) {
     List<String> cycle = new LinkedList<>();
     cycle.add(element);
