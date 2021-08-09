@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.categories.objects.group;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.dexenjaeger.algebra.model.Cycle;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,23 @@ public class ConcreteGroup implements Group {
   @Override
   public Set<List<String>> getNCycles(Integer n) {
     return cyclesMap.containsKey(n) ? cyclesMap.get(n) : Set.of();
+  }
+  
+  @Override
+  public Set<Cycle> getMaximalCycles() {
+    if (elements.size() == 1) {
+      return Set.of(Cycle.builder()
+                      .elements(List.of(identity))
+                      .build());
+    }
+    return cyclesMap.entrySet().stream()
+      .filter(entry -> entry.getKey() > 1)
+      .map(Map.Entry::getValue)
+      .flatMap(Set::stream)
+      .map(cycleElements -> Cycle.builder()
+      .elements(cycleElements)
+      .build())
+      .collect(Collectors.toSet());
   }
   
   @Override

@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.categories.objects.group;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dexenjaeger.algebra.model.Cycle;
 
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,13 @@ public class TrivialGroup implements Group {
   @Override
   public Set<List<String>> getNCycles(Integer n) {
     return n == 1 ? Set.of(List.of(identity)) : Set.of();
+  }
+  
+  @Override
+  public Set<Cycle> getMaximalCycles() {
+    return Set.of(Cycle.builder()
+                    .elements(List.of(identity))
+                    .build());
   }
   
   @Override

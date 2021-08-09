@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
+import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +43,12 @@ class AutomorphismServiceTest {
     assertEquals(
       Set.of(List.of("x", "y", "z", "E")),
       automorphism.getRange().getNCycles(4)
+    );
+    assertEquals(
+      Set.of(Cycle.builder()
+               .elements(List.of("x", "y", "z", "E"))
+               .build()),
+      automorphism.getRange().getMaximalCycles()
     );
   }
   

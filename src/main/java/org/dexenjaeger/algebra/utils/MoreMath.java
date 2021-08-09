@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.utils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class MoreMath {
     return cache.get(n);
   }
   
-  public static <T> Set<T> intersection(Set<T> a, Set<T> b) {
+  public static <T> Set<T> intersection(Collection<T> a, Collection<T> b) {
     if (a == null && b == null) {
       return null;
     }

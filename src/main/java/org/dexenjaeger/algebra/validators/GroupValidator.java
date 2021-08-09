@@ -2,11 +2,14 @@ package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
+import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.model.OrderedPair;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.utils.MoreMath;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,14 @@ public class GroupValidator implements Validator<Group> {
   
   private ValidationException getCyclesMapException(String reason) {
     return new ValidationException(String.format("Invalid cycles map: %s.", reason));
+  }
+  
+  private ValidationException getCycleException(String reason) {
+    return new ValidationException(String.format("Invalid cycle: %s.", reason));
+  }
+  
+  private ValidationException getMaximalCyclesException(String reason) {
+    return new ValidationException(String.format("Invalid maximal cycles: %s.", reason));
   }
   
   private void validateCyclesMap(Group item) throws ValidationException {
@@ -52,47 +63,80 @@ public class GroupValidator implements Validator<Group> {
         throw getCyclesMapException(String.format("the set of %d cycles is empty", n));
       }
       for (List<String> cycle:nCycles) {
-        LinkedList<String> linkedCycle = new LinkedList<>(cycle);
-        if (linkedCycle.size() != n) {
-          throw getCyclesMapException(String.format(
-            "there is a %d cycle whose length isn't %d",
-            n, n
+        validateCycleElements(item, cycle);
+      }
+    }
+  }
+  
+  private Optional<ValidationException> validateCycle(Group item, Cycle cycle) {
+    try {
+      validateCycleElements(item, cycle.getElements());
+      cycle.getSubCycles().forEach(subcycle -> validateCycle(item, subcycle));
+    } catch (ValidationException e) {
+      return Optional.of(e);
+    }
+    return Optional.empty();
+  }
+  
+  private void validateCycleElements(Group item, List<String> cycleElements) throws ValidationException {
+  
+    if (cycleElements.isEmpty()) {
+      throw getCycleException("cycle is empty");
+    }
+    LinkedList<String> linkedCycle = new LinkedList<>(cycleElements);
+    if (!linkedCycle.removeLast().equals(item.getIdentity())) {
+      throw getCycleException(String.format(
+        "cycle %s doesn't end with identity", cycleElements
+      ));
+    }
+    String generator = null;
+    String previous = null;
+    while (!linkedCycle.isEmpty()) {
+      String a = linkedCycle.removeFirst();
+      if (generator == null) {
+        generator = a;
+        previous = a;
+      } else if (!a.equals(item.prod(generator, previous))) {
+        throw getCycleException(String.format(
+          "cycle %s is improperly generated",
+          cycleElements
+        ));
+      } else {
+        previous = a;
+      }
+      if (linkedCycle.isEmpty()) {
+        if (!a.equals(item.getInverse(a))) {
+          throw getCycleException(String.format(
+            "cycle %s doesn't contain the inverse of each element",
+            cycleElements
           ));
         }
-        if (!linkedCycle.removeLast().equals(item.getIdentity())) {
-          throw getCyclesMapException(String.format(
-            "cycle %s doesn't end with identity", cycle
+      } else if (!linkedCycle.removeLast().equals(item.getInverse(a))) {
+        throw getCycleException(String.format(
+          "cycle %s doesn't contain the inverse of each element",
+          cycleElements
+        ));
+      }
+    }
+  }
+  
+  private void validateMaximalCycles(Group item) throws ValidationException {
+    Set<Cycle> maximalCycles = item.getMaximalCycles();
+    if (maximalCycles.isEmpty()) {
+      throw getMaximalCyclesException("there is an empty maximal cycle");
+    }
+    Set<String> coveredElements = new HashSet<>();
+    for (Cycle cycle:maximalCycles) {
+      Set<String> intersection = MoreMath.intersection(coveredElements, cycle.getElements());
+      if (intersection.size() > 1) {
+        throw getMaximalCyclesException(String.format(
+          "cycle %s intersects with the other maximal cycles in more than one element %s",
+            cycle, intersection
           ));
-        }
-        String generator = null;
-        String previous = null;
-        while (!linkedCycle.isEmpty()) {
-          String a = linkedCycle.removeFirst();
-          if (generator == null) {
-            generator = a;
-            previous = a;
-          } else if (!a.equals(item.prod(generator, previous))) {
-            throw getCyclesMapException(String.format(
-              "cycle %s is improperly generated",
-              cycle
-            ));
-          } else {
-            previous = a;
-          }
-          if (linkedCycle.isEmpty()) {
-            if (!a.equals(item.getInverse(a))) {
-              throw getCyclesMapException(String.format(
-                "cycle %s doesn't contain the inverse of each element",
-                cycle
-              ));
-            }
-          } else if (!linkedCycle.removeLast().equals(item.getInverse(a))) {
-            throw getCyclesMapException(String.format(
-              "cycle %s doesn't contain the inverse of each element",
-              cycle
-            ));
-          }
-        }
+      }
+      Optional<ValidationException> e = validateCycle(item, cycle);
+      if (e.isPresent()) {
+        throw e.get();
       }
     }
   }
@@ -100,10 +144,10 @@ public class GroupValidator implements Validator<Group> {
   private void validateInverses(Group item) throws ValidationException {
     for (String a: item.getElements()) {
       String inverse = Optional.ofNullable(item.getInverse(a))
-        .orElseThrow(() -> new ValidationException(String.format(
-          "The inverse of element %s not found in Group\n%s",
-          a, item.getMultiplicationTable()
-        )));
+                         .orElseThrow(() -> new ValidationException(String.format(
+                           "The inverse of element %s not found in Group\n%s",
+                           a, item.getMultiplicationTable()
+                         )));
       
       if (!item.getElements().contains(inverse)) {
         throw new ValidationException(String.format(
@@ -129,5 +173,6 @@ public class GroupValidator implements Validator<Group> {
     monoidValidator.validate(item);
     validateInverses(item);
     validateCyclesMap(item);
+    validateMaximalCycles(item);
   }
 }

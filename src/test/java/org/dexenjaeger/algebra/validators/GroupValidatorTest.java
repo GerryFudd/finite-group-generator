@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GroupValidatorTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
+  @SuppressWarnings("Convert2Diamond") // This encounters an exception if a diamond is used
   private final Validator<Group> groupValidator = injector.getInstance(Key.get(new TypeLiteral<Validator<Group>>(){}));
   private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
   
@@ -162,7 +163,7 @@ class GroupValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "Invalid cycles map: there is a 1 cycle whose length isn't 1.", e.getMessage()
+      "Invalid cycle: cycle is empty.", e.getMessage()
     );
   }
   
@@ -194,7 +195,7 @@ class GroupValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "Invalid cycles map: cycle [a] doesn't end with identity.", e.getMessage()
+      "Invalid cycle: cycle [a] doesn't end with identity.", e.getMessage()
     );
   }
   
@@ -216,7 +217,7 @@ class GroupValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "Invalid cycles map: cycle [a, I, b, I] is improperly generated.", e.getMessage()
+      "Invalid cycle: cycle [a, I, b, I] is improperly generated.", e.getMessage()
     );
   }
   
@@ -238,7 +239,7 @@ class GroupValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "Invalid cycles map: cycle [a, b, c, e, I] doesn't contain the inverse of each element.", e.getMessage()
+      "Invalid cycle: cycle [a, b, c, e, I] doesn't contain the inverse of each element.", e.getMessage()
     );
   }
   
@@ -260,7 +261,7 @@ class GroupValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "Invalid cycles map: cycle [a, b, e, I] doesn't contain the inverse of each element.", e.getMessage()
+      "Invalid cycle: cycle [a, b, e, I] doesn't contain the inverse of each element.", e.getMessage()
     );
   }
 }
