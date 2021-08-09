@@ -1,12 +1,17 @@
 package org.dexenjaeger.algebra.validators;
 
-import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 
-@RequiredArgsConstructor
+import javax.inject.Inject;
+
 public class AutomorphismValidator implements Validator<Automorphism> {
   private final Validator<Homomorphism> homomorphismValidator;
+  
+  @Inject
+  public AutomorphismValidator(Validator<Homomorphism> homomorphismValidator) {
+    this.homomorphismValidator = homomorphismValidator;
+  }
   
   @Override
   public void validate(Automorphism item) throws ValidationException {

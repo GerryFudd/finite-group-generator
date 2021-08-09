@@ -1,21 +1,14 @@
-package org.dexenjaeger.algebra.utils;
+package org.dexenjaeger.algebra.service;
 
-import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
-import org.dexenjaeger.algebra.categories.morphisms.ConcreteAutomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.ConcreteHomomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.OrderedPair;
-import org.dexenjaeger.algebra.validators.AutomorphismValidator;
-import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
-import org.dexenjaeger.algebra.validators.GroupValidator;
-import org.dexenjaeger.algebra.validators.HomomorphismValidator;
-import org.dexenjaeger.algebra.validators.MonoidValidator;
-import org.dexenjaeger.algebra.validators.SemigroupValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,23 +18,67 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class HomomorphismUtil {
-  private static Validator<Homomorphism> homomorphismValidator;
-  private static Validator<Automorphism> automorphismValidator;
-  private static Validator<Group> groupValidator;
+public class HomomorphismService {
+  private final GroupService groupService;
+  private final Validator<Group> groupValidator;
+  private final Validator<Homomorphism> homomorphismValidator;
   
-  private static void initValidators() {
-    homomorphismValidator = new HomomorphismValidator();
-    automorphismValidator = new AutomorphismValidator(homomorphismValidator);
-    groupValidator = new GroupValidator(new MonoidValidator(new SemigroupValidator(new BinaryOperatorValidator())));
+  @Inject
+  public HomomorphismService(
+    GroupService groupService,
+    Validator<Group> groupValidator,
+    Validator<Homomorphism> homomorphismValidator
+  ) {
+    this.groupService = groupService;
+    this.groupValidator = groupValidator;
+    this.homomorphismValidator = homomorphismValidator;
   }
   
-  private static RuntimeException getInvalidCycleException(List<String> cycle) {
+  private Homomorphism doCreateHomomorphism(
+    Group domain, Group range, Group kernel, Function<String, String> act
+  ) throws ValidationException {
+    Homomorphism result = ConcreteHomomorphism.builder()
+                            .domain(domain)
+                            .range(range)
+                            .kernel(kernel)
+                            .act(act)
+                            .build();
+    homomorphismValidator.validate(result);
+    return result;
+  }
+  
+  public Homomorphism createHomomorphism(
+    Group domain, Group range, Group kernel, Function<String, String> act
+  ) throws ValidationException {
+    groupValidator.validate(domain);
+    groupValidator.validate(range);
+    groupValidator.validate(kernel);
+    return doCreateHomomorphism(domain, range, kernel, act);
+  }
+  
+  public Homomorphism createHomomorphism(
+    Group domain,
+    Function<String, String> act
+  ) throws ValidationException {
+    groupValidator.validate(domain);
+    OrderedPair<Group, Group> rangeAndKernel = constructRangeAndKernel(
+      domain, act
+    );
+    
+    groupValidator.validate(rangeAndKernel.getLeft());
+    groupValidator.validate(rangeAndKernel.getRight());
+    return doCreateHomomorphism(
+      domain, rangeAndKernel.getLeft(), rangeAndKernel.getRight(), act
+    );
+  }
+  
+  private RuntimeException getInvalidCycleException(List<String> cycle) {
     return new RuntimeException(String.format(
       "Cycle is not valid: %s", String.join(", ", cycle)
     ));
   }
-  private static OrderedPair<Group, Group> constructRangeAndKernel(Group domain, Function<String, String> act) {
+  
+  private OrderedPair<Group, Group> constructRangeAndKernel(Group domain, Function<String, String> act) {
     Map<String, String> rangeInversesMap = new HashMap<>();
     Map<String, String> domainLookupMap = new HashMap<>();
     Set<String> rangeElements = new HashSet<>();
@@ -167,108 +204,5 @@ public class HomomorphismUtil {
         .operator(domain::prod)
         .build()
     );
-  }
-  
-  private static Homomorphism doCreateHomomorphism(
-    Group domain, Group range, Group kernel, Function<String, String> act
-  ) throws ValidationException {
-    Homomorphism result = ConcreteHomomorphism.builder()
-                            .domain(domain)
-                            .range(range)
-                            .kernel(kernel)
-                            .act(act)
-                            .build();
-    homomorphismValidator.validate(result);
-    return result;
-  }
-  
-  public static Homomorphism createHomomorphism(
-    Group domain, Group range, Group kernel, Function<String, String> act
-  ) throws ValidationException {
-    initValidators();
-    groupValidator.validate(domain);
-    groupValidator.validate(range);
-    groupValidator.validate(kernel);
-    return doCreateHomomorphism(domain, range, kernel, act);
-  }
-  
-  public static Homomorphism createHomomorphism(
-    Group domain,
-    Function<String, String> act
-  ) throws ValidationException {
-    initValidators();
-    groupValidator.validate(domain);
-    OrderedPair<Group, Group> rangeAndKernel = HomomorphismUtil.constructRangeAndKernel(
-      domain, act
-    );
-    
-    groupValidator.validate(rangeAndKernel.getLeft());
-    groupValidator.validate(rangeAndKernel.getRight());
-    return doCreateHomomorphism(
-      domain, rangeAndKernel.getLeft(), rangeAndKernel.getRight(), act
-    );
-  }
-  
-  private static Set<List<String>> convertCycles(Set<List<String>> cycles, Function<String, String> func) {
-    return cycles.stream()
-             .map(cycle -> cycle.stream()
-                             .map(func)
-                             .collect(Collectors.toList()))
-             .collect(Collectors.toSet());
-  }
-  
-  public static Automorphism createAutomorphism(
-    Group domain, Function<String, String> func
-  ) throws ValidationException {
-    Map<String, String> inverseFuncMap = domain.getElements().stream()
-                                           .collect(Collectors.toMap(
-                                             func,
-                                             Function.identity()
-                                           ));
-    
-    Map<String, String> rangeInverseMap = inverseFuncMap.entrySet().stream().collect(Collectors.toMap(
-      Map.Entry::getKey,
-      entry -> func.apply(domain.getInverse(entry.getValue()))
-    ));
-    
-    return createAutomorphism(
-      domain,
-      ConcreteGroup.builder()
-        .operatorSymbol("x")
-        .identity(func.apply(domain.getIdentity()))
-        .elements(inverseFuncMap.keySet())
-        .inversesMap(rangeInverseMap)
-        .cyclesMap(domain
-                     .getCycleSizes()
-                     .stream()
-                     .map(n -> new OrderedPair<>(
-                       n, convertCycles(domain.getNCycles(n), func)
-                     ))
-                     .collect(Collectors.toMap(
-                       OrderedPair::getLeft,
-                       OrderedPair::getRight
-                     )))
-        .operator((a, b) -> func.apply(domain.prod(
-          inverseFuncMap.get(a),
-          inverseFuncMap.get(b)
-        )))
-        .build(),
-      func,
-      inverseFuncMap::get
-    );
-  }
-  
-  public static Automorphism createAutomorphism(
-    Group domain, Group range, Function<String, String> func, Function<String, String> inverse
-  ) throws ValidationException {
-    Automorphism automorphism = ConcreteAutomorphism.builder()
-                                  .domain(domain)
-                                  .range(range)
-                                  .act(func)
-                                  .inverseAct(inverse)
-                                  .build();
-    initValidators();
-    automorphismValidator.validate(automorphism);
-    return automorphism;
   }
 }

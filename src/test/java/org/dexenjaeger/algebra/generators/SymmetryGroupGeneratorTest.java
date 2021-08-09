@@ -1,5 +1,8 @@
 package org.dexenjaeger.algebra.generators;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +14,13 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SymmetryGroupObjectGeneratorTest {
+class SymmetryGroupGeneratorTest {
+  private final Injector injector = Guice.createInjector(new AlgebraModule());
+  private final SymmetryGroupGenerator symmetryGroupGenerator = injector.getInstance(SymmetryGroupGenerator.class);
+  
   @Test
   void createS2() {
-    Group s2 = SymmetryGroupGenerator.createSymmetryGroup(2);
+    Group s2 = symmetryGroupGenerator.createSymmetryGroup(2);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
       .append("_o____|_I____a____\n")
@@ -29,7 +35,7 @@ class SymmetryGroupObjectGeneratorTest {
   
   @Test
   void createS3() {
-    Group s3 = SymmetryGroupGenerator.createSymmetryGroup(3);
+    Group s3 = symmetryGroupGenerator.createSymmetryGroup(3);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
       .append("_o____|_I____a____b____c____d____d2___\n")
@@ -48,7 +54,7 @@ class SymmetryGroupObjectGeneratorTest {
   
   @Test
   void createS4() {
-    Group s4 = SymmetryGroupGenerator.createSymmetryGroup(4);
+    Group s4 = symmetryGroupGenerator.createSymmetryGroup(4);
     
     Set<String> elements = s4.getElements();
     Map<Integer, Set<String>> groupOrderCount = new HashMap<>();

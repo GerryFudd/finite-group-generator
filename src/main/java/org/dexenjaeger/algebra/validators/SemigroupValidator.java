@@ -1,12 +1,17 @@
 package org.dexenjaeger.algebra.validators;
 
-import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 
-@RequiredArgsConstructor
+import javax.inject.Inject;
+
 public class SemigroupValidator implements Validator<Semigroup> {
   private final Validator<BinaryOperator> binaryOperatorValidator;
+  
+  @Inject
+  public SemigroupValidator(Validator<BinaryOperator> binaryOperatorValidator) {
+    this.binaryOperatorValidator = binaryOperatorValidator;
+  }
   
   @Override
   public void validate(Semigroup item) throws ValidationException {

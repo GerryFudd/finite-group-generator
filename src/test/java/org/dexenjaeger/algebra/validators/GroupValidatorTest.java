@@ -1,8 +1,14 @@
 package org.dexenjaeger.algebra.validators;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GroupValidatorTest {
-  private final Validator<Group> groupValidator = new GroupValidator(new MonoidValidator(new SemigroupValidator(new BinaryOperatorValidator())));
+  private final Injector injector = Guice.createInjector(new AlgebraModule());
+  private final Validator<Group> groupValidator = injector.getInstance(Key.get(new TypeLiteral<Validator<Group>>(){}));
+  private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
   
   @Test
   void invalidInverses() {
@@ -28,7 +36,7 @@ class GroupValidatorTest {
       {3, 1, 2, 0}
     };
     
-    BinaryOperatorSummary summary = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+    BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> product[i][j]
     );

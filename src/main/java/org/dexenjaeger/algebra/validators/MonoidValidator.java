@@ -1,12 +1,17 @@
 package org.dexenjaeger.algebra.validators;
 
-import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 
-@RequiredArgsConstructor
+import javax.inject.Inject;
+
 public class MonoidValidator implements Validator<Monoid> {
   private final Validator<Semigroup> semigroupValidator;
+  
+  @Inject
+  public MonoidValidator(Validator<Semigroup> semigroupValidator) {
+    this.semigroupValidator = semigroupValidator;
+  }
   
   @Override
   public void validate(Monoid item) throws ValidationException {

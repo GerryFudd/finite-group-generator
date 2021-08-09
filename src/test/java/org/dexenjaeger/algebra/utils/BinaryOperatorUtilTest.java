@@ -1,86 +1,62 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BinaryOperatorUtilTest {
-  private String getElements(BinaryOperatorSummary summary) {
-    return String.join(", ", BinaryOperatorUtil.getSortedElements(summary.getBinaryOperator().getElements(), summary.getIdentity()));
-  }
   @Test
-  void getSortedAndPrettifiedBinaryOperatorTest_withLeftIdentity() {
-    int[][] product = {
-      {1, 0, 3, 2},
-      {0, 1, 2, 3},
-      {1, 0, 3, 2},
-      {0, 1, 2, 3}
-    };
+  void getMultiplicationTableTest() {
+    String[] elements = {"a", "b", "c"};
     
-    BinaryOperatorSummary result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> product[i][j]
-    );
+    StringBuilder sb = new StringBuilder();
+    sb.append("\n")
+      .append("_+____|_a____b____c____\n")
+      .append(" a    | a    b    c    \n")
+      .append(" b    | b    c    a    \n")
+      .append(" c    | c    a    b    \n");
+    
     
     assertEquals(
-      "L1, L2, a, b",
-      getElements(result)
+      sb.toString(),
+      BinaryOperatorUtil.getMultiplicationTable(
+        ConcreteBinaryOperator.builder()
+          .operatorSymbol("+")
+          .elements(Set.of(elements))
+          .operator(BinaryOperatorUtil.createOperator(
+            elements, (a, b) -> (a + b) % 3
+          ))
+          .build()
+      )
     );
-    
-    assertNull(result.getIdentity());
-    assertNull(result.getInverseMap());
-  }
-  
-  @Test
-  void getSortedAndPrettifiedBinaryOperatorTest_withRightIdentity() {
-    int[][] product = {
-      {1, 0, 1, 0},
-      {0, 1, 0, 1},
-      {3, 2, 3, 2},
-      {2, 3, 2, 3}
-    };
-    
-    BinaryOperatorSummary result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> product[i][j]
-    );
-    
-    assertEquals(
-      "R1, R2, a, b",
-      getElements(result)
-    );
-  
-    assertNull(result.getIdentity());
-    assertNull(result.getInverseMap());
   }
   
   @Test
-  void getSortedAndPrettifiedBinaryOperatorTest_withIdentityAndInerses() {
-    int[][] product = {
-      {0, 1, 2, 3},
-      {1, 0, 3, 2},
-      {2, 3, 0, 1},
-      {3, 2, 1, 0}
-    };
-    
-    BinaryOperatorSummary result = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> product[i][j]
-    );
-    
-    assertEquals(
-      "I, a, b, c",
-      getElements(result)
-    );
+  void getCycleTest() {
+    String[] elements = {"a", "b", "c"};
   
-    assertEquals("I", result.getIdentity());
+    BiFunction<String, String, String> operator = BinaryOperatorUtil.createOperator(
+      elements, (a, b) -> (a + b) % 3
+    );
+    
     assertEquals(
-      Map.of("I", "I", "a", "a", "b", "b", "c", "c"),
-      result.getInverseMap()
+      List.of("b", "c", "a"),
+      BinaryOperatorUtil.getCycle("b", operator)
+    );
+    
+    assertEquals(
+      List.of("c", "b", "a"),
+      BinaryOperatorUtil.getCycle("c", operator)
+    );
+    
+    assertEquals(
+      List.of("a"),
+      BinaryOperatorUtil.getCycle("a", operator)
     );
   }
 }

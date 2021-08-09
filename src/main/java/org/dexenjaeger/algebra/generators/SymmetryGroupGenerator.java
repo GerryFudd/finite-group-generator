@@ -3,21 +3,28 @@ package org.dexenjaeger.algebra.generators;
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.dexenjaeger.algebra.utils.MoreMath;
-import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
-import org.dexenjaeger.algebra.validators.GroupValidator;
-import org.dexenjaeger.algebra.validators.MonoidValidator;
-import org.dexenjaeger.algebra.validators.SemigroupValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SymmetryGroupGenerator {
+  private final Validator<Group> groupValidator;
+  private final BinaryOperatorService binaryOperatorService;
   
-  private static int[][] getPermutationSet(int n) {
+  @Inject
+  public SymmetryGroupGenerator(
+    Validator<Group> groupValidator, BinaryOperatorService binaryOperatorService
+  ) {
+    this.groupValidator = groupValidator;
+    this.binaryOperatorService = binaryOperatorService;
+  }
+  
+  private int[][] getPermutationSet(int n) {
     int[][] result = new int[MoreMath.factorial(n)][n];
     if (n < 1) {
       throw new RuntimeException("No.");
@@ -48,7 +55,7 @@ public class SymmetryGroupGenerator {
     return result;
   }
   
-  private static String getPermutationAsString(int[] permutation) {
+  private String getPermutationAsString(int[] permutation) {
     StringBuilder sb = new StringBuilder();
     for (int x : permutation) {
       sb.append(x);
@@ -56,7 +63,7 @@ public class SymmetryGroupGenerator {
     return sb.toString();
   }
   
-  private static String multiplyPermutations(int[] p1, int[] p2) {
+  private String multiplyPermutations(int[] p1, int[] p2) {
     int[] prod = new int[p1.length];
     for (int i = 0; i < p1.length; i++) {
       prod[i] = p1[p2[i]];
@@ -64,7 +71,7 @@ public class SymmetryGroupGenerator {
     return getPermutationAsString(prod);
   }
   
-  public static Group createSymmetryGroup(int n) {
+  public Group createSymmetryGroup(int n) {
     int[][] permutations = getPermutationSet(n);
     Map<String, Integer> reverseLookup = new HashMap<>();
     for (int i = 0; i < permutations.length; i++) {
@@ -84,7 +91,7 @@ public class SymmetryGroupGenerator {
       }
     }
     
-    BinaryOperatorSummary summary = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+    BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       permutations.length,
       (a,b) -> binOp[a][b]
     );
@@ -98,9 +105,8 @@ public class SymmetryGroupGenerator {
                      .cyclesMap(summary.getCyclesMap())
                      .build();
   
-    Validator<Group> validator = new GroupValidator(new MonoidValidator(new SemigroupValidator(new BinaryOperatorValidator())));
     try {
-      validator.validate(result);
+      groupValidator.validate(result);
     } catch (ValidationException e) {
       throw new RuntimeException(
         "Generated group didn't validate", e

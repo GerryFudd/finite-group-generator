@@ -1,5 +1,9 @@
 package org.dexenjaeger.algebra.validators;
 
+import com.google.inject.Guice;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
 import org.junit.jupiter.api.Test;
@@ -10,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BinaryOperatorValidatorTest {
-  private final Validator<BinaryOperator> binaryOperatorValidator = new BinaryOperatorValidator();
+  private final Validator<BinaryOperator> binaryOperatorValidator = Guice.createInjector(new AlgebraModule()).getInstance(Key.get(new TypeLiteral<Validator<BinaryOperator>>() {
+  }));
   
   @Test
   void validateBinaryOperator() {

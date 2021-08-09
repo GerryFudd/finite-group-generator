@@ -1,16 +1,24 @@
 package org.dexenjaeger.algebra.validators;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.monoid.ConcreteMonoid;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MonoidValidatorTest {
-  MonoidValidator validator = new MonoidValidator(new SemigroupValidator(new BinaryOperatorValidator()));
+  private final Injector injector = Guice.createInjector(new AlgebraModule());
+  private final Validator<Monoid> validator = injector.getInstance(Key.get(new TypeLiteral<Validator<Monoid>>() {
+  }));
+  private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
   @Test
   void invalidIdentity() {
     int[][] product = {
@@ -20,7 +28,7 @@ class MonoidValidatorTest {
       {0, 1, 2, 3}
     };
     
-    BinaryOperator binOp = BinaryOperatorUtil.getSortedAndPrettifiedBinaryOperator(
+    BinaryOperator binOp = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> product[i][j]
     ).getBinaryOperator();

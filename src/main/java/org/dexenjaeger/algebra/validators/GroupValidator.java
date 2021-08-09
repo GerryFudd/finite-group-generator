@@ -1,11 +1,11 @@
 package org.dexenjaeger.algebra.validators;
 
-import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.model.OrderedPair;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,9 +14,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 public class GroupValidator implements Validator<Group> {
   private final Validator<Monoid> monoidValidator;
+  
+  @Inject
+  public GroupValidator(Validator<Monoid> monoidValidator) {
+    this.monoidValidator = monoidValidator;
+  }
   
   private ValidationException getCyclesMapException(String reason) {
     return new ValidationException(String.format("Invalid cycles map: %s.", reason));
