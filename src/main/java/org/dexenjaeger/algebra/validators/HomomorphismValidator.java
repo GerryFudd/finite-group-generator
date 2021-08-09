@@ -43,10 +43,10 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
     }
   }
   
-  private void validateInverseImageOfId(Homomorphism item) {
+  private void validateInverseImageOfId(Homomorphism item) throws ValidationException {
     for (String a:item.getDomain().getElements()) {
       if (item.getKernel().getElements().contains(a) != item.apply(a).equals(item.getRange().getIdentity())) {
-        throw new RuntimeException("Kernel is not the inverse image of the identity.");
+        throw new ValidationException("Kernel is not the inverse image of the identity.");
       }
     }
   }

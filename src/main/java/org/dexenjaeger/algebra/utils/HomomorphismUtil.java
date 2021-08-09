@@ -1,10 +1,13 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
+import org.dexenjaeger.algebra.categories.morphisms.ConcreteAutomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.ConcreteHomomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.OrderedPair;
+import org.dexenjaeger.algebra.validators.AutomorphismValidator;
 import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
 import org.dexenjaeger.algebra.validators.GroupValidator;
 import org.dexenjaeger.algebra.validators.HomomorphismValidator;
@@ -13,7 +16,6 @@ import org.dexenjaeger.algebra.validators.SemigroupValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,10 +27,12 @@ import java.util.stream.Collectors;
 
 public class HomomorphismUtil {
   private static Validator<Homomorphism> homomorphismValidator;
+  private static Validator<Automorphism> automorphismValidator;
   private static Validator<Group> groupValidator;
   
   private static void initValidators() {
     homomorphismValidator = new HomomorphismValidator();
+    automorphismValidator = new AutomorphismValidator(homomorphismValidator);
     groupValidator = new GroupValidator(new MonoidValidator(new SemigroupValidator(new BinaryOperatorValidator())));
   }
   
@@ -37,14 +41,14 @@ public class HomomorphismUtil {
       "Cycle is not valid: %s", String.join(", ", cycle)
     ));
   }
-  public static OrderedPair<Group, Group> constructRangeAndKernel(Group domain, Function<String, String> act) {
+  private static OrderedPair<Group, Group> constructRangeAndKernel(Group domain, Function<String, String> act) {
     Map<String, String> rangeInversesMap = new HashMap<>();
     Map<String, String> domainLookupMap = new HashMap<>();
     Set<String> rangeElements = new HashSet<>();
     Map<Integer, Set<List<String>>> rangeCycles = new HashMap<>();
     Set<String> kernelElements = new HashSet<>();
     Map<Integer, Set<List<String>>> kernelCycles = new HashMap<>();
-  
+    
     String rangeIdentity = act.apply(domain.getIdentity());
     
     rangeInversesMap.put(rangeIdentity, rangeIdentity);
@@ -56,7 +60,7 @@ public class HomomorphismUtil {
     
     rangeCycles.put(1, Set.of(List.of(rangeIdentity)));
     kernelCycles.put(1, Set.of(List.of(domain.getIdentity())));
-  
+    
     for (Integer n:domain.getCycleSizes()) {
       for (List<String> cycle:domain.getNCycles(n)) {
         LinkedList<String> linkedCycle = new LinkedList<>(cycle);
@@ -75,7 +79,7 @@ public class HomomorphismUtil {
             domainLookupMap.put(y, x);
             rangeElements.add(y);
             linkedRangeCycle.addLast(y);
-  
+            
             if (!linkedCycle.isEmpty()) {
               String inverseX = linkedCycle.getLast();
               if (!inverseX.equals(domain.getInverse(x))) {
@@ -138,68 +142,42 @@ public class HomomorphismUtil {
         }
       }
     }
-  
+    
     return new OrderedPair<>(
       ConcreteGroup.builder()
-      .inversesMap(rangeInversesMap)
-      .cyclesMap(rangeCycles)
-      .identity(rangeIdentity)
-      .operatorSymbol("x")
-      .elements(rangeElements)
-      .operator((a, b) -> act.apply(domain.prod(
-        domainLookupMap.get(a),
-        domainLookupMap.get(b)
-      )))
-      .build(),
+        .inversesMap(rangeInversesMap)
+        .cyclesMap(rangeCycles)
+        .identity(rangeIdentity)
+        .operatorSymbol("x")
+        .elements(rangeElements)
+        .operator((a, b) -> act.apply(domain.prod(
+          domainLookupMap.get(a),
+          domainLookupMap.get(b)
+        )))
+        .build(),
       ConcreteGroup.builder()
-      .inversesMap(kernelElements.stream().collect(Collectors.toMap(
-        Function.identity(),
-        domain::getInverse
-      )))
-      .cyclesMap(kernelCycles)
-      .identity(domain.getIdentity())
-      .operatorSymbol(domain.getOperatorSymbol())
-      .elements(kernelElements)
-      .operator(domain::prod)
-      .build()
+        .inversesMap(kernelElements.stream().collect(Collectors.toMap(
+          Function.identity(),
+          domain::getInverse
+        )))
+        .cyclesMap(kernelCycles)
+        .identity(domain.getIdentity())
+        .operatorSymbol(domain.getOperatorSymbol())
+        .elements(kernelElements)
+        .operator(domain::prod)
+        .build()
     );
-  }
-  
-  public static <T,U> void validateBijection(
-    Collection<T> domain, Collection<U> range, Function<T, U> func
-  ) {
-    RuntimeException e = new RuntimeException("Function is not a bijection");
-    if (domain.size() != range.size()) {
-      throw e;
-    }
-    Set<U> image = new HashSet<>();
-    for (T x:domain) {
-      U y = func.apply(x);
-      if (!range.contains(y) || !image.add(y)) {
-        throw e;
-      }
-    }
-  }
-  
-  public static <T,U> void validateLeftInverse(
-    Collection<T> domain, Function<T, U> func, Function<U, T> inverse
-  ) {
-    for (T x:domain) {
-      if (!x.equals(inverse.apply(func.apply(x)))) {
-        throw new RuntimeException("Function is not a left inverse.");
-      }
-    }
   }
   
   private static Homomorphism doCreateHomomorphism(
     Group domain, Group range, Group kernel, Function<String, String> act
   ) throws ValidationException {
     Homomorphism result = ConcreteHomomorphism.builder()
-      .domain(domain)
-      .range(range)
-      .kernel(kernel)
-      .act(act)
-      .build();
+                            .domain(domain)
+                            .range(range)
+                            .kernel(kernel)
+                            .act(act)
+                            .build();
     homomorphismValidator.validate(result);
     return result;
   }
@@ -229,5 +207,68 @@ public class HomomorphismUtil {
     return doCreateHomomorphism(
       domain, rangeAndKernel.getLeft(), rangeAndKernel.getRight(), act
     );
+  }
+  
+  private static Set<List<String>> convertCycles(Set<List<String>> cycles, Function<String, String> func) {
+    return cycles.stream()
+             .map(cycle -> cycle.stream()
+                             .map(func)
+                             .collect(Collectors.toList()))
+             .collect(Collectors.toSet());
+  }
+  
+  public static Automorphism createAutomorphism(
+    Group domain, Function<String, String> func
+  ) throws ValidationException {
+    Map<String, String> inverseFuncMap = domain.getElements().stream()
+                                           .collect(Collectors.toMap(
+                                             func,
+                                             Function.identity()
+                                           ));
+    
+    Map<String, String> rangeInverseMap = inverseFuncMap.entrySet().stream().collect(Collectors.toMap(
+      Map.Entry::getKey,
+      entry -> func.apply(domain.getInverse(entry.getValue()))
+    ));
+    
+    return createAutomorphism(
+      domain,
+      ConcreteGroup.builder()
+        .operatorSymbol("x")
+        .identity(func.apply(domain.getIdentity()))
+        .elements(inverseFuncMap.keySet())
+        .inversesMap(rangeInverseMap)
+        .cyclesMap(domain
+                     .getCycleSizes()
+                     .stream()
+                     .map(n -> new OrderedPair<>(
+                       n, convertCycles(domain.getNCycles(n), func)
+                     ))
+                     .collect(Collectors.toMap(
+                       OrderedPair::getLeft,
+                       OrderedPair::getRight
+                     )))
+        .operator((a, b) -> func.apply(domain.prod(
+          inverseFuncMap.get(a),
+          inverseFuncMap.get(b)
+        )))
+        .build(),
+      func,
+      inverseFuncMap::get
+    );
+  }
+  
+  public static Automorphism createAutomorphism(
+    Group domain, Group range, Function<String, String> func, Function<String, String> inverse
+  ) throws ValidationException {
+    Automorphism automorphism = ConcreteAutomorphism.builder()
+                                  .domain(domain)
+                                  .range(range)
+                                  .act(func)
+                                  .inverseAct(inverse)
+                                  .build();
+    initValidators();
+    automorphismValidator.validate(automorphism);
+    return automorphism;
   }
 }

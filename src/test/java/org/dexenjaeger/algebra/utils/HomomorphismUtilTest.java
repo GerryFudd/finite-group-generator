@@ -1,11 +1,14 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -57,8 +60,8 @@ class HomomorphismUtilTest {
     
     String[] rangeElements = {"E", "C"};
     
-    RuntimeException e = assertThrows(
-      RuntimeException.class,
+    ValidationException e = assertThrows(
+      ValidationException.class,
       () -> HomomorphismUtil.createHomomorphism(
         BinaryOperatorUtil.getCyclicGroup(
           "I", "a", "b", "c", "d", "e"
@@ -150,6 +153,81 @@ class HomomorphismUtilTest {
     
     assertEquals(
       "Function is not a homomorphism, f(a)xf(a)=b, but f(a*a)=I.", e.getMessage()
+    );
+  }
+  
+  @Test
+  void createAutomorphismTest_domainAndFunc() throws ValidationException {
+    Map<String, String> functionMap = Map.of(
+      "I", "E",
+      "a", "x",
+      "b", "y",
+      "c", "z"
+    );
+    Automorphism automorphism = HomomorphismUtil.createAutomorphism(
+      BinaryOperatorUtil.getCyclicGroup("I", "a", "b", "c"),
+      functionMap::get
+    );
+    
+    assertEquals(
+      new HashSet<>(functionMap.values()),
+      automorphism.getRange().getElements()
+    );
+    assertEquals(List.of(1, 4), automorphism.getRange().getCycleSizes());
+    assertEquals(
+      Set.of(List.of("x", "y", "z", "E")),
+      automorphism.getRange().getNCycles(4)
+    );
+  }
+  
+  @Test
+  void createAutomorphismTest_InvalidDomainAndRange() {
+    ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createAutomorphism(
+      new TrivialGroup("I"),
+      BinaryOperatorUtil.getCyclicGroup("E", "a"),
+      x -> "E",
+      y -> "I"
+    ));
+    
+    assertEquals(
+      "Domain and range are different sizes.", e.getMessage()
+    );
+  }
+  
+  @Test
+  void createAutomorphismTest_InvalidInverse() {
+    ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createAutomorphism(
+      BinaryOperatorUtil.getCyclicGroup("I", "a"),
+      BinaryOperatorUtil.getCyclicGroup("E", "x"),
+      x -> {
+        switch(x) {
+          case "I":
+            return "E";
+          case "a":
+            return "x";
+          default:
+            return null;
+        }
+      },
+      y -> "I"
+    ));
+    
+    assertEquals(
+      "Function is not a left inverse.", e.getMessage()
+    );
+  }
+  
+  @Test
+  void createAutomorphismTest_notInjection() {
+    ValidationException e = assertThrows(ValidationException.class, () -> HomomorphismUtil.createAutomorphism(
+      BinaryOperatorUtil.getCyclicGroup("I", "a"),
+      BinaryOperatorUtil.getCyclicGroup("E", "x"),
+      x -> "E",
+      y -> "I"
+    ));
+    
+    assertEquals(
+      "Kernel is not the inverse image of the identity.", e.getMessage()
     );
   }
 }
