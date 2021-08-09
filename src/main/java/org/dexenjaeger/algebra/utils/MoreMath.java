@@ -44,4 +44,22 @@ public class MoreMath {
       .filter(b::contains)
       .collect(Collectors.toSet());
   }
+  
+  public static int gcd(int m, int n) {
+    if (m < 0 || n < 0) {
+      throw new RuntimeException("No.");
+    }
+    int a = m;
+    int b = n;
+    while (a != 0 && b != 0) {
+      a = a % b;
+      int c = b;
+      b = a;
+      a = c;
+    }
+    if (a == 0) {
+      return b;
+    }
+    return a;
+  }
 }

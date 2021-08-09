@@ -1,11 +1,17 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MoreMathTest {
   @Test
@@ -42,6 +48,24 @@ class MoreMathTest {
     assertEquals(
       Set.of("four", "nine", "a", "tree"),
       MoreMath.intersection(null, Set.of("tree", "a", "four", "nine"))
+    );
+  }
+  
+  @ParameterizedTest
+  @CsvSource(
+    value = {
+      "0,0:0", "1,1:1", "2,3:1", "3,8:1",
+      "4,6:2", "24,36:12", "1820,3315:65"
+    },
+    delimiter = ':'
+  )
+  void gcdTest(String a, String b) {
+    List<Integer> inputs = Stream.of(a.split(",")).map(Integer::parseInt).collect(Collectors.toList());
+    assertEquals(
+      Integer.parseInt(b),
+      MoreMath.gcd(
+        inputs.get(0), inputs.get(1)
+      )
     );
   }
 }
