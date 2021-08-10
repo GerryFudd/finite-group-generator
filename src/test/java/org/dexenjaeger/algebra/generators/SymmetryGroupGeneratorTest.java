@@ -29,7 +29,7 @@ class SymmetryGroupGeneratorTest {
     
     assertEquals(
       sb.toString(),
-      s2.getMultiplicationTable()
+      s2.printMultiplicationTable()
     );
   }
   
@@ -48,7 +48,7 @@ class SymmetryGroupGeneratorTest {
     
     assertEquals(
       sb.toString(),
-      s3.getMultiplicationTable()
+      s3.printMultiplicationTable()
     );
   }
   
@@ -56,10 +56,10 @@ class SymmetryGroupGeneratorTest {
   void createS4() {
     Group s4 = symmetryGroupGenerator.createSymmetryGroup(4);
     
-    Set<String> elements = s4.getElements();
+    Set<String> elements = s4.getElementsDisplay();
     Map<Integer, Set<String>> groupOrderCount = new HashMap<>();
     for (String element:elements) {
-      List<String> cycle = s4.getCycle(element);
+      List<String> cycle = s4.getCycleElementsDisplay(element);
       groupOrderCount.compute(cycle.size(), (key, set) -> {
         if (set == null) {
           set = new HashSet<>();

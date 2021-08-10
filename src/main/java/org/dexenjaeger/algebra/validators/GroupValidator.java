@@ -4,7 +4,6 @@ import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.model.OrderedPair;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.MoreMath;
 
 import javax.inject.Inject;
@@ -84,7 +83,7 @@ public class GroupValidator implements Validator<Group> {
       throw getCycleException("cycle is empty");
     }
     LinkedList<String> linkedCycle = new LinkedList<>(cycleElements);
-    if (!linkedCycle.removeLast().equals(item.getIdentity())) {
+    if (!linkedCycle.removeLast().equals(item.getIdentityDisplay())) {
       throw getCycleException(String.format(
         "cycle %s doesn't end with identity", cycleElements
       ));
@@ -142,27 +141,24 @@ public class GroupValidator implements Validator<Group> {
   }
   
   private void validateInverses(Group item) throws ValidationException {
-    for (String a: item.getElements()) {
-      String inverse = Optional.ofNullable(item.getInverse(a))
-                         .orElseThrow(() -> new ValidationException(String.format(
-                           "The inverse of element %s not found in Group\n%s",
-                           a, item.getMultiplicationTable()
-                         )));
-      
-      if (!item.getElements().contains(inverse)) {
+    for (String a: item.getElementsDisplay()) {
+      String inverse;
+      try {
+        inverse = item.getInverse(a);
+      } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
         throw new ValidationException(String.format(
-          "The inverse %s of element %s not found in Group %s",
-          inverse, a, BinaryOperatorUtil.getSortedElements(item.getElements(), item.getIdentity())
+          "The inverse of element %s not found in Group\n%s",
+          a, item.printMultiplicationTable()
         ));
       }
       
       if (
-        !item.getIdentity().equals(item.prod(a, inverse))
-          || !item.getIdentity().equals(item.prod(inverse, a))
+        !item.getIdentityDisplay().equals(item.prod(a, inverse))
+          || !item.getIdentityDisplay().equals(item.prod(inverse, a))
       ) {
         throw new ValidationException(String.format(
           "The value %s is not the inverse of the element %s in Group\n%s",
-          inverse, a, item.getMultiplicationTable()
+          inverse, a, item.printMultiplicationTable()
         ));
       }
     }

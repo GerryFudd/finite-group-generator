@@ -16,15 +16,15 @@ public class SemigroupValidator implements Validator<Semigroup> {
   @Override
   public void validate(Semigroup item) throws ValidationException {
     binaryOperatorValidator.validate(item);
-    for (String a:item.getElements()) {
-      for (String b:item.getElements()) {
-        for (String c:item.getElements()) {
+    for (String a:item.getElementsDisplay()) {
+      for (String b:item.getElementsDisplay()) {
+        for (String c:item.getElementsDisplay()) {
           if (
             !item.prod(item.prod(a, b), c).equals(item.prod(a, item.prod(b, c)))
           ) {
             throw new ValidationException(String.format(
               "Binary operator is not associative\n%s",
-              item.getMultiplicationTable()
+              item.printMultiplicationTable()
             ));
           }
         }

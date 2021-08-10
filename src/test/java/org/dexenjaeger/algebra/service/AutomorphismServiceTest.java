@@ -37,7 +37,7 @@ class AutomorphismServiceTest {
     
     assertEquals(
       new HashSet<>(functionMap.values()),
-      automorphism.getRange().getElements()
+      automorphism.getRange().getElementsDisplay()
     );
     assertEquals(List.of(1, 4), automorphism.getRange().getCycleSizes());
     assertEquals(

@@ -86,17 +86,17 @@ public class HomomorphismService {
     Set<String> kernelElements = new HashSet<>();
     Map<Integer, Set<List<String>>> kernelCycles = new HashMap<>();
     
-    String rangeIdentity = act.apply(domain.getIdentity());
+    String rangeIdentity = act.apply(domain.getIdentityDisplay());
     
     rangeInversesMap.put(rangeIdentity, rangeIdentity);
     
     rangeElements.add(rangeIdentity);
-    kernelElements.add(domain.getIdentity());
+    kernelElements.add(domain.getIdentityDisplay());
     
-    domainLookupMap.put(rangeIdentity, domain.getIdentity());
+    domainLookupMap.put(rangeIdentity, domain.getIdentityDisplay());
     
     rangeCycles.put(1, Set.of(List.of(rangeIdentity)));
-    kernelCycles.put(1, Set.of(List.of(domain.getIdentity())));
+    kernelCycles.put(1, Set.of(List.of(domain.getIdentityDisplay())));
     
     for (Integer n:domain.getCycleSizes()) {
       for (List<String> cycle:domain.getNCycles(n)) {
@@ -106,7 +106,7 @@ public class HomomorphismService {
         LinkedList<String> linkedKernelCycle = new LinkedList<>();
         LinkedList<String> linkedKernelInverses = new LinkedList<>();
         String cycleId = linkedCycle.removeLast();
-        if (!cycleId.equals(domain.getIdentity())) {
+        if (!cycleId.equals(domain.getIdentityDisplay())) {
           throw getInvalidCycleException(cycle);
         }
         while (!linkedCycle.isEmpty()) {
@@ -168,7 +168,7 @@ public class HomomorphismService {
           while (!linkedKernelInverses.isEmpty()) {
             linkedKernelCycle.addLast(linkedKernelInverses.removeFirst());
           }
-          linkedKernelCycle.addLast(domain.getIdentity());
+          linkedKernelCycle.addLast(domain.getIdentityDisplay());
           kernelCycles.compute(linkedKernelCycle.size(), (key, cycles) -> {
             if (cycles == null) {
               cycles = new HashSet<>();
@@ -182,26 +182,26 @@ public class HomomorphismService {
     
     return new OrderedPair<>(
       ConcreteGroup.builder()
-        .inversesMap(rangeInversesMap)
+        .displayInversesMap(rangeInversesMap)
         .cyclesMap(rangeCycles)
-        .identity(rangeIdentity)
+        .identityDisplay(rangeIdentity)
         .operatorSymbol("x")
-        .elements(rangeElements)
-        .operator((a, b) -> act.apply(domain.prod(
+        .elementsDisplay(rangeElements)
+        .displayOperator((a, b) -> act.apply(domain.prod(
           domainLookupMap.get(a),
           domainLookupMap.get(b)
         )))
         .build(),
       ConcreteGroup.builder()
-        .inversesMap(kernelElements.stream().collect(Collectors.toMap(
+        .displayInversesMap(kernelElements.stream().collect(Collectors.toMap(
           Function.identity(),
           domain::getInverse
         )))
         .cyclesMap(kernelCycles)
-        .identity(domain.getIdentity())
+        .identityDisplay(domain.getIdentityDisplay())
         .operatorSymbol(domain.getOperatorSymbol())
-        .elements(kernelElements)
-        .operator(domain::prod)
+        .elementsDisplay(kernelElements)
+        .displayOperator(domain::prod)
         .build()
     );
   }

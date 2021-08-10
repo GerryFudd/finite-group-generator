@@ -6,9 +6,11 @@ import java.util.Set;
 
 public interface BinaryOperator {
   String getOperatorSymbol();
-  Set<String> getElements();
+  Set<String> getElementsDisplay();
+  int getSize();
   String prod(String a, String b);
-  default String getMultiplicationTable() {
-    return BinaryOperatorUtil.getMultiplicationTable(this);
+  int prod(int a, int b);
+  default String printMultiplicationTable() {
+    return BinaryOperatorUtil.printMultiplicationTable(this);
   }
 }

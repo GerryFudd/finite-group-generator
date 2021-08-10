@@ -33,16 +33,16 @@ class HomomorphismServiceTest {
     );
     
     assertEquals(
-      "I", validatedHomomorphism.getDomain().getIdentity()
+      "I", validatedHomomorphism.getDomain().getIdentityDisplay()
     );
     
     assertEquals(
-      validatedHomomorphism.getDomain().getMultiplicationTable(),
-      validatedHomomorphism.getKernel().getMultiplicationTable()
+      validatedHomomorphism.getDomain().printMultiplicationTable(),
+      validatedHomomorphism.getKernel().printMultiplicationTable()
     );
     
     assertEquals(
-      Set.of("E"), validatedHomomorphism.getRange().getElements()
+      Set.of("E"), validatedHomomorphism.getRange().getElementsDisplay()
     );
   }
   
@@ -130,8 +130,8 @@ class HomomorphismServiceTest {
     );
     
     assertEquals(
-      group.getMultiplicationTable(),
-      result.getKernel().getMultiplicationTable()
+      group.printMultiplicationTable(),
+      result.getKernel().printMultiplicationTable()
     );
   }
   
@@ -198,7 +198,7 @@ class HomomorphismServiceTest {
         " c    | c    d    d2   I    a    b    \n" +
         " d    | d    c    a    b    d2   I    \n" +
         " d2   | d2   b    c    a    I    d    \n",
-      result.getRange().getMultiplicationTable()
+      result.getRange().printMultiplicationTable()
     );
   }
 }

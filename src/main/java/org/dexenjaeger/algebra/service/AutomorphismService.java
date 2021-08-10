@@ -49,7 +49,7 @@ public class AutomorphismService {
   public Automorphism createAutomorphism(
     Group domain, Function<String, String> func
   ) throws ValidationException {
-    Map<String, String> inverseFuncMap = domain.getElements().stream()
+    Map<String, String> inverseFuncMap = domain.getElementsDisplay().stream()
                                            .collect(Collectors.toMap(
                                              func,
                                              Function.identity()
@@ -64,9 +64,9 @@ public class AutomorphismService {
       domain,
       ConcreteGroup.builder()
         .operatorSymbol("x")
-        .identity(func.apply(domain.getIdentity()))
-        .elements(inverseFuncMap.keySet())
-        .inversesMap(rangeInverseMap)
+        .identityDisplay(func.apply(domain.getIdentityDisplay()))
+        .elementsDisplay(inverseFuncMap.keySet())
+        .displayInversesMap(rangeInverseMap)
         .cyclesMap(domain
                      .getCycleSizes()
                      .stream()
@@ -77,7 +77,7 @@ public class AutomorphismService {
                        OrderedPair::getLeft,
                        OrderedPair::getRight
                      )))
-        .operator((a, b) -> func.apply(domain.prod(
+        .displayOperator((a, b) -> func.apply(domain.prod(
           inverseFuncMap.get(a),
           inverseFuncMap.get(b)
         )))

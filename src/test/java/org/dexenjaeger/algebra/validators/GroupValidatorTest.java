@@ -43,9 +43,13 @@ class GroupValidatorTest {
     );
     
     Group group = ConcreteGroup.builder()
-                    .inversesMap(Map.of("I", "I", "a", "b", "b", "a", "c", "c"))
-                    .elements(summary.getBinaryOperator().getElements())
-                    .operator(summary.getBinaryOperator()::prod)
+                    .displayInversesMap(Map.of("I", "I", "a", "b", "b", "a", "c", "c"))
+                    .elementsDisplay(summary.getBinaryOperator().getElementsDisplay())
+                    .displayOperator(summary.getBinaryOperator()::prod)
+                    .cyclesMap(Map.of(
+                      1, Set.of(List.of("I"), List.of("a"), List.of("b")),
+                      2, Set.of(List.of("c", "I"))
+                    ))
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -63,32 +67,36 @@ class GroupValidatorTest {
   @Test
   void inverseNotMemberOfGroup() {
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I", "a"))
-                    .inversesMap(Map.of("I", "I", "a", "b"))
+                    .elementsDisplay(Set.of("I", "a"))
+                    .inversesMap(Map.of(0, 0, 1, 2))
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       2, Set.of(List.of("a", "I"))
                     ))
-                    .operator((a, b) -> a.equals(b) ? "I" : "a")
+                    .operator((a, b) -> (a + b) % 2)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "The inverse b of element a not found in Group [I, a]", e.getMessage()
+      "The inverse of element a not found in Group\n" +
+        "\n" +
+        "_*____|_I____a____\n" +
+        " I    | I    a    \n" +
+        " a    | a    I    \n", e.getMessage()
     );
   }
   
   @Test
   void inverseNotPresentInInversesMap() {
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I", "a"))
-                    .inversesMap(Map.of("I", "I"))
+                    .elementsDisplay(Set.of("I", "a"))
+                    .displayInversesMap(Map.of("I", "I"))
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       2, Set.of(List.of("a", "I"))
                     ))
-                    .operator((a, b) -> a.equals(b) ? "I" : "a")
+                    .displayOperator((a, b) -> a.equals(b) ? "I" : "a")
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -104,9 +112,9 @@ class GroupValidatorTest {
   @Test
   void cyclesMapIsEmpty() {
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I"))
-                    .inversesMap(Map.of("I", "I"))
-                    .operator((a, b) -> "I")
+                    .elementsDisplay(Set.of("I"))
+                    .displayInversesMap(Map.of("I", "I"))
+                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of())
                     .build();
     
@@ -122,9 +130,9 @@ class GroupValidatorTest {
     Map<Integer, Set<List<String>>> cyclesMap = new HashMap<>();
     cyclesMap.put(1, null);
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I"))
-                    .inversesMap(Map.of("I", "I"))
-                    .operator((a, b) -> "I")
+                    .elementsDisplay(Set.of("I"))
+                    .displayInversesMap(Map.of("I", "I"))
+                    .displayOperator((a, b) -> "I")
                     .cyclesMap(cyclesMap)
                     .build();
     
@@ -138,9 +146,9 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsEmptySet() {
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I"))
-                    .inversesMap(Map.of("I", "I"))
-                    .operator((a, b) -> "I")
+                    .elementsDisplay(Set.of("I"))
+                    .displayInversesMap(Map.of("I", "I"))
+                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(1, Set.of()))
                     .build();
     
@@ -154,9 +162,9 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsCycleOfTheWrongSize() {
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I"))
-                    .inversesMap(Map.of("I", "I"))
-                    .operator((a, b) -> "I")
+                    .elementsDisplay(Set.of("I"))
+                    .displayInversesMap(Map.of("I", "I"))
+                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(1, Set.of(List.of())))
                     .build();
     
@@ -170,9 +178,9 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsInvalidCycleSize() {
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I"))
-                    .inversesMap(Map.of("I", "I"))
-                    .operator((a, b) -> "I")
+                    .elementsDisplay(Set.of("I"))
+                    .displayInversesMap(Map.of("I", "I"))
+                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(0, Set.of(List.of())))
                     .build();
     
@@ -186,9 +194,9 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsCycleThatDoesntEndWithI() {
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of("I", "a"))
-                    .inversesMap(Map.of("I", "I", "a", "a"))
-                    .operator((a, b) -> a.equals(b) ? "I" : "a")
+                    .elementsDisplay(Set.of("I", "a"))
+                    .displayInversesMap(Map.of("I", "I", "a", "a"))
+                    .displayOperator((a, b) -> a.equals(b) ? "I" : "a")
                     .cyclesMap(Map.of(1, Set.of(List.of("a"))))
                     .build();
     
@@ -203,9 +211,9 @@ class GroupValidatorTest {
   void cyclesMapContainsImproperCycle() {
     String[] elements = {"I", "a", "b"};
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of(elements))
-                    .inversesMap(Map.of("I", "I", "a", "b", "b", "a"))
-                    .operator(BinaryOperatorUtil.createOperator(
+                    .elementsDisplay(Set.of(elements))
+                    .displayInversesMap(Map.of("I", "I", "a", "b", "b", "a"))
+                    .displayOperator(BinaryOperatorUtil.createOperator(
                       elements, (a, b) -> (a + b) % 3
                     ))
                     .cyclesMap(Map.of(
@@ -225,9 +233,9 @@ class GroupValidatorTest {
   void cyclesMapContainsImproperCycleWithoutInverseAtEnd() {
     String[] elements = {"I", "a", "b", "c", "d", "e"};
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of(elements))
-                    .inversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
-                    .operator(BinaryOperatorUtil.createOperator(
+                    .elementsDisplay(Set.of(elements))
+                    .displayInversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
+                    .displayOperator(BinaryOperatorUtil.createOperator(
                       elements, (a, b) -> (a + b) % 6
                     ))
                     .cyclesMap(Map.of(
@@ -247,9 +255,9 @@ class GroupValidatorTest {
   void cyclesMapContainsImproperCycleWithoutInverseInMiddle() {
     String[] elements = {"I", "a", "b", "c", "d", "e"};
     Group group = ConcreteGroup.builder()
-                    .elements(Set.of(elements))
-                    .inversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
-                    .operator(BinaryOperatorUtil.createOperator(
+                    .elementsDisplay(Set.of(elements))
+                    .displayInversesMap(Map.of("I", "I", "a", "e", "b", "d", "c", "c", "d", "b", "e", "a"))
+                    .displayOperator(BinaryOperatorUtil.createOperator(
                       elements, (a, b) -> (a + b) % 6
                     ))
                     .cyclesMap(Map.of(

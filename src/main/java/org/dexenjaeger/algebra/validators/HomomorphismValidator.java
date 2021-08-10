@@ -18,16 +18,16 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
   }
   
   private void validateHomomorphism(Homomorphism item) throws ValidationException {
-    Set<String> rangeElements = item.getRange().getElements();
-    for (String a:item.getDomain().getElements()) {
+    Set<String> rangeElements = item.getRange().getElementsDisplay();
+    for (String a:item.getDomain().getElementsDisplay()) {
       String fa = item.apply(a);
       if (!rangeElements.contains(fa)) {
-        throw getNotFunctionException(rangeElements, item.getRange().getIdentity(), fa, a);
+        throw getNotFunctionException(rangeElements, item.getRange().getIdentityDisplay(), fa, a);
       }
-      for (String b:item.getDomain().getElements()) {
+      for (String b:item.getDomain().getElementsDisplay()) {
         String fb = item.apply(b);
         if (!rangeElements.contains(fb)) {
-          throw getNotFunctionException(rangeElements, item.getRange().getIdentity(), fb, b);
+          throw getNotFunctionException(rangeElements, item.getRange().getIdentityDisplay(), fb, b);
         }
         if (!item.getRange().prod(fa, fb)
                .equals(item.apply(item.getDomain().prod(a, b)))) {
@@ -44,16 +44,16 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
   }
   
   private void validateInverseImageOfId(Homomorphism item) throws ValidationException {
-    for (String a:item.getDomain().getElements()) {
-      if (item.getKernel().getElements().contains(a) != item.apply(a).equals(item.getRange().getIdentity())) {
+    for (String a:item.getDomain().getElementsDisplay()) {
+      if (item.getKernel().getElementsDisplay().contains(a) != item.apply(a).equals(item.getRange().getIdentityDisplay())) {
         throw new ValidationException("Kernel is not the inverse image of the identity.");
       }
     }
   }
   
   public static void validateSubgroup(Homomorphism item) throws ValidationException {
-    for (String a:item.getKernel().getElements()) {
-      for (String b:item.getKernel().getElements()) {
+    for (String a:item.getKernel().getElementsDisplay()) {
+      for (String b:item.getKernel().getElementsDisplay()) {
         String c = item.getDomain().prod(a, b);
         if (!c.equals(item.getKernel().prod(a, b))) {
           throw new ValidationException("Kernel binary operator doesn't match group binary operator.");

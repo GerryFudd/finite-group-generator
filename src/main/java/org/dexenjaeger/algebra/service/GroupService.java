@@ -35,14 +35,14 @@ public class GroupService {
     cycle.addLast(elements[0]);
     return ConcreteGroup.builder()
              .operatorSymbol(operatorSymbol)
-             .identity(elements[0])
-             .inversesMap(inverses)
+             .identityDisplay(elements[0])
+             .displayInversesMap(inverses)
              .cyclesMap(Map.of(
                1, Set.of(List.of(elements[0])),
                n, Set.of(cycle)
              ))
-             .elements(Set.of(elements))
-             .operator(binaryOperatorSerice.createOperator(
+             .elementsDisplay(Set.of(elements))
+             .displayOperator(binaryOperatorSerice.createOperator(
                elements, (a, b) -> (a + b) % n
              ))
              .build();
@@ -95,11 +95,11 @@ public class GroupService {
       });
     }
     return ConcreteGroup.builder()
-             .identity(elements[0])
-             .inversesMap(inversesMap)
+             .identityDisplay(elements[0])
+             .displayInversesMap(inversesMap)
              .cyclesMap(cyclesMap)
-             .elements(Set.of(elements))
-             .operator(binaryOperatorSerice.createOperator(
+             .elementsDisplay(Set.of(elements))
+             .displayOperator(binaryOperatorSerice.createOperator(
                elements, (a, b) -> table[a][b]
              ))
              .build();

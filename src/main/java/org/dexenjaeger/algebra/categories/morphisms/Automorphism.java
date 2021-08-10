@@ -10,6 +10,6 @@ public interface Automorphism extends Homomorphism {
   
   @Override
   default Group getKernel() {
-    return new TrivialGroup(getDomain().getOperatorSymbol(), getDomain().getIdentity());
+    return new TrivialGroup(getDomain().getOperatorSymbol(), getDomain().getIdentityDisplay());
   }
 }

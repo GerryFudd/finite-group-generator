@@ -24,10 +24,10 @@ class BinaryOperatorUtilTest {
     
     assertEquals(
       sb.toString(),
-      BinaryOperatorUtil.getMultiplicationTable(
+      BinaryOperatorUtil.printMultiplicationTable(
         ConcreteBinaryOperator.builder()
           .operatorSymbol("+")
-          .elements(Set.of(elements))
+          .elementsDisplay(Set.of(elements))
           .operator(BinaryOperatorUtil.createOperator(
             elements, (a, b) -> (a + b) % 3
           ))

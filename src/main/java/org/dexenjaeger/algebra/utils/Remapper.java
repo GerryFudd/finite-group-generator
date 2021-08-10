@@ -79,7 +79,7 @@ public class Remapper {
   
   public BinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
     BinaryOperator result = ConcreteBinaryOperator.builder()
-             .elements(Set.of(elements))
+             .elementsDisplay(Set.of(elements))
              .operator((a, b) -> elements[inverseRemap[binOp.apply(
                remap[reverseLookup.get(a)],
                remap[reverseLookup.get(b)]

@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MonoidValidatorTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
+  @SuppressWarnings("Convert2Diamond") // The diamond doesn't work here
   private final Validator<Monoid> validator = injector.getInstance(Key.get(new TypeLiteral<Validator<Monoid>>() {
   }));
   private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
@@ -34,8 +35,8 @@ class MonoidValidatorTest {
     ).getBinaryOperator();
     
     Monoid monoid = ConcreteMonoid.builder()
-                      .identity("L1")
-                      .elements(binOp.getElements())
+                      .identityDisplay("L1")
+                      .elementsDisplay(binOp.getElementsDisplay())
                       .operator(binOp::prod)
                       .build();
     

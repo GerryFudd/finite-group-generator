@@ -55,17 +55,17 @@ public class BinaryOperatorUtil {
              .sorted(getElementComparator(identity)).collect(Collectors.toList());
   }
   
-  public static String getMultiplicationTable(
+  public static String printMultiplicationTable(
     BinaryOperator binaryOperator
   ) {
-    return getMultiplicationTable(binaryOperator, null);
+    return printMultiplicationTable(binaryOperator, null);
   }
   
-  public static String getMultiplicationTable(
+  public static String printMultiplicationTable(
     BinaryOperator binaryOperator,
     String identity
   ) {
-    List<String> elementsList = getSortedElements(binaryOperator.getElements(), identity);
+    List<String> elementsList = getSortedElements(binaryOperator.getElementsDisplay(), identity);
     
     StringBuilder sb = new StringBuilder("\n_");
     sb.append(binaryOperator.getOperatorSymbol());

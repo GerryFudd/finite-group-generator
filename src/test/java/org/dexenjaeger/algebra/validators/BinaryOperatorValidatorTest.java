@@ -14,13 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BinaryOperatorValidatorTest {
+  @SuppressWarnings("Convert2Diamond") // The diamond doesn't work here
   private final Validator<BinaryOperator> binaryOperatorValidator = Guice.createInjector(new AlgebraModule()).getInstance(Key.get(new TypeLiteral<Validator<BinaryOperator>>() {
   }));
   
   @Test
   void validateBinaryOperator() {
     BinaryOperator binaryOperator = ConcreteBinaryOperator.builder()
-      .elements(Set.of("a"))
+      .elementsDisplay(Set.of("a"))
       .operator((a, b) -> "b")
       .build();
     

@@ -25,7 +25,7 @@ class SemigroupValidatorTest {
   @Test
   void invalidBinaryOperator() {
     Semigroup semigroup = ConcreteSemigroup.builder()
-      .elements(elements)
+      .elementsDisplay(elements)
       .operator(this::nonAssociative)
       .build();
     ValidationException e = assertThrows(ValidationException.class, () -> validator.validate(semigroup));
