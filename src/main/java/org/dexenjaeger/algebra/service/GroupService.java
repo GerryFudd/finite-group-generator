@@ -38,13 +38,13 @@ public class GroupService {
     return ConcreteGroup.builder()
              .operatorSymbol(operatorSymbol)
              .identity(0)
+             .elements(elements)
              .inversesMap(inverses)
              .cyclesMap(Map.of(
                1, Set.of(List.of(elements[0])),
                n, Set.of(cycle)
              ))
              .maximalCycles(Set.of(Cycle.builder().elements(cycle).build()))
-             .elements(elements)
              .operator((a, b) -> (a + b) % n)
              .build();
   }
@@ -56,27 +56,30 @@ public class GroupService {
     if (elements.length != table.length) {
       throw new RuntimeException("No.");
     }
-    Map<String, String> inversesMap = new HashMap<>();
-    inversesMap.put(elements[0], elements[0]);
+    Map<Integer, Integer> inversesMap = new HashMap<>();
+    inversesMap.put(0, 0);
     
     Set<List<String>> cycles = new HashSet<>();
     for (int i = 1; i < elements.length; i++) {
       String element = elements[i];
       if (cycles.stream().noneMatch(otherCycle -> otherCycle.contains(element))) {
         LinkedList<String> cycle = new LinkedList<>();
+        LinkedList<Integer> intCycle = new LinkedList<>();
         cycle.addLast(elements[i]);
+        intCycle.addLast(i);
         int newEl = table[i][i];
-        while (!cycle.contains(elements[newEl])) {
+        while (!intCycle.contains(newEl)) {
           cycle.addLast(elements[newEl]);
+          intCycle.addLast(newEl);
           newEl = table[i][newEl];
         }
         cycles.removeIf(cycle::containsAll);
         cycles.add(List.copyOf(cycle));
-        cycle.removeLast();
-        while (!cycle.isEmpty()) {
-          String x = cycle.removeFirst();
-          if (!cycle.isEmpty()) {
-            String inverseX = cycle.removeLast();
+        intCycle.removeLast();
+        while (!intCycle.isEmpty()) {
+          int x = intCycle.removeFirst();
+          if (!intCycle.isEmpty()) {
+            int inverseX = intCycle.removeLast();
             inversesMap.put(x, inverseX);
             inversesMap.put(inverseX, x);
           } else {
@@ -99,12 +102,13 @@ public class GroupService {
              .identity(0)
              .elements(elements)
              .multiplicationTable(table)
-             .displayInversesMap(inversesMap)
+             .inversesMap(inversesMap)
              .cyclesMap(cyclesMap)
-             .maximalCycles(cycles.stream().map(cycle -> Cycle.builder()
-             .elements(cycle)
-             .build())
-             .collect(Collectors.toSet()))
+             .maximalCycles(cycles.stream()
+                              .map(cycle -> Cycle.builder()
+                                              .elements(cycle)
+                                              .build())
+                              .collect(Collectors.toSet()))
              .build();
   }
 }

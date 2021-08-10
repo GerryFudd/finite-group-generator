@@ -96,7 +96,7 @@ class GroupValidatorTest {
   void inverseNotPresentInInversesMap() {
     Group group = ConcreteGroup.builder()
                     .elements("I", "a")
-                    .displayInversesMap(Map.of("I", "I"))
+                    .inversesMap(Map.of(0, 0))
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       2, Set.of(List.of("a", "I"))
@@ -118,7 +118,7 @@ class GroupValidatorTest {
   void cyclesMapIsEmpty() {
     Group group = ConcreteGroup.builder()
                     .elements("I")
-                    .displayInversesMap(Map.of("I", "I"))
+                    .inversesMap(Map.of(0, 0))
                     .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of())
                     .build();
@@ -136,7 +136,7 @@ class GroupValidatorTest {
     cyclesMap.put(1, null);
     Group group = ConcreteGroup.builder()
                     .elements("I")
-                    .displayInversesMap(Map.of("I", "I"))
+                    .inversesMap(Map.of(0, 0))
                     .displayOperator((a, b) -> "I")
                     .cyclesMap(cyclesMap)
                     .build();
@@ -152,7 +152,7 @@ class GroupValidatorTest {
   void cyclesMapContainsEmptySet() {
     Group group = ConcreteGroup.builder()
                     .elements("I")
-                    .displayInversesMap(Map.of("I", "I"))
+                    .inversesMap(Map.of(0, 0))
                     .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(1, Set.of()))
                     .build();
@@ -168,7 +168,7 @@ class GroupValidatorTest {
   void cyclesMapContainsCycleOfTheWrongSize() {
     Group group = ConcreteGroup.builder()
                     .elements("I")
-                    .displayInversesMap(Map.of("I", "I"))
+                    .inversesMap(Map.of(0, 0))
                     .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(1, Set.of(List.of())))
                     .build();
@@ -184,7 +184,7 @@ class GroupValidatorTest {
   void cyclesMapContainsInvalidCycleSize() {
     Group group = ConcreteGroup.builder()
                     .elements("I")
-                    .displayInversesMap(Map.of("I", "I"))
+                    .inversesMap(Map.of(0, 0))
                     .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(0, Set.of(List.of())))
                     .build();
