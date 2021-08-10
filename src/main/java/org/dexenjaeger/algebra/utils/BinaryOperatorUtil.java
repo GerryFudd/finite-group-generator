@@ -61,11 +61,37 @@ public class BinaryOperatorUtil {
     return printMultiplicationTable(binaryOperator, null);
   }
   
+  private static BiFunction<String, String, String> getSafeOperator(BinaryOperator binaryOperator) {
+    return (a, b) -> {
+      try {
+        return binaryOperator.prod(a, b);
+      } catch (RuntimeException e) {
+        System.out.printf("Couldn't find product of %s and %s while printing table.", a, b);
+      }
+  
+      Integer i = binaryOperator.eval(a);
+      Integer j = binaryOperator.eval(b);
+      if (i == null || j == null) {
+        return "?";
+      }
+      try {
+        int k = binaryOperator.prod(i, j);
+        if (k < 0 || k >= binaryOperator.getSize()) {
+          return String.format("[%d?]", k);
+        }
+      } catch (RuntimeException e) {
+        System.out.printf("Couldn't find product of %d and %d while printing table.", i, j);
+      }
+      return "?";
+    };
+  }
+  
   public static String printMultiplicationTable(
     BinaryOperator binaryOperator,
     String identity
   ) {
     List<String> elementsList = getSortedElements(binaryOperator.getElementsDisplay(), identity);
+    BiFunction<String, String, String> safeOperator = getSafeOperator(binaryOperator);
     
     StringBuilder sb = new StringBuilder("\n_");
     sb.append(binaryOperator.getOperatorSymbol());
@@ -77,7 +103,7 @@ public class BinaryOperatorUtil {
     for (String a: elementsList) {
       appendLine(
         sb, a, elementsList.stream()
-                 .map(b -> binaryOperator.prod(a, b))
+                 .map(b -> safeOperator.apply(a, b))
                  .collect(Collectors.toList())
       );
     }

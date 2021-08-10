@@ -8,7 +8,7 @@ import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,9 +20,11 @@ class BinaryOperatorValidatorTest {
   
   @Test
   void validateBinaryOperator() {
+    String[] elements = {"a"};
     BinaryOperator binaryOperator = ConcreteBinaryOperator.builder()
-      .elementsDisplay(Set.of("a"))
-      .operator((a, b) -> "b")
+      .elements(elements)
+      .lookup(Map.of("a", 0))
+      .operator((a, b) -> 1)
       .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> binaryOperatorValidator.validate(binaryOperator));
@@ -30,7 +32,7 @@ class BinaryOperatorValidatorTest {
     assertEquals(
       "This set is not closed under *\n\n" +
         "_*____|_a____\n" +
-        " a    | b    \n", e.getMessage()
+        " a    | [1?] \n", e.getMessage()
     );
   }
 }

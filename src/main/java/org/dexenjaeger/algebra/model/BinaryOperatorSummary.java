@@ -12,7 +12,9 @@ import java.util.Set;
 @Builder
 public class BinaryOperatorSummary {
   private final BinaryOperator binaryOperator;
-  private final Map<String, String> inverseMap;
+  private final Map<String, String> displayInversesMap;
+  private final Map<Integer, Integer> inversesMap;
+  private final Map<String, Integer> lookupMap;
   private final Map<Integer, Set<List<String>>> cyclesMap;
-  private final String identity;
+  private final String identityDisplay;
 }

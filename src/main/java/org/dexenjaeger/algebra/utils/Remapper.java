@@ -15,11 +15,13 @@ import java.util.function.BiFunction;
 
 public class Remapper {
   private final BinaryOperatorValidator validator = new BinaryOperatorValidator();
+  @Getter
   private int currentIndex = 0;
   private int defaultIndicesUsed = 0;
   private final String[] elements;
   private final int[] remap;
   private final int[] inverseRemap;
+  @Getter
   private final Map<String, Integer> reverseLookup;
   @Getter
   private final Set<Integer> available;
@@ -79,12 +81,10 @@ public class Remapper {
   
   public BinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
     BinaryOperator result = ConcreteBinaryOperator.builder()
-             .elementsDisplay(Set.of(elements))
-             .operator((a, b) -> elements[inverseRemap[binOp.apply(
-               remap[reverseLookup.get(a)],
-               remap[reverseLookup.get(b)]
-             )]])
-      .build();
+                              .elements(elements)
+                              .lookup(reverseLookup)
+                              .operator((a, b) -> inverseRemap[binOp.apply(remap[a], remap[b])])
+                              .build();
     try {
       validator.validate(result);
       return result;

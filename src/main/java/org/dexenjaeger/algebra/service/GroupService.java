@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.Cycle;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GroupService {
   private final BinaryOperatorService binaryOperatorSerice;
@@ -26,25 +28,24 @@ public class GroupService {
   public Group getCyclicGroup(String[] elements, String operatorSymbol) {
     int n = elements.length;
     LinkedList<String> cycle = new LinkedList<>();
-    Map<String, String> inverses = new HashMap<>();
+    Map<Integer, Integer> inverses = new HashMap<>();
     for (int i = 1; i < n; i++) {
-      inverses.put(elements[i], elements[n-i]);
+      inverses.put(i, n - i);
       cycle.addLast(elements[i]);
     }
-    inverses.put(elements[0], elements[0]);
+    inverses.put(0, 0);
     cycle.addLast(elements[0]);
     return ConcreteGroup.builder()
              .operatorSymbol(operatorSymbol)
-             .identityDisplay(elements[0])
-             .displayInversesMap(inverses)
+             .identity(0)
+             .inversesMap(inverses)
              .cyclesMap(Map.of(
                1, Set.of(List.of(elements[0])),
                n, Set.of(cycle)
              ))
-             .elementsDisplay(Set.of(elements))
-             .displayOperator(binaryOperatorSerice.createOperator(
-               elements, (a, b) -> (a + b) % n
-             ))
+             .maximalCycles(Set.of(Cycle.builder().elements(cycle).build()))
+             .elements(elements)
+             .operator((a, b) -> (a + b) % n)
              .build();
   }
   
@@ -95,13 +96,15 @@ public class GroupService {
       });
     }
     return ConcreteGroup.builder()
-             .identityDisplay(elements[0])
+             .identity(0)
+             .elements(elements)
+             .multiplicationTable(table)
              .displayInversesMap(inversesMap)
              .cyclesMap(cyclesMap)
-             .elementsDisplay(Set.of(elements))
-             .displayOperator(binaryOperatorSerice.createOperator(
-               elements, (a, b) -> table[a][b]
-             ))
+             .maximalCycles(cycles.stream().map(cycle -> Cycle.builder()
+             .elements(cycle)
+             .build())
+             .collect(Collectors.toSet()))
              .build();
   }
 }

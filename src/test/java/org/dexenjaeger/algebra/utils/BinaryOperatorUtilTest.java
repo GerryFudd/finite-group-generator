@@ -4,7 +4,7 @@ import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,10 +27,9 @@ class BinaryOperatorUtilTest {
       BinaryOperatorUtil.printMultiplicationTable(
         ConcreteBinaryOperator.builder()
           .operatorSymbol("+")
-          .elementsDisplay(Set.of(elements))
-          .operator(BinaryOperatorUtil.createOperator(
-            elements, (a, b) -> (a + b) % 3
-          ))
+          .elements(elements)
+          .lookup(Map.of("a", 0, "b", 1, "c", 2))
+          .operator((a, b) -> (a + b) % 3)
           .build()
       )
     );

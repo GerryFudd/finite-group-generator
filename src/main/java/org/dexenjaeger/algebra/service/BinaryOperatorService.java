@@ -28,8 +28,9 @@ public class BinaryOperatorService {
     int size,
     BiFunction<Integer, Integer, Integer> binOp
   ) {
-    BinaryOperatorSummary.BinaryOperatorSummaryBuilder resultBuilder = BinaryOperatorSummary.builder();
     Remapper remapper = Remapper.init(size);
+    BinaryOperatorSummary.BinaryOperatorSummaryBuilder resultBuilder = BinaryOperatorSummary.builder()
+      .lookupMap(remapper.getReverseLookup());
     
     RawBinaryOperatorSummary summary = new RawBinaryOperatorSummary();
     for (int i = 0; i < size; i++) {
@@ -56,10 +57,14 @@ public class BinaryOperatorService {
       summary.addCycle(cycle);
     }
     Optional<Integer> identity = summary.getIdentity();
-    Map<String, String> inverseMap = new HashMap<>();
+    Map<String, String> displayInverseMap = new HashMap<>();
+    Map<Integer, Integer> inversesMap = new HashMap<>();
     if (identity.isPresent()) {
-      inverseMap.put("I", "I");
-      resultBuilder.identity("I").inverseMap(inverseMap);
+      displayInverseMap.put("I", "I");
+      inversesMap.put(0, 0);
+      resultBuilder.identityDisplay("I")
+        .displayInversesMap(displayInverseMap)
+        .inversesMap(inversesMap);
       remapper.map("I", identity.get()).orElseThrow();
     } else {
       int l = 1;
@@ -80,10 +85,13 @@ public class BinaryOperatorService {
       summary.getNCycles(cycleSize).forEach(cycle -> {
         cyclesMap.computeIfAbsent(cycleSize, (acc) -> new HashSet<>());
         List<String> resultCycle = new LinkedList<>();
+        LinkedList<Integer> indexCycle = new LinkedList<>();
+        indexCycle.addLast(remapper.getCurrentIndex());
         String baseValue = remapper.map(cycle.get(0)).orElseThrow();
         resultCycle.add(baseValue);
         int i = 1;
         while (i < cycle.size() - 1) {
+          indexCycle.addLast(remapper.getCurrentIndex());
           resultCycle.add(remapper.map(baseValue + (i + 1), cycle.get(i)).orElseThrow());
           i++;
         }
@@ -94,8 +102,13 @@ public class BinaryOperatorService {
         while (!cycleVals.isEmpty()) {
           String val = cycleVals.removeFirst();
           String inv = cycleVals.isEmpty() ? val : cycleVals.removeLast();
-          inverseMap.put(val, inv);
-          inverseMap.put(inv, val);
+          displayInverseMap.put(val, inv);
+          displayInverseMap.put(inv, val);
+          
+          Integer valIndex = indexCycle.removeFirst();
+          Integer invIndex = indexCycle.isEmpty() ? valIndex : indexCycle.removeLast();
+          inversesMap.put(valIndex, invIndex);
+          inversesMap.put(invIndex, valIndex);
         }
       });
     }

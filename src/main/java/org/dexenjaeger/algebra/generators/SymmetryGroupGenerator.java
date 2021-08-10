@@ -98,10 +98,10 @@ public class SymmetryGroupGenerator {
     
     Group result = ConcreteGroup.builder()
                      .operatorSymbol("o")
-                     .identityDisplay("I")
-                     .displayInversesMap(summary.getInverseMap())
-                     .elementsDisplay(summary.getBinaryOperator().getElementsDisplay())
-                     .displayOperator(summary.getBinaryOperator()::prod)
+                     .identity(0)
+                     .inversesMap(summary.getInversesMap())
+                     .lookup(summary.getLookupMap())
+                     .operator(summary.getBinaryOperator()::prod)
                      .cyclesMap(summary.getCyclesMap())
                      .build();
   

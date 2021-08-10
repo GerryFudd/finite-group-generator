@@ -10,6 +10,9 @@ public interface BinaryOperator {
   int getSize();
   String prod(String a, String b);
   int prod(int a, int b);
+  default Integer eval(String a) {
+    return null;
+  }
   default String printMultiplicationTable() {
     return BinaryOperatorUtil.printMultiplicationTable(this);
   }

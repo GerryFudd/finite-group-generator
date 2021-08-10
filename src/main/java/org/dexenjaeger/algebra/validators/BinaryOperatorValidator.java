@@ -7,7 +7,9 @@ public class BinaryOperatorValidator implements Validator<BinaryOperator>{
   public void validate(BinaryOperator item) throws ValidationException {
     for (String a:item.getElementsDisplay()) {
       for (String b:item.getElementsDisplay()) {
-        if (!item.getElementsDisplay().contains(item.prod(a, b))) {
+        try {
+          item.prod(a, b);
+        } catch (RuntimeException e) {
           throw new ValidationException(String.format(
             "This set is not closed under %s\n%s",
             item.getOperatorSymbol(), item.printMultiplicationTable()

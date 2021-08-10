@@ -42,8 +42,13 @@ public class GroupBuilder {
     return this;
   }
   
-  public GroupBuilder elements(String[] elements) {
+  public GroupBuilder elements(String... elements) {
     this.elements = elements;
+    return this;
+  }
+  
+  public GroupBuilder lookup(Map<String, Integer> lookup) {
+    this.lookup = lookup;
     return this;
   }
   
@@ -87,6 +92,11 @@ public class GroupBuilder {
     return this;
   }
   
+  public GroupBuilder maximalCycles(Set<Cycle> maximalCycles) {
+    this.maximalCycles = maximalCycles;
+    return this;
+  }
+  
   public GroupBuilder displayOperator(BiFunction<String, String, String> displayOperator) {
     this.displayOperator = displayOperator;
     return this;
@@ -94,7 +104,14 @@ public class GroupBuilder {
   
   public Group build() {
     if (elements == null) {
-      elements = new String[elementsDisplay.size()];
+      if (size == null) {
+        if (elementsDisplay == null) {
+          size = lookup.size();
+        } else {
+          size = elementsDisplay.size();
+        }
+      }
+      elements = new String[size];
       if (lookup == null) {
         lookup = new HashMap<>();
         identity = 0;

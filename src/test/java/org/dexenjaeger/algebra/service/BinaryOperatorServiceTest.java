@@ -6,10 +6,13 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -19,7 +22,7 @@ class BinaryOperatorServiceTest {
   private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
   
   private String getElements(BinaryOperatorSummary summary) {
-    return String.join(", ", BinaryOperatorUtil.getSortedElements(summary.getBinaryOperator().getElementsDisplay(), summary.getIdentity()));
+    return String.join(", ", BinaryOperatorUtil.getSortedElements(summary.getBinaryOperator().getElementsDisplay(), summary.getIdentityDisplay()));
   }
   
   @Test
@@ -41,8 +44,8 @@ class BinaryOperatorServiceTest {
       getElements(result)
     );
     
-    assertNull(result.getIdentity());
-    assertNull(result.getInverseMap());
+    assertNull(result.getIdentityDisplay());
+    assertNull(result.getDisplayInversesMap());
   }
   
   @Test
@@ -64,8 +67,8 @@ class BinaryOperatorServiceTest {
       getElements(result)
     );
     
-    assertNull(result.getIdentity());
-    assertNull(result.getInverseMap());
+    assertNull(result.getIdentityDisplay());
+    assertNull(result.getDisplayInversesMap());
   }
   
   @Test
@@ -87,10 +90,10 @@ class BinaryOperatorServiceTest {
       getElements(result)
     );
     
-    assertEquals("I", result.getIdentity());
+    assertEquals("I", result.getIdentityDisplay());
     assertEquals(
       Map.of("I", "I", "a", "a", "b", "b", "c", "c"),
-      result.getInverseMap()
+      result.getDisplayInversesMap()
     );
   }
   
@@ -102,11 +105,15 @@ class BinaryOperatorServiceTest {
     );
     
     Group result = ConcreteGroup.builder()
-                             .displayInversesMap(summary.getInverseMap())
-                             .cyclesMap(summary.getCyclesMap())
-                             .elementsDisplay(summary.getBinaryOperator().getElementsDisplay())
-                             .displayOperator(summary.getBinaryOperator()::prod)
-                             .build();
+                     .inversesMap(summary.getInversesMap())
+                     .cyclesMap(summary.getCyclesMap())
+                     .maximalCycles(Set.of(
+                       Cycle.builder()
+                         .elements(List.of("a", "b", "c", "I"))
+                         .build()))
+                     .lookup(summary.getLookupMap())
+                     .operator(summary.getBinaryOperator()::prod)
+                     .build();
     
     result.getElementsDisplay().forEach(element -> assertEquals(
       result.getIdentityDisplay(),
