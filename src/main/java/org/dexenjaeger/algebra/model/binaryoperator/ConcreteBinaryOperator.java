@@ -1,22 +1,21 @@
 package org.dexenjaeger.algebra.model.binaryoperator;
 
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 
-@Builder
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ConcreteBinaryOperator implements BinaryOperator {
   @Getter
-  @Builder.Default
-  private final String operatorSymbol = "*";
+  private final String operatorSymbol;
   @Getter
   private final int size;
   private final String[] elements;
-  private final BiFunction<Integer, Integer, Integer> operator;
   private final Map<String, Integer> lookup;
+  private final int[][] multiplicationTable;
   
   @Override
   public Set<String> getElementsDisplay() {
@@ -25,16 +24,25 @@ public class ConcreteBinaryOperator implements BinaryOperator {
   
   @Override
   public String prod(String a, String b) {
-    return elements[operator.apply(lookup.get(a), lookup.get(b))];
+    return elements[prod(lookup.get(a), lookup.get(b))];
   }
   
   @Override
   public int prod(int a, int b) {
-    return operator.apply(a, b);
+    return multiplicationTable[a][b];
   }
   
   @Override
   public Integer eval(String a) {
     return lookup.get(a);
+  }
+  
+  @Override
+  public String display(int i) {
+    return elements[i];
+  }
+  
+  public static BinaryOperatorBuilder builder() {
+    return new BinaryOperatorBuilder();
   }
 }

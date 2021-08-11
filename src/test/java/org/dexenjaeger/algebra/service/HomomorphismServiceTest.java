@@ -48,17 +48,12 @@ class HomomorphismServiceTest {
   
   @Test
   void createHomomorphismTest_InvalidHomomorphismFunction() {
-    RuntimeException e = assertThrows(
-      RuntimeException.class,
+    assertThrows(
+      ValidationException.class,
       () -> homomorphismService.createHomomorphism(
         groupService.getCyclicGroup("I", "a", "b"),
-        (a) -> "b".equals(a) ? "B" : "E"
+        (a) -> a == 2 ? "B" : "E"
       )
-    );
-    
-    assertEquals(
-      "Invalid homomorphism. Kernel is not a subgroup since a is in the kernel but its inverse b is not.",
-      e.getMessage()
     );
   }
   
@@ -81,7 +76,7 @@ class HomomorphismServiceTest {
         groupService.getCyclicGroup(
           "I", "d", "e"
         ),
-        (a) -> rangeElements[lookup.get(a) % 2]
+        i -> i % 2
       )
     );
     
@@ -111,7 +106,7 @@ class HomomorphismServiceTest {
         groupService.getGroupFromElementsAndIntTable(
           elements, kernelMult
         ),
-        (a) -> "E"
+        i -> 0
       )
     );
     
@@ -146,7 +141,7 @@ class HomomorphismServiceTest {
     ));
     
     assertEquals(
-      "Range [I] doesn't contain image a of a.", e.getMessage()
+      "Range with size 1 doesn't contain image 1 of 1.", e.getMessage()
     );
   }
   
@@ -161,21 +156,21 @@ class HomomorphismServiceTest {
     ));
     
     assertEquals(
-      "Function is not a homomorphism, f(a)xf(a)=b, but f(a*a)=I.", e.getMessage()
+      "Function is not a homomorphism, f(1)xf(1)=2, but f(1*1)=0.", e.getMessage()
     );
   }
   
   @Test
   void createHomomorphismTest_createsRange() throws ValidationException {
     Group s3 = symmetryGroupGenerator.createSymmetryGroup(3);
-    Function<String, String> act = a -> {
-      if (a.equals("d")) {
+    Function<Integer, String> act = a -> {
+      if (s3.display(a).equals("d")) {
         return "d2";
       }
-      if (a.equals("d2")) {
+      if (s3.display(a).equals("d2")) {
         return "d";
       }
-      return a;
+      return s3.display(a);
     };
     
     Homomorphism homomorphism = homomorphismService.createHomomorphism(
@@ -185,8 +180,8 @@ class HomomorphismServiceTest {
     Automorphism result = ConcreteAutomorphism.builder()
                             .domain(homomorphism.getDomain())
                             .range(homomorphism.getRange())
-                            .act(act)
-                            .inverseAct(act)
+                            .act(homomorphism::apply)
+                            .inverseAct(homomorphism::apply)
                             .build();
     
     assertEquals(

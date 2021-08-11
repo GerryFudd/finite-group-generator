@@ -1,13 +1,16 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -129,5 +132,51 @@ public class BinaryOperatorUtil {
       lookup.put(elements[i], i);
     }
     return (a, b) -> elements[intOp.apply(lookup.get(a), lookup.get(b))];
+  }
+  
+  public static int[][] getMultiplicationTable(int size, BiFunction<Integer, Integer, Integer> operator) {
+    int[][] multiplicationTable = new int[size][size];
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        multiplicationTable[i][j] = operator.apply(i, j);
+      }
+    }
+    return multiplicationTable;
+  }
+  
+  public static String[] createElementsList(Map<String, Integer> lookup) {
+    String[] elements = new String[lookup.size()];
+    for (Map.Entry<String, Integer> entry:lookup.entrySet()) {
+      elements[entry.getValue()] = entry.getKey();
+    }
+    return elements;
+  }
+  
+  public static Map<String, Integer> createLookup(String[] elements) {
+    Map<String, Integer> lookup = new HashMap<>();
+    for (int i = 0; i < elements.length; i++) {
+      lookup.put(elements[i], i);
+    }
+    return lookup;
+  }
+  
+  public static Map<Integer, Set<List<String>>> getCyclesMap(Set<Cycle> cycles, String identity) {
+    Set<List<String>> oneCycles = new HashSet<>();
+    oneCycles.add(List.of(identity));
+    Map<Integer, Set<List<String>>> result = new HashMap<>();
+    result.put(1, oneCycles);
+    
+    for (Cycle cycle:cycles) {
+      result.computeIfPresent(cycle.getElements().size(), (key, c) -> {
+        c.add(cycle.getElements());
+        return c;
+      });
+      result.computeIfAbsent(cycle.getElements().size(), key -> {
+        Set<List<String>> c = new HashSet<>();
+        c.add(cycle.getElements());
+        return c;
+      });
+    }
+    return result;
   }
 }

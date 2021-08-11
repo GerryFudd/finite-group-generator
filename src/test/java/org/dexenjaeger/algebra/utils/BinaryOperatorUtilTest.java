@@ -27,8 +27,8 @@ class BinaryOperatorUtilTest {
       BinaryOperatorUtil.printMultiplicationTable(
         ConcreteBinaryOperator.builder()
           .operatorSymbol("+")
-          .elements(elements)
           .lookup(Map.of("a", 0, "b", 1, "c", 2))
+          .elements(elements)
           .operator((a, b) -> (a + b) % 3)
           .build()
       )

@@ -9,6 +9,7 @@ import org.dexenjaeger.algebra.validators.AutomorphismValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,7 @@ public class AutomorphismService {
   }
   
   public Automorphism createAutomorphism(
-    Group domain, Group range, Function<String, String> func, Function<String, String> inverse
+    Group domain, Group range, Function<Integer, Integer> func, Function<Integer, Integer> inverse
   ) throws ValidationException {
     Automorphism automorphism = ConcreteAutomorphism.builder()
                                   .domain(domain)
@@ -47,43 +48,44 @@ public class AutomorphismService {
   }
   
   public Automorphism createAutomorphism(
-    Group domain, Function<String, String> func
+    Group domain, Function<Integer, String> func
   ) throws ValidationException {
-    Map<String, String> inverseFuncMap = domain.getElementsDisplay().stream()
-                                           .collect(Collectors.toMap(
-                                             func,
-                                             Function.identity()
-                                           ));
+    Map<String, Integer> rangeLookup = new HashMap<>();
+    String[] elements = new String[domain.getSize()];
+    for (int i = 0; i < domain.getSize(); i++) {
+      String y = func.apply(i);
+      elements[i] = y;
+      rangeLookup.put(y, i);
+    }
     
-    Map<String, String> rangeInverseMap = inverseFuncMap.entrySet().stream().collect(Collectors.toMap(
-      Map.Entry::getKey,
-      entry -> func.apply(domain.getInverse(entry.getValue()))
+    Function<String, String> displayFunc = x -> func.apply(domain.eval(x));
+    
+    Map<Integer, Integer> rangeInverseMap = rangeLookup.values().stream().collect(Collectors.toMap(
+      Function.identity(),
+      domain::getInverse
     ));
     
     return createAutomorphism(
       domain,
       ConcreteGroup.builder()
-        .operatorSymbol("x")
-        .identityDisplay(func.apply(domain.getIdentityDisplay()))
-        .elementsDisplay(inverseFuncMap.keySet())
-        .displayInversesMap(rangeInverseMap)
+        .inversesMap(rangeInverseMap)
         .cyclesMap(domain
                      .getCycleSizes()
                      .stream()
                      .map(n -> new OrderedPair<>(
-                       n, convertCycles(domain.getNCycles(n), func)
+                       n, convertCycles(domain.getNCycles(n), displayFunc)
                      ))
                      .collect(Collectors.toMap(
                        OrderedPair::getLeft,
                        OrderedPair::getRight
                      )))
-        .displayOperator((a, b) -> func.apply(domain.prod(
-          inverseFuncMap.get(a),
-          inverseFuncMap.get(b)
-        )))
+        .identity(domain.getIdentity())
+        .operatorSymbol("x")
+        .elements(elements)
+        .operator(domain::prod)
         .build(),
-      func,
-      inverseFuncMap::get
+      Function.identity(),
+      Function.identity()
     );
   }
 }

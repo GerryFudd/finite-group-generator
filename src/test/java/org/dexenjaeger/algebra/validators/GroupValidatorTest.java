@@ -44,8 +44,6 @@ class GroupValidatorTest {
     
     Group group = ConcreteGroup.builder()
                     .inversesMap(Map.of(0, 0, 1, 2, 2, 1, 3, 3))
-                    .lookup(summary.getLookupMap())
-                    .operator(summary.getBinaryOperator()::prod)
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I"), List.of("a"), List.of("b")),
                       2, Set.of(List.of("c", "I"))
@@ -55,6 +53,8 @@ class GroupValidatorTest {
                       Cycle.builder().elements(List.of("a")).build(),
                       Cycle.builder().elements(List.of("b")).build()
                     ))
+                    .lookup(summary.getLookupMap())
+                    .operator(summary.getBinaryOperator()::prod)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -72,12 +72,12 @@ class GroupValidatorTest {
   @Test
   void inverseNotMemberOfGroup() {
     Group group = ConcreteGroup.builder()
-                    .elements("I", "a")
                     .inversesMap(Map.of(0, 0, 1, 2))
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       2, Set.of(List.of("a", "I"))
                     ))
+                    .elements("I", "a")
                     .operator((a, b) -> (a + b) % 2)
                     .build();
     
@@ -95,13 +95,13 @@ class GroupValidatorTest {
   @Test
   void inverseNotPresentInInversesMap() {
     Group group = ConcreteGroup.builder()
-                    .elements("I", "a")
                     .inversesMap(Map.of(0, 0))
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       2, Set.of(List.of("a", "I"))
                     ))
-                    .displayOperator((a, b) -> a.equals(b) ? "I" : "a")
+                    .elements("I", "a")
+                    .operator((a, b) -> (a + b) % 2)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -117,10 +117,10 @@ class GroupValidatorTest {
   @Test
   void cyclesMapIsEmpty() {
     Group group = ConcreteGroup.builder()
-                    .elements("I")
                     .inversesMap(Map.of(0, 0))
-                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of())
+                    .elements("I")
+                    .operator((a, b) -> 0)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -135,10 +135,10 @@ class GroupValidatorTest {
     Map<Integer, Set<List<String>>> cyclesMap = new HashMap<>();
     cyclesMap.put(1, null);
     Group group = ConcreteGroup.builder()
-                    .elements("I")
                     .inversesMap(Map.of(0, 0))
-                    .displayOperator((a, b) -> "I")
                     .cyclesMap(cyclesMap)
+                    .elements("I")
+                    .operator((a, b) -> 0)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -151,10 +151,10 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsEmptySet() {
     Group group = ConcreteGroup.builder()
-                    .elements("I")
                     .inversesMap(Map.of(0, 0))
-                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(1, Set.of()))
+                    .elements("I")
+                    .operator((a, b) -> 0)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -167,10 +167,10 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsCycleOfTheWrongSize() {
     Group group = ConcreteGroup.builder()
-                    .elements("I")
                     .inversesMap(Map.of(0, 0))
-                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(1, Set.of(List.of())))
+                    .elements("I")
+                    .operator((a, b) -> 0)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -183,10 +183,10 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsInvalidCycleSize() {
     Group group = ConcreteGroup.builder()
-                    .elements("I")
                     .inversesMap(Map.of(0, 0))
-                    .displayOperator((a, b) -> "I")
                     .cyclesMap(Map.of(0, Set.of(List.of())))
+                    .elements("I")
+                    .operator((a, b) -> 0)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -199,10 +199,10 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsCycleThatDoesntEndWithI() {
     Group group = ConcreteGroup.builder()
-                    .elements("I", "a")
                     .inversesMap(Map.of(0, 0, 1, 1))
-                    .operator((a, b) -> (a + b) % 2)
                     .cyclesMap(Map.of(1, Set.of(List.of("a"))))
+                    .elements("I", "a")
+                    .operator((a, b) -> (a + b) % 2)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -215,13 +215,13 @@ class GroupValidatorTest {
   @Test
   void cyclesMapContainsImproperCycle() {
     Group group = ConcreteGroup.builder()
-                    .elements("I", "a", "b")
                     .inversesMap(Map.of(0, 0, 1, 2, 2, 1))
-                    .operator((a, b) -> (a + b) % 3)
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       4, Set.of(List.of("a", "I", "b", "I"))
                     ))
+                    .elements("I", "a", "b")
+                    .operator((a, b) -> (a + b) % 3)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -235,9 +235,7 @@ class GroupValidatorTest {
   void cyclesMapContainsImproperCycleWithoutInverseAtEnd() {
     String[] elements = {"I", "a", "b", "c", "d", "e"};
     Group group = ConcreteGroup.builder()
-                    .elements(elements)
                     .inversesMap(Map.of(0, 0, 1, 5, 2, 4, 3, 3, 4, 2, 5, 1))
-                    .operator((a, b) -> (a + b) % 6)
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       5, Set.of(List.of("a", "b", "c", "e", "I"))
@@ -246,6 +244,8 @@ class GroupValidatorTest {
                       Cycle.builder()
                         .elements(List.of("a", "b", "c", "e", "I"))
                         .build()))
+                    .elements(elements)
+                    .operator((a, b) -> (a + b) % 6)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
@@ -259,9 +259,7 @@ class GroupValidatorTest {
   void cyclesMapContainsImproperCycleWithoutInverseInMiddle() {
     String[] elements = {"I", "a", "b", "c", "d", "e"};
     Group group = ConcreteGroup.builder()
-                    .elements(elements)
                     .inversesMap(Map.of(0, 0, 1, 5, 2, 4, 3, 3, 4, 2, 5, 1))
-                    .operator((a, b) -> (a + b) % 6)
                     .cyclesMap(Map.of(
                       1, Set.of(List.of("I")),
                       4, Set.of(List.of("a", "b", "e", "I"))
@@ -270,6 +268,8 @@ class GroupValidatorTest {
                       Cycle.builder()
                         .elements(List.of("a", "b", "e", "I"))
                         .build()))
+                    .elements(elements)
+                    .operator((a, b) -> (a + b) % 6)
                     .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));

@@ -2,21 +2,17 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.morphisms.ConcreteHomomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
-import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.OrderedPair;
+import org.dexenjaeger.algebra.model.Cycle;
+import org.dexenjaeger.algebra.model.HomomorphismSummary;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class HomomorphismService {
   private final GroupService groupService;
@@ -35,7 +31,7 @@ public class HomomorphismService {
   }
   
   private Homomorphism doCreateHomomorphism(
-    Group domain, Group range, Group kernel, Function<String, String> act
+    Group domain, Group range, Group kernel, Function<Integer, Integer> act
   ) throws ValidationException {
     Homomorphism result = ConcreteHomomorphism.builder()
                             .domain(domain)
@@ -48,7 +44,7 @@ public class HomomorphismService {
   }
   
   public Homomorphism createHomomorphism(
-    Group domain, Group range, Group kernel, Function<String, String> act
+    Group domain, Group range, Group kernel, Function<Integer, Integer> act
   ) throws ValidationException {
     groupValidator.validate(domain);
     groupValidator.validate(range);
@@ -58,17 +54,20 @@ public class HomomorphismService {
   
   public Homomorphism createHomomorphism(
     Group domain,
-    Function<String, String> act
+    Function<Integer, String> act
   ) throws ValidationException {
     groupValidator.validate(domain);
-    OrderedPair<Group, Group> rangeAndKernel = constructRangeAndKernel(
+    HomomorphismSummary summary = constructRangeAndKernel(
       domain, act
     );
     
-    groupValidator.validate(rangeAndKernel.getLeft());
-    groupValidator.validate(rangeAndKernel.getRight());
+    Group range = summary.getRange();
+    Group kernel = summary.getKernel();
+    
+    groupValidator.validate(range);
+    groupValidator.validate(kernel);
     return doCreateHomomorphism(
-      domain, rangeAndKernel.getLeft(), rangeAndKernel.getRight(), act
+      domain, range, kernel, summary.getAct()
     );
   }
   
@@ -78,131 +77,134 @@ public class HomomorphismService {
     ));
   }
   
-  private OrderedPair<Group, Group> constructRangeAndKernel(Group domain, Function<String, String> act) {
-    Map<String, String> rangeInversesMap = new HashMap<>();
-    Map<String, String> domainLookupMap = new HashMap<>();
-    Set<String> rangeElements = new HashSet<>();
-    Map<Integer, Set<List<String>>> rangeCycles = new HashMap<>();
-    Set<String> kernelElements = new HashSet<>();
-    Map<Integer, Set<List<String>>> kernelCycles = new HashMap<>();
+  private void addRangeElement(String a, int x, Map<String, Integer> lookup, Map<Integer, Integer> inverseImageLookup) {
+    int i = lookup.size();
+    lookup.put(a, i);
+    inverseImageLookup.put(i, x);
+  }
+  
+  private HomomorphismSummary constructRangeAndKernel(Group domain, Function<Integer, String> act) {
+    HomomorphismSummary summary = new HomomorphismSummary(domain, act);
     
-    String rangeIdentity = act.apply(domain.getIdentityDisplay());
+    String rangeIdentityDisplay = act.apply(domain.getIdentity());
+    summary.setRangeIdentity(
+      rangeIdentityDisplay, domain.getIdentity()
+    );
     
-    rangeInversesMap.put(rangeIdentity, rangeIdentity);
-    
-    rangeElements.add(rangeIdentity);
-    kernelElements.add(domain.getIdentityDisplay());
-    
-    domainLookupMap.put(rangeIdentity, domain.getIdentityDisplay());
-    
-    rangeCycles.put(1, Set.of(List.of(rangeIdentity)));
-    kernelCycles.put(1, Set.of(List.of(domain.getIdentityDisplay())));
-    
-    for (Integer n:domain.getCycleSizes()) {
-      for (List<String> cycle:domain.getNCycles(n)) {
-        LinkedList<String> linkedCycle = new LinkedList<>(cycle);
-        LinkedList<String> linkedRangeCycle = new LinkedList<>();
-        LinkedList<String> linkedRangeInverses = new LinkedList<>();
-        LinkedList<String> linkedKernelCycle = new LinkedList<>();
-        LinkedList<String> linkedKernelInverses = new LinkedList<>();
-        String cycleId = linkedCycle.removeLast();
-        if (!cycleId.equals(domain.getIdentityDisplay())) {
-          throw getInvalidCycleException(cycle);
+    for (Cycle cycle:domain.getMaximalCycles()) {
+      LinkedList<String> rangeCycle = new LinkedList<>();
+      List<String> kernelCycle = new LinkedList<>();
+      LinkedList<String> domainCycle = new LinkedList<>(cycle.getElements());
+      
+      while (!domainCycle.isEmpty() && (
+        rangeCycle.isEmpty() || !rangeCycle.getLast().equals(rangeIdentityDisplay)
+      )) {
+        String x = domainCycle.removeFirst();
+        rangeCycle.addLast(act.apply(domain.eval(x)));
+        if (rangeCycle.getLast().equals(rangeIdentityDisplay)) {
+          kernelCycle.add(x);
         }
-        while (!linkedCycle.isEmpty()) {
-          String x = linkedCycle.removeFirst();
-          String y = act.apply(x);
-          if (!rangeElements.contains(y)) {
-            domainLookupMap.put(y, x);
-            rangeElements.add(y);
-            linkedRangeCycle.addLast(y);
-            
-            if (!linkedCycle.isEmpty()) {
-              String inverseX = linkedCycle.getLast();
-              if (!inverseX.equals(domain.getInverse(x))) {
-                throw getInvalidCycleException(cycle);
-              }
-              String inverseY = act.apply(inverseX);
-              rangeInversesMap.put(y, inverseY);
-              rangeInversesMap.put(inverseY, y);
-              domainLookupMap.put(inverseY, inverseX);
-              rangeElements.add(inverseY);
-              linkedRangeInverses.addFirst(inverseY);
-            } else {
-              rangeInversesMap.put(y, y);
-            }
-          } else if (y.equals(rangeIdentity)) {
-            kernelElements.add(x);
-            linkedKernelCycle.addLast(x);
-            if (!linkedCycle.isEmpty()) {
-              String inverseX = linkedCycle.removeLast();
-              if (!inverseX.equals(domain.getInverse(x))) {
-                throw getInvalidCycleException(cycle);
-              }
-              if (!act.apply(inverseX).equals(rangeIdentity)) {
-                throw new RuntimeException(String.format(
-                  "Invalid homomorphism. Kernel is not a subgroup since %s is in the kernel but its inverse %s is not.", x, inverseX
-                ));
-              }
-              linkedKernelInverses.addFirst(inverseX);
-              kernelElements.add(inverseX);
-            }
-          } else if (!linkedCycle.isEmpty()){
-            linkedCycle.removeLast();
-          }
+      }
+      if (rangeCycle.size() > 1) {
+        summary.addRangeMaximalCycle(
+          rangeCycle, domain.eval(cycle.getElements().get(0))
+        );
+      }
+      if (kernelCycle.size() > 0 &&
+            !kernelCycle.get(0).equals(domain.getIdentityDisplay())) {
+        String kernGen = kernelCycle.get(0);
+        String kernNext = domain.prod(kernGen, kernGen);
+        while (!kernNext.equals(kernGen)) {
+          kernelCycle.add(kernNext);
+          kernNext = domain.prod(kernGen, kernNext);
         }
-        if (!linkedRangeCycle.isEmpty()) {
-          while (!linkedRangeInverses.isEmpty()) {
-            linkedRangeCycle.addLast(linkedRangeInverses.removeFirst());
-          }
-          linkedRangeCycle.addLast(rangeIdentity);
-          rangeCycles.compute(linkedRangeCycle.size(), (key, cycles) -> {
-            if (cycles == null) {
-              cycles = new HashSet<>();
-            }
-            cycles.add(linkedRangeCycle);
-            return cycles;
-          });
-        }
-        if (!linkedKernelCycle.isEmpty()) {
-          while (!linkedKernelInverses.isEmpty()) {
-            linkedKernelCycle.addLast(linkedKernelInverses.removeFirst());
-          }
-          linkedKernelCycle.addLast(domain.getIdentityDisplay());
-          kernelCycles.compute(linkedKernelCycle.size(), (key, cycles) -> {
-            if (cycles == null) {
-              cycles = new HashSet<>();
-            }
-            cycles.add(linkedKernelCycle);
-            return cycles;
-          });
+        if (kernelCycle.size() > 1) {
+          summary.addKernelCycle(kernelCycle);
         }
       }
     }
     
-    return new OrderedPair<>(
-      ConcreteGroup.builder()
-        .displayInversesMap(rangeInversesMap)
-        .cyclesMap(rangeCycles)
-        .identityDisplay(rangeIdentity)
-        .operatorSymbol("x")
-        .elementsDisplay(rangeElements)
-        .displayOperator((a, b) -> act.apply(domain.prod(
-          domainLookupMap.get(a),
-          domainLookupMap.get(b)
-        )))
-        .build(),
-      ConcreteGroup.builder()
-        .displayInversesMap(kernelElements.stream().collect(Collectors.toMap(
-          Function.identity(),
-          domain::getInverse
-        )))
-        .cyclesMap(kernelCycles)
-        .identityDisplay(domain.getIdentityDisplay())
-        .operatorSymbol(domain.getOperatorSymbol())
-        .elementsDisplay(kernelElements)
-        .displayOperator(domain::prod)
-        .build()
-    );
+//    for (Integer n:domain.getCycleSizes()) {
+//      for (List<String> cycle:domain.getNCycles(n)) {
+//        LinkedList<String> linkedCycle = new LinkedList<>(cycle);
+//        LinkedList<String> linkedRangeCycle = new LinkedList<>();
+//        LinkedList<String> linkedRangeInverses = new LinkedList<>();
+//        LinkedList<String> linkedKernelCycle = new LinkedList<>();
+//        LinkedList<String> linkedKernelInverses = new LinkedList<>();
+//        String cycleId = linkedCycle.removeLast();
+//        if (!cycleId.equals(domain.getIdentityDisplay())) {
+//          throw getInvalidCycleException(cycle);
+//        }
+//        while (!linkedCycle.isEmpty()) {
+//          String x = linkedCycle.removeFirst();
+//          String y = act.apply(x);
+//          if (!rangeLookup.contains(y)) {
+//            inverseImageLookup.put(y, x);
+//            rangeLookup.add(y);
+//            linkedRangeCycle.addLast(y);
+//
+//            if (!linkedCycle.isEmpty()) {
+//              String inverseX = linkedCycle.getLast();
+//              if (!inverseX.equals(domain.getInverse(x))) {
+//                throw getInvalidCycleException(cycle);
+//              }
+//              String inverseY = act.apply(inverseX);
+//              rangeInversesMap.put(y, inverseY);
+//              rangeInversesMap.put(inverseY, y);
+//              inverseImageLookup.put(inverseY, inverseX);
+//              rangeLookup.add(inverseY);
+//              linkedRangeInverses.addFirst(inverseY);
+//            } else {
+//              rangeInversesMap.put(y, y);
+//            }
+//          } else if (y.equals(rangeIdentity)) {
+//            kernelElements.add(x);
+//            linkedKernelCycle.addLast(x);
+//            if (!linkedCycle.isEmpty()) {
+//              String inverseX = linkedCycle.removeLast();
+//              if (!inverseX.equals(domain.getInverse(x))) {
+//                throw getInvalidCycleException(cycle);
+//              }
+//              if (!act.apply(inverseX).equals(rangeIdentity)) {
+//                throw new RuntimeException(String.format(
+//                  "Invalid homomorphism. Kernel is not a subgroup since %s is in the kernel but its inverse %s is not.", x, inverseX
+//                ));
+//              }
+//              linkedKernelInverses.addFirst(inverseX);
+//              kernelElements.add(inverseX);
+//            }
+//          } else if (!linkedCycle.isEmpty()){
+//            linkedCycle.removeLast();
+//          }
+//        }
+//        if (!linkedRangeCycle.isEmpty()) {
+//          while (!linkedRangeInverses.isEmpty()) {
+//            linkedRangeCycle.addLast(linkedRangeInverses.removeFirst());
+//          }
+//          linkedRangeCycle.addLast(rangeIdentity);
+//          rangeCycles.compute(linkedRangeCycle.size(), (key, cycles) -> {
+//            if (cycles == null) {
+//              cycles = new HashSet<>();
+//            }
+//            cycles.add(linkedRangeCycle);
+//            return cycles;
+//          });
+//        }
+//        if (!linkedKernelCycle.isEmpty()) {
+//          while (!linkedKernelInverses.isEmpty()) {
+//            linkedKernelCycle.addLast(linkedKernelInverses.removeFirst());
+//          }
+//          linkedKernelCycle.addLast(domain.getIdentityDisplay());
+//          kernelCycles.compute(linkedKernelCycle.size(), (key, cycles) -> {
+//            if (cycles == null) {
+//              cycles = new HashSet<>();
+//            }
+//            cycles.add(linkedKernelCycle);
+//            return cycles;
+//          });
+//        }
+//      }
+//    }
+    return summary;
   }
 }

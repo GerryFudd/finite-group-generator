@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,11 +25,11 @@ class AutomorphismServiceTest {
   
   @Test
   void createAutomorphismTest_domainAndFunc() throws ValidationException {
-    Map<String, String> functionMap = Map.of(
-      "I", "E",
-      "a", "x",
-      "b", "y",
-      "c", "z"
+    Map<Integer, String> functionMap = Map.of(
+      0, "E",
+      1, "x",
+      2, "y",
+      3, "z"
     );
     Automorphism automorphism = automorphismService.createAutomorphism(
       groupService.getCyclicGroup("I", "a", "b", "c"),
@@ -57,8 +58,8 @@ class AutomorphismServiceTest {
     ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createAutomorphism(
       new TrivialGroup("I"),
       groupService.getCyclicGroup("E", "a"),
-      x -> "E",
-      y -> "I"
+      x -> 0,
+      y -> 0
     ));
     
     assertEquals(
@@ -71,17 +72,8 @@ class AutomorphismServiceTest {
     ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createAutomorphism(
       groupService.getCyclicGroup("I", "a"),
       groupService.getCyclicGroup("E", "x"),
-      x -> {
-        switch(x) {
-          case "I":
-            return "E";
-          case "a":
-            return "x";
-          default:
-            return null;
-        }
-      },
-      y -> "I"
+      Function.identity(),
+      y -> 0
     ));
     
     assertEquals(
@@ -94,8 +86,8 @@ class AutomorphismServiceTest {
     ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createAutomorphism(
       groupService.getCyclicGroup("I", "a"),
       groupService.getCyclicGroup("E", "x"),
-      x -> "E",
-      y -> "I"
+      x -> 0,
+      Function.identity()
     ));
     
     assertEquals(

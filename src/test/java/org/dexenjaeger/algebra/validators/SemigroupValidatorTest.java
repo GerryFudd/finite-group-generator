@@ -14,18 +14,18 @@ class SemigroupValidatorTest {
     new BinaryOperatorValidator()
   );
   
-  private final Set<String> elements = Set.of("x", "y", "z");
+  private final Set<String> elements = Set.of();
   
-  private String nonAssociative(String a, String b) {
-    if (a.equals("y")) {
-      return "x";
+  private int nonAssociative(int a, int b) {
+    if (a == 1) {
+      return 0;
     }
     return b;
   }
   @Test
   void invalidBinaryOperator() {
     Semigroup semigroup = ConcreteSemigroup.builder()
-      .elementsDisplay(elements)
+      .elements("x", "y", "z")
       .operator(this::nonAssociative)
       .build();
     ValidationException e = assertThrows(ValidationException.class, () -> validator.validate(semigroup));

@@ -1,42 +1,58 @@
 package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class HomomorphismValidator implements Validator<Homomorphism> {
   
-  private static ValidationException getNotFunctionException(
-    Collection<String> rangeElements, String identity, String output, String input) {
+  private static ValidationException getInvalidDomainException(
+    int n, int i) {
     return new ValidationException(String.format(
-      "Range %s doesn't contain image %s of %s.",
-      BinaryOperatorUtil.getSortedElements(rangeElements, identity),
-      output, input
+      "Homomorphism not defined on domain with size %d for input %d.",
+      n, i
+    ));
+  }
+  
+  private int applySafe(Function<Integer, Integer> act, int n, int i) throws ValidationException {
+    try {
+      return Optional.ofNullable(act.apply(i)).orElseThrow(() -> getInvalidDomainException(n, i));
+    } catch (RuntimeException e) {
+      throw getInvalidDomainException(n, i);
+    }
+  }
+  
+  private static ValidationException getNotFunctionException(
+    int n, int fi, int i) {
+    return new ValidationException(String.format(
+      "Range with size %d doesn't contain image %d of %d.",
+      n, fi, i
     ));
   }
   
   private void validateHomomorphism(Homomorphism item) throws ValidationException {
-    Set<String> rangeElements = item.getRange().getElementsDisplay();
-    for (String a:item.getDomain().getElementsDisplay()) {
-      String fa = item.apply(a);
-      if (!rangeElements.contains(fa)) {
-        throw getNotFunctionException(rangeElements, item.getRange().getIdentityDisplay(), fa, a);
+    int rangeSize = item.getRange().getSize();
+    for (int i = 0; i < item.getDomain().getSize(); i++) {
+      int fi = applySafe(item::apply, item.getDomain().getSize(), i);
+      if (rangeSize <= fi) {
+        throw getNotFunctionException(rangeSize, fi, i);
       }
-      for (String b:item.getDomain().getElementsDisplay()) {
-        String fb = item.apply(b);
-        if (!rangeElements.contains(fb)) {
-          throw getNotFunctionException(rangeElements, item.getRange().getIdentityDisplay(), fb, b);
+      for (int j = 0; j < item.getDomain().getSize(); j++) {
+        int fj = applySafe(item::apply, item.getDomain().getSize(), j);
+        if (rangeSize <= fj) {
+          throw getNotFunctionException(rangeSize, fj, j);
         }
-        if (!item.getRange().prod(fa, fb)
-               .equals(item.apply(item.getDomain().prod(a, b)))) {
+        if (item.getRange().prod(fi, fj)
+              != applySafe(
+                item::apply, item.getDomain().getSize(), item.getDomain().prod(i, j)
+        )) {
           throw new ValidationException(String.format(
-            "Function is not a homomorphism, f(%s)%sf(%s)=%s, but f(%s%s%s)=%s.",
-            a, item.getRange().getOperatorSymbol(),
-            b, item.getRange().prod(fa, fb),
-            a, item.getDomain().getOperatorSymbol(), b,
-            item.apply(item.getDomain().prod(a, b))
+            "Function is not a homomorphism, f(%d)%sf(%d)=%d, but f(%d%s%d)=%d.",
+            i, item.getRange().getOperatorSymbol(),
+            j, item.getRange().prod(fi, fj),
+            i, item.getDomain().getOperatorSymbol(), j,
+            item.apply(item.getDomain().prod(i, j))
           ));
         }
       }
@@ -45,7 +61,10 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
   
   private void validateInverseImageOfId(Homomorphism item) throws ValidationException {
     for (String a:item.getDomain().getElementsDisplay()) {
-      if (item.getKernel().getElementsDisplay().contains(a) != item.apply(a).equals(item.getRange().getIdentityDisplay())) {
+      if (item.getKernel().getElementsDisplay().contains(a)
+            != item.getRange()
+                 .display(item.apply(item.getDomain().eval(a)))
+                 .equals(item.getRange().getIdentityDisplay())) {
         throw new ValidationException("Kernel is not the inverse image of the identity.");
       }
     }

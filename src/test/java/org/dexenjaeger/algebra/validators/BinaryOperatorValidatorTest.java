@@ -30,7 +30,7 @@ class BinaryOperatorValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> binaryOperatorValidator.validate(binaryOperator));
     
     assertEquals(
-      "This set is not closed under *\n\n" +
+      "The product of a and a doesn't exist in this binary operator\n\n" +
         "_*____|_a____\n" +
         " a    | [1?] \n", e.getMessage()
     );

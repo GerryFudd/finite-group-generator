@@ -12,8 +12,8 @@ public class ConcreteAutomorphism implements Automorphism {
   private final Group domain;
   @Getter
   private final Group range;
-  private final Function<String, String> act;
-  private final Function<String, String> inverseAct;
+  private final Function<Integer, Integer> act;
+  private final Function<Integer, Integer> inverseAct;
   
   @Override
   public Automorphism getInverse() {
@@ -26,12 +26,12 @@ public class ConcreteAutomorphism implements Automorphism {
   }
   
   @Override
-  public String apply(String a) {
+  public int apply(int a) {
     return act.apply(a);
   }
   
   @Override
-  public String unApply(String b) {
+  public int unApply(int b) {
     return inverseAct.apply(b);
   }
 }

@@ -14,10 +14,10 @@ public class ConcreteHomomorphism implements Homomorphism {
   private final Group range;
   @Getter
   private final Group kernel;
-  private final Function<String, String> act;
+  private final Function<Integer, Integer> act;
   
   @Override
-  public String apply(String in) {
+  public int apply(int in) {
     return act.apply(in);
   }
 }

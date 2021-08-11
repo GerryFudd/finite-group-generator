@@ -32,8 +32,8 @@ public class AutomorphismValidator implements Validator<Automorphism> {
     
     // If the reverse map is a left inverse, it is also an inverse
     // function.
-    for (String x:item.getDomain().getElementsDisplay()) {
-      if (!x.equals(item.unApply(item.apply(x)))) {
+    for (int i = 0; i < item.getDomain().getSize(); i++) {
+      if (i != item.unApply(item.apply(i))) {
         throw new ValidationException("Function is not a left inverse.");
       }
     }

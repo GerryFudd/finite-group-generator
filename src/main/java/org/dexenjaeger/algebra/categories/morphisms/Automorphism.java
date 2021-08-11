@@ -4,7 +4,7 @@ import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 
 public interface Automorphism extends Homomorphism {
-  String unApply(String b);
+  int unApply(int b);
   
   Automorphism getInverse();
   

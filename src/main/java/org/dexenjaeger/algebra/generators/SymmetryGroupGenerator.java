@@ -97,12 +97,12 @@ public class SymmetryGroupGenerator {
     );
     
     Group result = ConcreteGroup.builder()
-                     .operatorSymbol("o")
-                     .identity(0)
                      .inversesMap(summary.getInversesMap())
+                     .cyclesMap(summary.getCyclesMap())
+                     .identity(0)
+                     .operatorSymbol("o")
                      .lookup(summary.getLookupMap())
                      .operator(summary.getBinaryOperator()::prod)
-                     .cyclesMap(summary.getCyclesMap())
                      .build();
   
     try {

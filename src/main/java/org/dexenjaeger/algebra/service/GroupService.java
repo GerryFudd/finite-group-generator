@@ -36,15 +36,15 @@ public class GroupService {
     inverses.put(0, 0);
     cycle.addLast(elements[0]);
     return ConcreteGroup.builder()
-             .operatorSymbol(operatorSymbol)
-             .identity(0)
-             .elements(elements)
              .inversesMap(inverses)
              .cyclesMap(Map.of(
                1, Set.of(List.of(elements[0])),
                n, Set.of(cycle)
              ))
              .maximalCycles(Set.of(Cycle.builder().elements(cycle).build()))
+             .identity(0)
+             .operatorSymbol(operatorSymbol)
+             .elements(elements)
              .operator((a, b) -> (a + b) % n)
              .build();
   }
@@ -99,9 +99,6 @@ public class GroupService {
       });
     }
     return ConcreteGroup.builder()
-             .identity(0)
-             .elements(elements)
-             .multiplicationTable(table)
              .inversesMap(inversesMap)
              .cyclesMap(cyclesMap)
              .maximalCycles(cycles.stream()
@@ -109,6 +106,9 @@ public class GroupService {
                                               .elements(cycle)
                                               .build())
                               .collect(Collectors.toSet()))
+             .identity(0)
+             .elements(elements)
+             .multiplicationTable(table)
              .build();
   }
 }

@@ -7,7 +7,7 @@ import com.google.inject.TypeLiteral;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.monoid.ConcreteMonoid;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
-import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.junit.jupiter.api.Test;
 
@@ -29,15 +29,15 @@ class MonoidValidatorTest {
       {0, 1, 2, 3}
     };
     
-    BinaryOperator binOp = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
+    BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> product[i][j]
-    ).getBinaryOperator();
+    );
     
     Monoid monoid = ConcreteMonoid.builder()
-                      .identityDisplay("L1")
-                      .elementsDisplay(binOp.getElementsDisplay())
-                      .operator(binOp::prod)
+                      .identity(summary.getLookupMap().get("L1"))
+                      .lookup(summary.getLookupMap())
+                      .operator(summary.getBinaryOperator()::prod)
                       .build();
     
     ValidationException e = assertThrows(ValidationException.class, () -> validator.validate(monoid));

@@ -69,6 +69,16 @@ public class TrivialGroup implements Group {
   }
   
   @Override
+  public Integer eval(String a) {
+    return 0;
+  }
+  
+  @Override
+  public String display(int i) {
+    return identityDisplay;
+  }
+  
+  @Override
   public int getIdentity() {
     return 0;
   }

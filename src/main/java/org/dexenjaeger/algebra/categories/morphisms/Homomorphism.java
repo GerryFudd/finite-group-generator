@@ -6,5 +6,5 @@ public interface Homomorphism {
   Group getDomain();
   Group getRange();
   Group getKernel();
-  String apply(String in);
+  int apply(int in);
 }
