@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.model;
 
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

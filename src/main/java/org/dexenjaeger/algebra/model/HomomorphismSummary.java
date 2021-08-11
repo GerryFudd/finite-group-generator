@@ -3,6 +3,7 @@ package org.dexenjaeger.algebra.model;
 import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 
 import java.util.HashMap;

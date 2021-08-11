@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
-import org.dexenjaeger.algebra.model.Cycle;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 

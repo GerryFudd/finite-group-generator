@@ -1,10 +1,9 @@
 package org.dexenjaeger.algebra.categories.objects.group;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dexenjaeger.algebra.model.Cycle;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ConcreteGroup implements Group {
   @Getter
-  @Builder.Default
   private final String operatorSymbol;
   @Getter
   private final int size;

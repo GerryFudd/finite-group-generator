@@ -3,7 +3,7 @@ package org.dexenjaeger.algebra.categories.objects.group;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.monoid.BaseMonoidBuilder;
-import org.dexenjaeger.algebra.model.Cycle;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 
 import java.util.List;
 import java.util.Map;

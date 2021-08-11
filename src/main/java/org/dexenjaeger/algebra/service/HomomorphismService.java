@@ -3,8 +3,8 @@ package org.dexenjaeger.algebra.service;
 import org.dexenjaeger.algebra.categories.morphisms.ConcreteHomomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.model.HomomorphismSummary;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 

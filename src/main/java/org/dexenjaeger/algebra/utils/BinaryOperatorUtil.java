@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 
 import java.util.Collection;
 import java.util.Comparator;

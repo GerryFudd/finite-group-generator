@@ -2,7 +2,7 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.Cycle;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 
 import javax.inject.Inject;
 import java.util.HashMap;

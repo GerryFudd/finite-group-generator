@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.categories.objects.group;
 
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
-import org.dexenjaeger.algebra.model.Cycle;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 
 import java.util.List;
 import java.util.Set;

@@ -2,8 +2,8 @@ package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
-import org.dexenjaeger.algebra.model.Cycle;
 import org.dexenjaeger.algebra.model.OrderedPair;
+import org.dexenjaeger.algebra.model.cycle.Cycle;
 import org.dexenjaeger.algebra.utils.MoreMath;
 
 import javax.inject.Inject;
