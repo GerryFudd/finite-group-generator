@@ -1,16 +1,13 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -158,25 +155,5 @@ public class BinaryOperatorUtil {
       lookup.put(elements[i], i);
     }
     return lookup;
-  }
-  
-  public static Map<Integer, Set<List<String>>> getCyclesMap(Set<Cycle> cycles, String identity) {
-    Set<List<String>> oneCycles = new HashSet<>();
-    oneCycles.add(List.of(identity));
-    Map<Integer, Set<List<String>>> result = new HashMap<>();
-    result.put(1, oneCycles);
-    
-    for (Cycle cycle:cycles) {
-      result.computeIfPresent(cycle.getElements().size(), (key, c) -> {
-        c.add(cycle.getElements());
-        return c;
-      });
-      result.computeIfAbsent(cycle.getElements().size(), key -> {
-        Set<List<String>> c = new HashSet<>();
-        c.add(cycle.getElements());
-        return c;
-      });
-    }
-    return result;
   }
 }

@@ -4,7 +4,7 @@ import org.dexenjaeger.algebra.categories.morphisms.ConcreteHomomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.HomomorphismSummary;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
@@ -91,7 +91,7 @@ public class HomomorphismService {
       rangeIdentityDisplay, domain.getIdentity()
     );
     
-    for (Cycle cycle:domain.getMaximalCycles()) {
+    for (StringCycle cycle:domain.getMaximalCycles()) {
       LinkedList<String> rangeCycle = new LinkedList<>();
       List<String> kernelCycle = new LinkedList<>();
       LinkedList<String> domainCycle = new LinkedList<>(cycle.getElements());
@@ -107,7 +107,7 @@ public class HomomorphismService {
       }
       if (rangeCycle.size() > 1) {
         summary.addRangeMaximalCycle(
-          rangeCycle, domain.eval(cycle.getElements().get(0))
+          rangeCycle, domain.eval(cycle.get(0))
         );
       }
       if (kernelCycle.size() > 0 &&

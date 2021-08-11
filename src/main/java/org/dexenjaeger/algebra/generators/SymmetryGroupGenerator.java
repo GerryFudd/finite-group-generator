@@ -1,6 +1,5 @@
 package org.dexenjaeger.algebra.generators;
 
-import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.service.BinaryOperatorService;
@@ -96,9 +95,9 @@ public class SymmetryGroupGenerator {
       (a,b) -> binOp[a][b]
     );
     
-    Group result = ConcreteGroup.builder()
+    Group result = Group.builder()
                      .inversesMap(summary.getInversesMap())
-                     .cyclesMap(summary.getCyclesMap())
+                     .maximalCycles(summary.getCycles())
                      .identity(0)
                      .operatorSymbol("o")
                      .lookup(summary.getLookupMap())

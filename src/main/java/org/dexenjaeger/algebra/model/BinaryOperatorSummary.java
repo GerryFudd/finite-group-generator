@@ -3,8 +3,8 @@ package org.dexenjaeger.algebra.model;
 import lombok.Builder;
 import lombok.Getter;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +15,6 @@ public class BinaryOperatorSummary {
   private final Map<String, String> displayInversesMap;
   private final Map<Integer, Integer> inversesMap;
   private final Map<String, Integer> lookupMap;
-  private final Map<Integer, Set<List<String>>> cyclesMap;
+  private final Set<StringCycle> cycles;
   private final String identityDisplay;
 }

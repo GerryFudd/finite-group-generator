@@ -2,9 +2,8 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.ConcreteAutomorphism;
-import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.OrderedPair;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.validators.AutomorphismValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 
@@ -58,8 +57,6 @@ public class AutomorphismService {
       rangeLookup.put(y, i);
     }
     
-    Function<String, String> displayFunc = x -> func.apply(domain.eval(x));
-    
     Map<Integer, Integer> rangeInverseMap = rangeLookup.values().stream().collect(Collectors.toMap(
       Function.identity(),
       domain::getInverse
@@ -67,18 +64,17 @@ public class AutomorphismService {
     
     return createAutomorphism(
       domain,
-      ConcreteGroup.builder()
+      Group.builder()
         .inversesMap(rangeInverseMap)
-        .cyclesMap(domain
-                     .getCycleSizes()
-                     .stream()
-                     .map(n -> new OrderedPair<>(
-                       n, convertCycles(domain.getNCycles(n), displayFunc)
-                     ))
-                     .collect(Collectors.toMap(
-                       OrderedPair::getLeft,
-                       OrderedPair::getRight
-                     )))
+        .maximalCycles(
+          domain.getMaximalCycles().stream()
+            .map(StringCycle::getElements)
+            .map(domainEls -> domainEls.stream()
+                                .map(el -> func.apply(domain.eval(el)))
+                                .collect(Collectors.toList()))
+            .map(rangeEls -> StringCycle.builder().elements(rangeEls).build())
+            .collect(Collectors.toSet())
+        )
         .identity(domain.getIdentity())
         .operatorSymbol("x")
         .elements(elements)

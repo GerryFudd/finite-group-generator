@@ -3,10 +3,9 @@ package org.dexenjaeger.algebra.service;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
-import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +44,7 @@ class BinaryOperatorServiceTest {
     );
     
     assertNull(result.getIdentityDisplay());
-    assertNull(result.getDisplayInversesMap());
+    assertNull(result.getInversesMap());
   }
   
   @Test
@@ -68,7 +67,7 @@ class BinaryOperatorServiceTest {
     );
     
     assertNull(result.getIdentityDisplay());
-    assertNull(result.getDisplayInversesMap());
+    assertNull(result.getInversesMap());
   }
   
   @Test
@@ -92,8 +91,8 @@ class BinaryOperatorServiceTest {
     
     assertEquals("I", result.getIdentityDisplay());
     assertEquals(
-      Map.of("I", "I", "a", "a", "b", "b", "c", "c"),
-      result.getDisplayInversesMap()
+      Map.of(0, 0, 1, 1, 2, 2, 3, 3),
+      result.getInversesMap()
     );
   }
   
@@ -104,11 +103,10 @@ class BinaryOperatorServiceTest {
       (i, j) -> (i + j) % 4
     );
     
-    Group result = ConcreteGroup.builder()
+    Group result = Group.builder()
                      .inversesMap(summary.getInversesMap())
-                     .cyclesMap(summary.getCyclesMap())
                      .maximalCycles(Set.of(
-                       Cycle.builder()
+                       StringCycle.builder()
                          .elements(List.of("a", "b", "c", "I"))
                          .build()))
                      .lookup(summary.getLookupMap())

@@ -2,19 +2,15 @@ package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
-import org.dexenjaeger.algebra.model.OrderedPair;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.utils.MoreMath;
 
 import javax.inject.Inject;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class GroupValidator implements Validator<Group> {
   private final Validator<Monoid> monoidValidator;
@@ -36,38 +32,7 @@ public class GroupValidator implements Validator<Group> {
     return new ValidationException(String.format("Invalid maximal cycles: %s.", reason));
   }
   
-  private void validateCyclesMap(Group item) throws ValidationException {
-    Collection<Integer> cycleSizes = item.getCycleSizes();
-    if (cycleSizes.isEmpty()) {
-      throw getCyclesMapException("map is empty");
-    }
-    if (cycleSizes.stream().anyMatch(n -> item.getNCycles(n) == null)) {
-      throw getCyclesMapException("there exists a null set of nCycles");
-    }
-    Map<Integer, Set<List<String>>> cyclesMap = cycleSizes.stream()
-                                                  .map(n -> new OrderedPair<>(n, item.getNCycles(n)))
-                                                  .collect(Collectors.toMap(
-                                                    OrderedPair::getLeft,
-                                                    OrderedPair::getRight
-                                                  ));
-    
-    for (Integer n:cyclesMap.keySet()) {
-      Set<List<String>> nCycles = cyclesMap.get(n);
-      if (n < 1) {
-        throw getCyclesMapException(String.format(
-          "cycle size %d is invalid", n
-        ));
-      }
-      if (nCycles.isEmpty()) {
-        throw getCyclesMapException(String.format("the set of %d cycles is empty", n));
-      }
-      for (List<String> cycle:nCycles) {
-        validateCycleElements(item, cycle);
-      }
-    }
-  }
-  
-  private Optional<ValidationException> validateCycle(Group item, Cycle cycle) {
+  private Optional<ValidationException> validateCycle(Group item, StringCycle cycle) {
     try {
       validateCycleElements(item, cycle.getElements());
       cycle.getSubCycles().forEach(subcycle -> validateCycle(item, subcycle));
@@ -120,12 +85,12 @@ public class GroupValidator implements Validator<Group> {
   }
   
   private void validateMaximalCycles(Group item) throws ValidationException {
-    Set<Cycle> maximalCycles = item.getMaximalCycles();
+    Set<StringCycle> maximalCycles = item.getMaximalCycles();
     if (maximalCycles.isEmpty()) {
       throw getMaximalCyclesException("there is an empty maximal cycle");
     }
     Set<String> coveredElements = new HashSet<>();
-    for (Cycle cycle:maximalCycles) {
+    for (StringCycle cycle:maximalCycles) {
       Set<String> intersection = MoreMath.intersection(coveredElements, cycle.getElements());
       if (intersection.size() > 1) {
         throw getMaximalCyclesException(String.format(
@@ -168,7 +133,6 @@ public class GroupValidator implements Validator<Group> {
   public void validate(Group item) throws ValidationException {
     monoidValidator.validate(item);
     validateInverses(item);
-    validateCyclesMap(item);
     validateMaximalCycles(item);
   }
 }

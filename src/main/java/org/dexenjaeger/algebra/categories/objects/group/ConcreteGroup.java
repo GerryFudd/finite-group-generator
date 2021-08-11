@@ -3,12 +3,14 @@ package org.dexenjaeger.algebra.categories.objects.group;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ConcreteGroup implements Group {
@@ -22,8 +24,7 @@ public class ConcreteGroup implements Group {
   @Getter
   private final int identity;
   private final Map<Integer, Integer> inversesMap;
-  private final Set<Cycle> maximalCycles;
-  private final Map<Integer, Set<List<String>>> cyclesMap;
+  private final Set<StringCycle> maximalCycles;
   
   
   @Override
@@ -48,16 +49,30 @@ public class ConcreteGroup implements Group {
   
   @Override
   public List<Integer> getCycleSizes() {
-    return cyclesMap.keySet().stream().sorted().collect(Collectors.toList());
+    return maximalCycles.stream()
+             .flatMap(cycle -> Stream.concat(
+               Stream.of(cycle.getSize()),
+               cycle.getSubCycleSizes().stream()
+             ))
+             .collect(Collectors.toSet())
+             .stream()
+             .sorted()
+             .collect(Collectors.toList());
   }
   
   @Override
-  public Set<List<String>> getNCycles(Integer n) {
-    return cyclesMap.containsKey(n) ? cyclesMap.get(n) : Set.of();
+  public Set<StringCycle> getNCycles(Integer n) {
+    return maximalCycles.stream()
+             .map(cycle -> cycle.getSize() == n ?
+                             Optional.of(cycle) :
+                             cycle.getSubCycleOfSize(n))
+             .filter(Optional::isPresent)
+             .map(Optional::get)
+             .collect(Collectors.toSet());
   }
   
   @Override
-  public Set<Cycle> getMaximalCycles() {
+  public Set<StringCycle> getMaximalCycles() {
     return maximalCycles;
   }
   
@@ -79,9 +94,5 @@ public class ConcreteGroup implements Group {
   @Override
   public String prod(String a, String b) {
     return elements[prod(lookup.get(a), lookup.get(b))];
-  }
-  
-  public static GroupBuilder builder() {
-    return new GroupBuilder();
   }
 }

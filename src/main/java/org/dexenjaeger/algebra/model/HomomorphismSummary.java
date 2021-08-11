@@ -1,10 +1,8 @@
 package org.dexenjaeger.algebra.model;
 
 import lombok.RequiredArgsConstructor;
-import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,8 +25,8 @@ public class HomomorphismSummary {
   private final Map<Integer, Integer> rangeInversesMap = new HashMap<>();
   private final Set<String> kernelElements = new HashSet<>();
   
-  private final Set<Cycle> rangeCycles = new HashSet<>();
-  private final Set<Cycle> kernelCycles = new HashSet<>();
+  private final Set<StringCycle> rangeCycles = new HashSet<>();
+  private final Set<StringCycle> kernelCycles = new HashSet<>();
   
   public HomomorphismSummary setRangeIdentity(String rangeIdentityDisplay, int domainIdentity) {
     rangeIdentity = rangeLookup.size();
@@ -67,7 +65,7 @@ public class HomomorphismSummary {
   }
   
   public HomomorphismSummary addRangeMaximalCycle(List<String> cycle, int domainGenerator) {
-    rangeCycles.add(Cycle.builder()
+    rangeCycles.add(StringCycle.builder()
                       .elements(cycle)
                       .build());
   
@@ -87,7 +85,7 @@ public class HomomorphismSummary {
   }
   
   public HomomorphismSummary addKernelCycle(List<String> cycle) {
-    kernelCycles.add(Cycle.builder()
+    kernelCycles.add(StringCycle.builder()
                        .elements(cycle)
                        .build());
     
@@ -103,8 +101,8 @@ public class HomomorphismSummary {
     return this;
   }
   
-  private Set<Cycle> getTrivialCycle(String identityDisplay) {
-    return Set.of(Cycle.builder().elements(List.of(identityDisplay)).build());
+  private Set<StringCycle> getTrivialCycle(String identityDisplay) {
+    return Set.of(StringCycle.builder().elements(List.of(identityDisplay)).build());
   }
   
   private String[] getElements(Map<String, Integer> lookup) {
@@ -117,12 +115,11 @@ public class HomomorphismSummary {
   
   public Group getRange() {
     String[] elements = getElements(rangeLookup);
-    return ConcreteGroup.builder()
+    return Group.builder()
              .inversesMap(rangeInversesMap)
              .maximalCycles(rangeCycles.size() == 0 ?
                               getTrivialCycle(elements[rangeIdentity]) :
                              rangeCycles)
-             .cyclesMap(BinaryOperatorUtil.getCyclesMap(rangeCycles, act.apply(domain.getIdentity())))
              .identity(rangeIdentity)
              .operatorSymbol("x")
              .elements(elements)
@@ -136,7 +133,7 @@ public class HomomorphismSummary {
   
   public Group getKernel() {
     String[] elements = getElements(kernelLookup);
-    return ConcreteGroup.builder()
+    return Group.builder()
              .inversesMap(kernelElements.stream().collect(Collectors.toMap(
                kernelLookup::get,
                el -> kernelLookup.get(domain.display(
@@ -146,7 +143,6 @@ public class HomomorphismSummary {
              .maximalCycles(kernelCycles.size() == 0 ?
                              getTrivialCycle(domain.getIdentityDisplay()) :
                              kernelCycles)
-             .cyclesMap(BinaryOperatorUtil.getCyclesMap(kernelCycles, domain.getIdentityDisplay()))
              .identity(kernelLookup.get(domain.getIdentityDisplay()))
              .operatorSymbol(domain.getOperatorSymbol())
              .elements(elements)

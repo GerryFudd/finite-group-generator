@@ -9,20 +9,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class CycleBuilder implements Builder<Cycle> {
-  private String[] elements;
+public abstract class AbstractCycleBuilder<T, U> implements Builder<U> {
   
-  public CycleBuilder elements(List<String> elements) {
-    this.elements = elements.toArray(new String[0]);
+  abstract T[] makeEmptyArray();
+  
+  protected T[] elements;
+  
+  public AbstractCycleBuilder<T, U> elements(List<T> elements) {
+    this.elements = elements.toArray(makeEmptyArray());
     return this;
   }
   
-  public CycleBuilder elements(String[] elements) {
-    this.elements = elements;
-    return this;
-  }
-  
-  private OrderedPair<int[], Map<Integer, Integer>> resolveGenerators() {
+  protected OrderedPair<int[], Map<Integer, Integer>> resolveGenerators() {
     if (elements.length == 1) {
       return new OrderedPair<>(
         new int[]{1},
@@ -51,16 +49,6 @@ public class CycleBuilder implements Builder<Cycle> {
     
     return new OrderedPair<>(
       generatorArray, subCycleGenerators
-    );
-  }
-  
-  @Override
-  public Cycle build() {
-    OrderedPair<int[], Map<Integer, Integer>> generatorArrays = resolveGenerators();
-    return new Cycle(
-      elements,
-      generatorArrays.getLeft(),
-      generatorArrays.getRight()
     );
   }
 }

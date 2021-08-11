@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.model;
 
-import org.dexenjaeger.algebra.model.cycle.Cycle;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CycleTest {
+class StringCycleTest {
   @ParameterizedTest
   @CsvSource(
     value = {
@@ -29,7 +29,7 @@ class CycleTest {
     delimiter = ':'
   )
   void getGeneratorsTest(String elements, String generators) {
-    Cycle cycle = Cycle.builder()
+    StringCycle cycle = StringCycle.builder()
                     .elements(List.of(elements.split(",")))
                     .build();
     assertEquals(
@@ -51,10 +51,10 @@ class CycleTest {
   )
   void getSubCyclesTest(String elements, String subCycleGenerators) {
     List<String> elementList = List.of(elements.split(","));
-    Cycle cycle = Cycle.builder()
+    StringCycle cycle = StringCycle.builder()
                     .elements(elementList)
                     .build();
-    Set<Cycle> expectedSubCycles = new HashSet<>();
+    Set<StringCycle> expectedSubCycles = new HashSet<>();
     List<Integer> subCycleGeneratorList = subCycleGenerators == null ? List.of() : Stream.of(
       subCycleGenerators.split(",")
     ).map(Integer::parseInt).collect(Collectors.toList());
@@ -67,7 +67,7 @@ class CycleTest {
         i += subCycleGenerator;
       }
       subCycleElements.add(elementList.get(elementList.size() - 1));
-      expectedSubCycles.add(Cycle.builder()
+      expectedSubCycles.add(StringCycle.builder()
                               .elements(subCycleElements)
                               .build());
     }
@@ -91,7 +91,7 @@ class CycleTest {
   )
   void getSubCycleOfSizeTest(String elements, String subCycleGenerators) {
     List<String> elementList = List.of(elements.split(","));
-    Cycle cycle = Cycle.builder()
+    StringCycle cycle = StringCycle.builder()
                     .elements(elementList)
                     .build();
     Map<Integer, List<String>> subCyclesBySize;
@@ -115,13 +115,13 @@ class CycleTest {
     
     for (int i = 1; i <= elementList.size(); i++) {
       List<String> subCycleElements = subCyclesBySize.get(i);
-      Optional<Cycle> subCycle = cycle.getSubCycleOfSize(i);
+      Optional<StringCycle> subCycle = cycle.getSubCycleOfSize(i);
       
       if (subCycleElements == null) {
         assertTrue(subCycle.isEmpty());
       } else {
         assertEquals(
-          Cycle.builder().elements(subCycleElements).build(),
+          StringCycle.builder().elements(subCycleElements).build(),
           subCycle.orElseThrow()
         );
       }

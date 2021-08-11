@@ -1,8 +1,7 @@
 package org.dexenjaeger.algebra.service;
 
-import org.dexenjaeger.algebra.categories.objects.group.ConcreteGroup;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
+import org.dexenjaeger.algebra.model.cycle.StringCycle;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -35,13 +34,9 @@ public class GroupService {
     }
     inverses.put(0, 0);
     cycle.addLast(elements[0]);
-    return ConcreteGroup.builder()
+    return Group.builder()
              .inversesMap(inverses)
-             .cyclesMap(Map.of(
-               1, Set.of(List.of(elements[0])),
-               n, Set.of(cycle)
-             ))
-             .maximalCycles(Set.of(Cycle.builder().elements(cycle).build()))
+             .maximalCycles(Set.of(StringCycle.builder().elements(cycle).build()))
              .identity(0)
              .operatorSymbol(operatorSymbol)
              .elements(elements)
@@ -88,21 +83,10 @@ public class GroupService {
         }
       }
     }
-    Map<Integer, Set<List<String>>> cyclesMap = new HashMap<>();
-    for (List<String> cycle:cycles) {
-      cyclesMap.compute(cycle.size(), (n, nCycles) -> {
-        if (nCycles == null) {
-          nCycles = new HashSet<>();
-        }
-        nCycles.add(cycle);
-        return nCycles;
-      });
-    }
-    return ConcreteGroup.builder()
+    return Group.builder()
              .inversesMap(inversesMap)
-             .cyclesMap(cyclesMap)
              .maximalCycles(cycles.stream()
-                              .map(cycle -> Cycle.builder()
+                              .map(cycle -> StringCycle.builder()
                                               .elements(cycle)
                                               .build())
                               .collect(Collectors.toSet()))
