@@ -20,10 +20,6 @@ public class GroupValidator implements Validator<Group> {
     this.monoidValidator = monoidValidator;
   }
   
-  private ValidationException getCyclesMapException(String reason) {
-    return new ValidationException(String.format("Invalid cycles map: %s.", reason));
-  }
-  
   private ValidationException getCycleException(String reason) {
     return new ValidationException(String.format("Invalid cycle: %s.", reason));
   }
