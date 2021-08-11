@@ -7,6 +7,8 @@ import lombok.ToString;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,7 +18,8 @@ import java.util.stream.Collectors;
 public class Cycle {
   private final String[] elements;
   private final int[] generators;
-  private final int[] subCycleGenerators;
+  // Map of cycle size to a representative generator of the cycle of that size
+  private final Map<Integer, Integer> subCycleGenerators;
   
   @EqualsAndHashCode.Include
   public List<String> getElements() {
@@ -25,8 +28,8 @@ public class Cycle {
   
   public Set<String> getGenerators() {
     return Arrays.stream(generators)
-      .mapToObj(i -> elements[i - 1])
-      .collect(Collectors.toSet());
+             .mapToObj(i -> elements[i - 1])
+             .collect(Collectors.toSet());
   }
   
   private Cycle createCycle(int i) {
@@ -41,14 +44,20 @@ public class Cycle {
     specList.addLast(elements[elements.length - 1]);
     
     return Cycle.builder()
-      .elements(specList)
-      .build();
+             .elements(specList)
+             .build();
   }
   
   public Set<Cycle> getSubCycles() {
-    return Arrays.stream(subCycleGenerators)
-      .mapToObj(this::createCycle)
-      .collect(Collectors.toSet());
+    return subCycleGenerators.values()
+             .stream()
+             .map(this::createCycle)
+             .collect(Collectors.toSet());
+  }
+  
+  public Optional<Cycle> getSubCycleOfSize(int i) {
+    return Optional.ofNullable(subCycleGenerators.get(i))
+      .map(this::createCycle);
   }
   
   public static CycleBuilder builder() {

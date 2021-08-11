@@ -4,8 +4,10 @@ import org.dexenjaeger.algebra.model.OrderedPair;
 import org.dexenjaeger.algebra.utils.Builder;
 import org.dexenjaeger.algebra.utils.MoreMath;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class CycleBuilder implements Builder<Cycle> {
   private String[] elements;
@@ -20,19 +22,19 @@ public class CycleBuilder implements Builder<Cycle> {
     return this;
   }
   
-  private OrderedPair<int[], int[]> resolveGenerators() {
+  private OrderedPair<int[], Map<Integer, Integer>> resolveGenerators() {
     if (elements.length == 1) {
       return new OrderedPair<>(
         new int[]{1},
-        new int[]{}
+        Map.of()
       );
     }
     LinkedList<Integer> generators = new LinkedList<>();
-    LinkedList<Integer> subCycleGenerators = new LinkedList<>();
-    subCycleGenerators.addLast(elements.length);
+    Map<Integer, Integer> subCycleGenerators = new HashMap<>();
+    subCycleGenerators.put(1, elements.length);
     for (int i = elements.length / 2; i > 0; i--) {
       if (1 < i && elements.length % i == 0) {
-        subCycleGenerators.addFirst(i);
+        subCycleGenerators.put(elements.length / i, i);
       }
       if (MoreMath.gcd(i, elements.length) == 1) {
         generators.addFirst(i);
@@ -47,18 +49,14 @@ public class CycleBuilder implements Builder<Cycle> {
       generatorArray[generators.size()-1] = generators.removeLast();
     }
     
-    int[] subCycleGeneratorArray = new int[subCycleGenerators.size()];
-    while (!subCycleGenerators.isEmpty()) {
-      subCycleGeneratorArray[subCycleGenerators.size() - 1] = subCycleGenerators.removeLast();
-    }
     return new OrderedPair<>(
-      generatorArray, subCycleGeneratorArray
+      generatorArray, subCycleGenerators
     );
   }
   
   @Override
   public Cycle build() {
-    OrderedPair<int[], int[]> generatorArrays = resolveGenerators();
+    OrderedPair<int[], Map<Integer, Integer>> generatorArrays = resolveGenerators();
     return new Cycle(
       elements,
       generatorArrays.getLeft(),
