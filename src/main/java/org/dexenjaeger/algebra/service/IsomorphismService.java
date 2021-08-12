@@ -1,10 +1,10 @@
 package org.dexenjaeger.algebra.service;
 
-import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
-import org.dexenjaeger.algebra.categories.morphisms.ConcreteAutomorphism;
+import org.dexenjaeger.algebra.categories.morphisms.ConcreteIsomorphism;
+import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.cycle.StringCycle;
-import org.dexenjaeger.algebra.validators.AutomorphismValidator;
+import org.dexenjaeger.algebra.validators.IsomorphismValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 
 import javax.inject.Inject;
@@ -15,12 +15,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class AutomorphismService {
+public class IsomorphismService {
   private final HomomorphismService homomorphismService;
-  private final AutomorphismValidator automorphismValidator;
+  private final IsomorphismValidator automorphismValidator;
   
   @Inject
-  public AutomorphismService(HomomorphismService homomorphismService, AutomorphismValidator automorphismValidator) {
+  public IsomorphismService(HomomorphismService homomorphismService, IsomorphismValidator automorphismValidator) {
     this.homomorphismService = homomorphismService;
     this.automorphismValidator = automorphismValidator;
   }
@@ -33,10 +33,10 @@ public class AutomorphismService {
              .collect(Collectors.toSet());
   }
   
-  public Automorphism createAutomorphism(
+  public Isomorphism createIsomorphism(
     Group domain, Group range, Function<Integer, Integer> func, Function<Integer, Integer> inverse
   ) throws ValidationException {
-    Automorphism automorphism = ConcreteAutomorphism.builder()
+    Isomorphism automorphism = ConcreteIsomorphism.builder()
                                   .domain(domain)
                                   .range(range)
                                   .act(func)
@@ -46,7 +46,7 @@ public class AutomorphismService {
     return automorphism;
   }
   
-  public Automorphism createAutomorphism(
+  public Isomorphism createIsomorphism(
     Group domain, Function<Integer, String> func
   ) throws ValidationException {
     Map<String, Integer> rangeLookup = new HashMap<>();
@@ -62,7 +62,7 @@ public class AutomorphismService {
       domain::getInverse
     ));
     
-    return createAutomorphism(
+    return createIsomorphism(
       domain,
       Group.builder()
         .inversesMap(rangeInverseMap)

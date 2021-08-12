@@ -3,7 +3,7 @@ package org.dexenjaeger.algebra.service;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
-import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
+import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.validators.ValidationException;
@@ -18,20 +18,20 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class AutomorphismServiceTest {
+class IsomorphismServiceTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
   private final GroupService groupService = injector.getInstance(GroupService.class);
-  private final AutomorphismService automorphismService = injector.getInstance(AutomorphismService.class);
+  private final IsomorphismService automorphismService = injector.getInstance(IsomorphismService.class);
   
   @Test
-  void createAutomorphismTest_domainAndFunc() throws ValidationException {
+  void createIsomorphismTest_domainAndFunc() throws ValidationException {
     Map<Integer, String> functionMap = Map.of(
       0, "E",
       1, "x",
       2, "y",
       3, "z"
     );
-    Automorphism automorphism = automorphismService.createAutomorphism(
+    Isomorphism automorphism = automorphismService.createIsomorphism(
       groupService.getCyclicGroup("I", "a", "b", "c"),
       functionMap::get
     );
@@ -54,8 +54,8 @@ class AutomorphismServiceTest {
   }
   
   @Test
-  void createAutomorphismTest_InvalidDomainAndRange() {
-    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createAutomorphism(
+  void createIsomorphismTest_InvalidDomainAndRange() {
+    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createIsomorphism(
       new TrivialGroup("I"),
       groupService.getCyclicGroup("E", "a"),
       x -> 0,
@@ -68,8 +68,8 @@ class AutomorphismServiceTest {
   }
   
   @Test
-  void createAutomorphismTest_InvalidInverse() {
-    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createAutomorphism(
+  void createIsomorphismTest_InvalidInverse() {
+    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createIsomorphism(
       groupService.getCyclicGroup("I", "a"),
       groupService.getCyclicGroup("E", "x"),
       Function.identity(),
@@ -82,8 +82,8 @@ class AutomorphismServiceTest {
   }
   
   @Test
-  void createAutomorphismTest_notInjection() {
-    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createAutomorphism(
+  void createIsomorphismTest_notInjection() {
+    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createIsomorphism(
       groupService.getCyclicGroup("I", "a"),
       groupService.getCyclicGroup("E", "x"),
       x -> 0,

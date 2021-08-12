@@ -3,9 +3,9 @@ package org.dexenjaeger.algebra.service;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
-import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
-import org.dexenjaeger.algebra.categories.morphisms.ConcreteAutomorphism;
+import org.dexenjaeger.algebra.categories.morphisms.ConcreteIsomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
+import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
@@ -177,7 +177,7 @@ class HomomorphismServiceTest {
       s3, act
     );
     
-    Automorphism result = ConcreteAutomorphism.builder()
+    Isomorphism result = ConcreteIsomorphism.builder()
                             .domain(homomorphism.getDomain())
                             .range(homomorphism.getRange())
                             .act(homomorphism::apply)

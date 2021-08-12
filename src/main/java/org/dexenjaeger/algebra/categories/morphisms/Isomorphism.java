@@ -3,10 +3,10 @@ package org.dexenjaeger.algebra.categories.morphisms;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 
-public interface Automorphism extends Homomorphism {
+public interface Isomorphism extends Homomorphism {
   int unApply(int b);
   
-  Automorphism getInverse();
+  Isomorphism getInverse();
   
   @Override
   default Group getKernel() {

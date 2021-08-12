@@ -7,7 +7,7 @@ import org.dexenjaeger.algebra.categories.objects.group.Group;
 import java.util.function.Function;
 
 @Builder
-public class ConcreteAutomorphism implements Automorphism {
+public class ConcreteIsomorphism implements Isomorphism {
   @Getter
   private final Group domain;
   @Getter
@@ -16,8 +16,8 @@ public class ConcreteAutomorphism implements Automorphism {
   private final Function<Integer, Integer> inverseAct;
   
   @Override
-  public Automorphism getInverse() {
-    return ConcreteAutomorphism.builder()
+  public Isomorphism getInverse() {
+    return ConcreteIsomorphism.builder()
              .range(range)
              .domain(domain)
              .act(inverseAct)
