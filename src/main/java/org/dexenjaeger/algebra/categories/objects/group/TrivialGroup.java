@@ -95,9 +95,12 @@ public class TrivialGroup implements Group {
   
   @Override
   public String printMultiplicationTable() {
-    return BinaryOperatorUtil.printMultiplicationTable(
-      this, identityDisplay
-    );
+    return BinaryOperatorUtil.printMultiplicationTable(this);
+  }
+  
+  @Override
+  public List<String> getSortedElements() {
+    return List.of(identityDisplay);
   }
   
   @Override

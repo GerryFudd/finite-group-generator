@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +36,9 @@ public abstract class BaseBinaryOperator implements BinaryOperator {
   }
   
   @Override
+  public List<String> getSortedElements() { return List.of(elements); }
+  
+  @Override
   public String prod(String a, String b) {
     return elements[prod(lookup.get(a), lookup.get(b))];
   }
@@ -58,6 +62,7 @@ public abstract class BaseBinaryOperator implements BinaryOperator {
     return printMultiplicationTable();
   }
   
+  @Override
   public String printMultiplicationTable() {
     return BinaryOperatorUtil.printMultiplicationTable(this);
   }

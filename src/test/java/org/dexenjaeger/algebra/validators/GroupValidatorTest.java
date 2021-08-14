@@ -55,11 +55,11 @@ class GroupValidatorTest {
     
     assertTrue(
       Pattern.compile("The value [ab] is not the inverse of the element [ab] in Group\n\n" +
-                        "_\\*____\\|_I____a____b____c____\n" +
-                        " I {4}\\| I {4}a {4}b {4}c {4}\n" +
-                        " a {4}\\| a {4}a {4}a {4}a {4}\n" +
-                        " b {4}\\| b {4}b {4}b {4}b {4}\n" +
-                        " c {4}\\| c {4}a {4}b {4}I {4}\n").asMatchPredicate().test(e.getMessage())
+                        "_\\*_\\|_I_a_b_c_\n" +
+                        " I \\| I a b c \n" +
+                        " a \\| a a a a \n" +
+                        " b \\| b b b b \n" +
+                        " c \\| c a b I \n").asMatchPredicate().test(e.getMessage())
     );
   }
   
@@ -77,11 +77,11 @@ class GroupValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "The inverse of element a not found in Group\n" +
+      "The inverse of element a not found in inverses map for Group\n" +
         "\n" +
-        "_*____|_I____a____\n" +
-        " I    | I    a    \n" +
-        " a    | a    I    \n", e.getMessage()
+        "_*_|_I_a_\n" +
+        " I | I a \n" +
+        " a | a I \n", e.getMessage()
     );
   }
   
@@ -99,10 +99,10 @@ class GroupValidatorTest {
     ValidationException e = assertThrows(ValidationException.class, () -> groupValidator.validate(group));
     
     assertEquals(
-      "The inverse of element a not found in Group\n\n" +
-        "_*____|_I____a____\n" +
-        " I    | I    a    \n" +
-        " a    | a    I    \n", e.getMessage()
+      "The inverse of element a not found in inverses map for Group\n\n" +
+        "_*_|_I_a_\n" +
+        " I | I a \n" +
+        " a | a I \n", e.getMessage()
     );
   }
 }

@@ -106,4 +106,13 @@ public class Remapper {
              ).build())
              .collect(Collectors.toSet());
   }
+  
+  public Map<Integer, Integer> remapInverses(Map<Integer, Integer> inversesMap) {
+    return inversesMap.entrySet()
+      .stream()
+      .collect(Collectors.toMap(
+        entry -> inverseRemap[entry.getKey()],
+        entry -> inverseRemap[entry.getValue()]
+      ));
+  }
 }

@@ -6,6 +6,7 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,5 +37,24 @@ class InnerAutomorphismServiceTest {
           );
         }
       });
+  }
+  
+  @Test
+  void createInnerAutomorphismGroup() throws ValidationException {
+    Group inn3 = innerAutomorphismService.createInnerAutomorphismGroup(
+      symmetryGroupGenerator.createSymmetryGroup(3)
+    );
+    
+    assertEquals(
+      "\n" +
+        "_o_________|_I_________(ab)(dd2)_(ac)(dd2)_(bc)(dd2)_(abc)_____(acb)_____\n" +
+        " I         | I         (ab)(dd2) (ac)(dd2) (bc)(dd2) (abc)     (acb)     \n" +
+        " (ab)(dd2) | (ab)(dd2) I         (acb)     (abc)     (bc)(dd2) (ac)(dd2) \n" +
+        " (ac)(dd2) | (ac)(dd2) (abc)     I         (acb)     (ab)(dd2) (bc)(dd2) \n" +
+        " (bc)(dd2) | (bc)(dd2) (acb)     (abc)     I         (ac)(dd2) (ab)(dd2) \n" +
+        " (abc)     | (abc)     (ac)(dd2) (bc)(dd2) (ab)(dd2) (acb)     I         \n" +
+        " (acb)     | (acb)     (bc)(dd2) (ab)(dd2) (ac)(dd2) I         (abc)     \n",
+      inn3.toString()
+    );
   }
 }

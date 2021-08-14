@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.model.binaryoperator;
 
+import java.util.List;
 import java.util.Set;
 
 public interface BinaryOperator {
@@ -11,8 +12,10 @@ public interface BinaryOperator {
   Integer eval(String a);
   String display(int i);
   String printMultiplicationTable();
+  List<String> getSortedElements();
   
   static BinaryOperatorBuilder builder() {
     return new BinaryOperatorBuilder();
   }
+  
 }

@@ -44,11 +44,11 @@ class MonoidValidatorTest {
     
     assertEquals(
       "The element L1 is not an identity in this Monoid\n\n" +
-        "_*____|_L1___L2___a____b____\n" +
-        " L1   | L1   L2   a    b    \n" +
-        " L2   | L1   L2   a    b    \n" +
-        " a    | a    b    L1   L2   \n" +
-        " b    | a    b    L1   L2   \n", e.getMessage()
+        "_*__|_L1_L2_a__b__\n" +
+        " L1 | L1 L2 a  b  \n" +
+        " L2 | L1 L2 a  b  \n" +
+        " a  | a  b  L1 L2 \n" +
+        " b  | a  b  L1 L2 \n", e.getMessage()
     );
   }
 }

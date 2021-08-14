@@ -32,10 +32,10 @@ class SemigroupValidatorTest {
     
     assertEquals(
       "Binary operator is not associative\n\n" +
-        "_*____|_x____y____z____\n" +
-        " x    | x    y    z    \n" +
-        " y    | x    x    x    \n" +
-        " z    | x    y    z    \n", e.getMessage()
+        "_*_|_x_y_z_\n" +
+        " x | x y z \n" +
+        " y | x x x \n" +
+        " z | x y z \n", e.getMessage()
     );
   }
 }

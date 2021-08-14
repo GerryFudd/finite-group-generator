@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -9,33 +10,38 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BinaryOperatorUtil {
-  private static String padOperator(String operatorSymbol) {
-    return padOperator(operatorSymbol, ' ');
+  private static String padOperator(String operatorSymbol, int width) {
+    return padOperator(operatorSymbol, ' ', width);
   }
   
-  private static String padOperator(String operatorSymbol, char padSymbol) {
-    return String.format("%s   ", operatorSymbol).replace(' ', padSymbol).substring(0, 4);
+  private static String padOperator(String operatorSymbol, char padSymbol, int width) {
+    char[] charArray = new char[width];
+    Arrays.fill(charArray, padSymbol);
+    return new StringBuilder(operatorSymbol)
+      .append(String.valueOf(charArray))
+      .substring(0, width);
   }
   
   private static void appendLine(
-    StringBuilder sb, String a,
+    StringBuilder sb, String a, int width,
     List<String> products
   ) {
     sb.append(" ")
-      .append(padOperator(a))
+      .append(padOperator(a, width))
       .append(" |");
     
     for (String b:products) {
       sb.append(" ")
-        .append(padOperator(b));
+        .append(padOperator(b, width));
     }
     sb.append(" \n");
   }
   
-  private static Comparator<String> getElementComparator(String identity) {
+  public static Comparator<String> getElementComparator(String identity) {
     if (identity == null) {
       return Comparator.naturalOrder();
     }
@@ -58,7 +64,11 @@ public class BinaryOperatorUtil {
   public static String printMultiplicationTable(
     BinaryOperator binaryOperator
   ) {
-    return printMultiplicationTable(binaryOperator, null);
+    return printMultiplicationTable(
+      binaryOperator.getOperatorSymbol(),
+      binaryOperator.getSortedElements(),
+      getSafeOperator(binaryOperator)
+    );
   }
   
   private static BiFunction<String, String, String> getSafeOperator(BinaryOperator binaryOperator) {
@@ -86,25 +96,34 @@ public class BinaryOperatorUtil {
     };
   }
   
-  public static String printMultiplicationTable(
-    BinaryOperator binaryOperator,
-    String identity
+  private static String printMultiplicationTable(
+    String operatorSymbol,
+    List<String> elementsList,
+    BiFunction<String, String, String> safeOperator
   ) {
-    List<String> elementsList = getSortedElements(binaryOperator.getElementsDisplay(), identity);
-    BiFunction<String, String, String> safeOperator = getSafeOperator(binaryOperator);
+    Map<String, List<String>> rowMap = elementsList.stream()
+      .collect(Collectors.toMap(
+        Function.identity(),
+        a -> elementsList.stream()
+               .map(b -> safeOperator.apply(a, b))
+               .collect(Collectors.toList())
+      ));
+    int width = rowMap.values().stream()
+                  .flatMap(List::stream)
+                  .map(String::length)
+                  .max(Comparator.naturalOrder())
+                  .orElseThrow();
     
     StringBuilder sb = new StringBuilder("\n_");
-    sb.append(binaryOperator.getOperatorSymbol());
-    sb.append("____|_");
+    sb.append(padOperator(operatorSymbol, '_', width));
+    sb.append("_|_");
     sb.append(elementsList.stream()
-                .map(n -> padOperator(n, '_'))
+                .map(n -> padOperator(n, '_', width))
                 .collect(Collectors.joining("_")));
     sb.append("_\n");
     for (String a: elementsList) {
       appendLine(
-        sb, a, elementsList.stream()
-                 .map(b -> safeOperator.apply(a, b))
-                 .collect(Collectors.toList())
+        sb, a, width, rowMap.get(a)
       );
     }
     return sb.toString();

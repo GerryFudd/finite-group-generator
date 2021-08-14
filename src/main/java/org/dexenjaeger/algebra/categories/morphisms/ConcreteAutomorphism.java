@@ -44,4 +44,30 @@ public class ConcreteAutomorphism extends ConcreteIsomorphism implements Automor
     }
     return fixedElements;
   }
+  
+  @Override
+  public String toString() {
+    Set<String> elementsDisplay = new HashSet<>(domain.getElementsDisplay());
+    StringBuilder sb = new StringBuilder();
+    while (!elementsDisplay.isEmpty()) {
+      String seed = elementsDisplay.stream().findAny().orElseThrow();
+      elementsDisplay.remove(seed);
+      String next = domain.display(mapping[domain.eval(seed)]);
+      if (seed.equals(next)) {
+        continue;
+      }
+      sb.append("(")
+        .append(seed);
+      while (!next.equals(seed)) {
+        elementsDisplay.remove(next);
+        sb.append(next);
+        next = domain.display(mapping[domain.eval(next)]);
+      }
+      sb.append(")");
+    }
+    if (sb.length() == 0) {
+      sb.append("I");
+    }
+    return sb.toString();
+  }
 }

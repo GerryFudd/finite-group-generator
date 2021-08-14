@@ -1,17 +1,32 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.Remapper;
+import org.dexenjaeger.algebra.validators.ValidationException;
+import org.dexenjaeger.algebra.validators.Validator;
 
+import javax.inject.Inject;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GroupService {
+  private final Validator<Group> groupValidator;
+  
+  @Inject
+  public GroupService(Validator<Group> groupValidator) {
+    this.groupValidator = groupValidator;
+  }
+  
   public Group getCyclicGroup(String... elements) {
     return getCyclicGroup(elements, "*");
   }
@@ -36,11 +51,65 @@ public class GroupService {
              .build();
   }
   
-  public Group getGroupFromElementsAndIntTable(
+  public SortedGroupResult constructSortedGroup(
+             String operatorSymbol,
+             String[] elements,
+             Map<Integer, Integer> inversesMap,
+             Set<IntCycle> maximalCycles,
+             BiFunction<Integer, Integer, Integer> operator
+  ) throws ValidationException {
+    Remapper remapper = Remapper.init(elements.length);
+    Map<Integer, Set<Integer>> nCycleGenerators = new HashMap<>();
+    for (IntCycle cycle:maximalCycles.stream()
+      .flatMap(cycle -> Stream.concat(
+        Stream.of(cycle),
+        cycle.getSubCycles().stream()
+      )).collect(Collectors.toSet())) {
+      nCycleGenerators.computeIfPresent(cycle.getSize(), (n, generators) -> {
+        generators.addAll(cycle.getGenerators());
+        return generators;
+      });
+      nCycleGenerators.computeIfAbsent(cycle.getSize(), n -> new HashSet<>(cycle.getGenerators()));
+    }
+    
+    nCycleGenerators.entrySet()
+      .stream()
+      .sorted(Map.Entry.comparingByKey())
+      .map(Map.Entry::getValue)
+      .forEach(nGenerators -> nGenerators.stream()
+      .sorted(Comparator.comparing(i -> elements[i]))
+      .forEach(generator -> remapper.map(elements[generator], generator)));
+    
+    Group group = Group.builder()
+                     .inversesMap(remapper.remapInverses(inversesMap))
+                     .maximalCycles(remapper.remapCycles(maximalCycles))
+                     .identity(0)// The identity will be the only 1-cycle in a valid group
+                     .operatorSymbol(operatorSymbol)
+                     .lookup(remapper.getReverseLookup())
+                     .operator(remapper.createBinaryOperator(operator)::prod)
+      .build();
+    
+    groupValidator.validate(group);
+    return new SortedGroupResult(
+      group, remapper
+    );
+  }
+  
+  public Group constructGroupFromElementsAndMultiplicationTable(
     String[] elements,
-    int[][] table
-  ) {
-    if (elements.length != table.length) {
+    int[][] multiplicationTable
+  ) throws ValidationException {
+    return constructGroupFromElementsAndMultiplicationTable(
+      "*", elements, multiplicationTable
+    );
+  }
+  
+  public Group constructGroupFromElementsAndMultiplicationTable(
+    String operatorSymbol,
+    String[] elements,
+    int[][] multiplicationTable
+  ) throws ValidationException {
+    if (elements.length != multiplicationTable.length) {
       throw new RuntimeException("No.");
     }
     Map<Integer, Integer> inversesMap = new HashMap<>();
@@ -52,10 +121,10 @@ public class GroupService {
       if (cycles.stream().noneMatch(otherCycle -> otherCycle.contains(curr))) {
         LinkedList<Integer> intCycle = new LinkedList<>();
         intCycle.addLast(i);
-        int newEl = table[i][i];
+        int newEl = multiplicationTable[i][i];
         while (!intCycle.contains(newEl)) {
           intCycle.addLast(newEl);
-          newEl = table[i][newEl];
+          newEl = multiplicationTable[i][newEl];
         }
         cycles.removeIf(intCycle::containsAll);
         cycles.add(List.copyOf(intCycle));
@@ -72,16 +141,19 @@ public class GroupService {
         }
       }
     }
-    return Group.builder()
-             .inversesMap(inversesMap)
-             .maximalCycles(cycles.stream()
-                              .map(cycle -> IntCycle.builder()
-                                              .elements(cycle)
-                                              .build())
-                              .collect(Collectors.toSet()))
-             .identity(0)
-             .elements(elements)
-             .multiplicationTable(table)
-             .build();
+    Group result = constructSortedGroup(
+      operatorSymbol,
+      elements,
+      inversesMap,
+      cycles.stream()
+        .map(cycle -> IntCycle.builder()
+                        .elements(cycle)
+                        .build())
+        .collect(Collectors.toSet()),
+      (i, j) -> multiplicationTable[i][j]
+    ).getGroup();
+    
+    groupValidator.validate(result);
+    return result;
   }
 }

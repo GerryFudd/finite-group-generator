@@ -16,10 +16,10 @@ class BinaryOperatorUtilTest {
     
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
-      .append("_+____|_a____b____c____\n")
-      .append(" a    | a    b    c    \n")
-      .append(" b    | b    c    a    \n")
-      .append(" c    | c    a    b    \n");
+      .append("_+_|_a_b_c_\n")
+      .append(" a | a b c \n")
+      .append(" b | b c a \n")
+      .append(" c | c a b \n");
     
     
     assertEquals(

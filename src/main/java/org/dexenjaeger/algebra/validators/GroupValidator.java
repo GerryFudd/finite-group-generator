@@ -108,7 +108,7 @@ public class GroupValidator implements Validator<Group> {
         inverse = item.getInverse(a);
       } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
         throw new ValidationException(String.format(
-          "The inverse of element %s not found in Group\n%s",
+          "The inverse of element %s not found in inverses map for Group\n%s",
           a, item
         ));
       }

@@ -27,7 +27,7 @@ public abstract class AbstractCycle<T, U extends Cycle<T>> implements Cycle<T> {
   
   @Override
   public List<T> getElements() {
-    return List.of(elements);
+    return Arrays.asList(elements);
   }
   
   @Override

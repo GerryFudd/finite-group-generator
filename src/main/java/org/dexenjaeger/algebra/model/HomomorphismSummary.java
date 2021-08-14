@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.model;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
@@ -10,18 +11,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class HomomorphismSummary {
   private final Group domain;
-  private final Function<Integer, String> act;
   private int rangeIdentity;
   private final Map<String, Integer> rangeLookup = new HashMap<>();
   private final Map<String, Integer> kernelLookup = new HashMap<>();
   private final Map<Integer, Integer> actionBuilder = new HashMap<>();
   private final Map<Integer, Integer> inverseActionBuilder = new HashMap<>();
+  @Getter
   private final Map<Integer, Integer> rangeInversesMap = new HashMap<>();
   private final Set<String> kernelElements = new HashSet<>();
   
@@ -119,46 +119,51 @@ public class HomomorphismSummary {
     return result;
   }
   
-  public Group getRange() {
-    String[] elements = getElements(rangeLookup);
-    return Group.builder()
-             .inversesMap(rangeInversesMap)
-             .maximalCycles(rangeCycles.size() == 0 ?
-                              getTrivialCycle(rangeIdentity) :
-                              rangeCycles)
-             .identity(rangeIdentity)
-             .operatorSymbol("x")
-             .elements(elements)
-             .lookup(rangeLookup)
-             .operator((a, b) -> actionBuilder.get(domain.prod(
-               inverseActionBuilder.get(a),
-               inverseActionBuilder.get(b)
-             )))
-             .build();
+  public String[] getRangeElementsArray() {
+    return getElements(rangeLookup);
   }
   
-  public Group getKernel() {
-    String[] elements = getElements(kernelLookup);
-    return Group.builder()
-             .inversesMap(kernelElements.stream().collect(Collectors.toMap(
-               kernelLookup::get,
-               el -> kernelLookup.get(domain.display(
-                 domain.getInverse(domain.eval(el))
-               ))
-             )))
-             .maximalCycles(kernelCycles.size() == 0 ?
-                              getTrivialCycle(domain.getIdentity()) :
-                              kernelCycles)
-             .identity(kernelLookup.get(domain.getIdentityDisplay()))
-             .operatorSymbol(domain.getOperatorSymbol())
-             .elements(elements)
-             .operator((i, j) -> kernelLookup.get(
-               domain.prod(elements[i], elements[j])
-             ))
-             .build();
+  public Set<IntCycle> getRangeMaximalCycles() {
+    return rangeCycles.size() == 0 ?
+             getTrivialCycle(rangeIdentity) :
+             rangeCycles;
   }
   
-  public Function<Integer, Integer> getAct() {
-    return i -> rangeLookup.get(act.apply(i));
+  public int rangeProd(int i, int j) {
+    return actionBuilder.get(domain.prod(
+      inverseActionBuilder.get(i),
+      inverseActionBuilder.get(j)
+    ));
+  }
+  
+  private String[] kernelElementsArray;
+  
+  public synchronized String[] getKernelElementsArray() {
+    if (kernelElementsArray == null) {
+      kernelElementsArray = getElements(kernelLookup);
+    }
+    return kernelElementsArray;
+  }
+  
+  public Map<Integer, Integer> getKernelInversesMap() {
+    return kernelElements.stream().collect(Collectors.toMap(
+      kernelLookup::get,
+      el -> kernelLookup.get(domain.display(
+        domain.getInverse(domain.eval(el))
+      ))
+    ));
+  }
+  
+  public Set<IntCycle> getKernelMaximalCycles() {
+    return kernelCycles.size() == 0 ?
+             getTrivialCycle(domain.getIdentity()) :
+             kernelCycles;
+  }
+  
+  public int kernelProd(int i, int j) {
+    String[] elements = getKernelElementsArray();
+    return kernelLookup.get(
+      domain.prod(elements[i], elements[j])
+    );
   }
 }

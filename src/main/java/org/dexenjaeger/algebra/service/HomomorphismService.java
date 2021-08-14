@@ -3,26 +3,33 @@ package org.dexenjaeger.algebra.service;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.HomomorphismSummary;
+import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class HomomorphismService {
   private final Validator<Group> groupValidator;
   private final Validator<Homomorphism> homomorphismValidator;
+  private final GroupService groupService;
   
   @Inject
   public HomomorphismService(
     Validator<Group> groupValidator,
-    Validator<Homomorphism> homomorphismValidator
+    Validator<Homomorphism> homomorphismValidator,
+    GroupService groupService
   ) {
     this.groupValidator = groupValidator;
     this.homomorphismValidator = homomorphismValidator;
+    this.groupService = groupService;
   }
   
   private Homomorphism doCreateHomomorphism(
@@ -67,19 +74,34 @@ public class HomomorphismService {
     HomomorphismSummary summary = constructRangeAndKernel(
       domain, act
     );
+    SortedGroupResult sortedRange = groupService.constructSortedGroup(
+      "x",
+      summary.getRangeElementsArray(),
+      summary.getRangeInversesMap(),
+      summary.getRangeMaximalCycles(),
+      summary::rangeProd
+    );
+    SortedGroupResult sortedKernel = groupService.constructSortedGroup(
+      domain.getOperatorSymbol(),
+      summary.getKernelElementsArray(),
+      summary.getKernelInversesMap(),
+      summary.getKernelMaximalCycles(),
+      summary::kernelProd
+    );
     
-    Group range = summary.getRange();
-    Group kernel = summary.getKernel();
-    
-    groupValidator.validate(range);
-    groupValidator.validate(kernel);
+    groupValidator.validate(sortedRange.getGroup());
+    groupValidator.validate(sortedKernel.getGroup());
     return doCreateHomomorphism(
-      domain, range, kernel, summary.getAct(), act
+      domain,
+      sortedRange.getGroup(),
+      sortedKernel.getGroup(),
+      i -> sortedRange.getRemapper().getReverseLookup().get(act.apply(i)),
+      act
     );
   }
   
   private HomomorphismSummary constructRangeAndKernel(Group domain, Function<Integer, String> act) {
-    HomomorphismSummary summary = new HomomorphismSummary(domain, act);
+    HomomorphismSummary summary = new HomomorphismSummary(domain);
     
     String rangeIdentityDisplay = act.apply(domain.getIdentity());
     summary.setRangeIdentity(
@@ -119,5 +141,36 @@ public class HomomorphismService {
       }
     }
     return summary;
+  }
+  
+  public Homomorphism compose(Homomorphism a, Homomorphism b) throws ValidationException {
+    if (!a.getDomain().equals(b.getRange())) {
+      throw new RuntimeException("No.");
+    }
+    Map<Integer, Integer> kernelLookup = new HashMap<>();
+    LinkedList<String> kernelElements = new LinkedList<>();
+    
+    for (int i = 0; i < b.getDomain().getSize(); i++) {
+      if (a.apply(b.apply(i)) == a.getRange().getIdentity()) {
+        kernelLookup.put(i, kernelLookup.size());
+        kernelElements.addLast(b.getDomain().display(i));
+      }
+    }
+    
+    return doCreateHomomorphism(
+      b.getDomain(),
+      a.getRange(),
+      groupService.constructGroupFromElementsAndMultiplicationTable(
+        kernelElements.toArray(new String[0]),
+        BinaryOperatorUtil.getMultiplicationTable(
+          kernelElements.size(),
+          (i, j) -> kernelLookup.get(b.getDomain().prod(
+            b.getDomain().eval(kernelElements.get(i)),
+            b.getDomain().eval(kernelElements.get(i))
+          ))
+        )
+      ),
+      i -> a.apply(b.apply(i))
+    );
   }
 }

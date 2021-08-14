@@ -23,9 +23,9 @@ class SymmetryGroupGeneratorTest {
     Group s2 = symmetryGroupGenerator.createSymmetryGroup(2);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
-      .append("_o____|_I____a____\n")
-      .append(" I    | I    a    \n")
-      .append(" a    | a    I    \n");
+      .append("_o_|_I_a_\n")
+      .append(" I | I a \n")
+      .append(" a | a I \n");
     
     assertEquals(
       sb.toString(),
@@ -38,13 +38,13 @@ class SymmetryGroupGeneratorTest {
     Group s3 = symmetryGroupGenerator.createSymmetryGroup(3);
     StringBuilder sb = new StringBuilder();
     sb.append("\n")
-      .append("_o____|_I____a____b____c____d____d2___\n")
-      .append(" I    | I    a    b    c    d    d2   \n")
-      .append(" a    | a    I    d2   d    c    b    \n")
-      .append(" b    | b    d    I    d2   a    c    \n")
-      .append(" c    | c    d2   d    I    b    a    \n")
-      .append(" d    | d    b    c    a    d2   I    \n")
-      .append(" d2   | d2   c    a    b    I    d    \n");
+      .append("_o__|_I__a__b__c__d__d2_\n")
+      .append(" I  | I  a  b  c  d  d2 \n")
+      .append(" a  | a  I  d2 d  c  b  \n")
+      .append(" b  | b  d  I  d2 a  c  \n")
+      .append(" c  | c  d2 d  I  b  a  \n")
+      .append(" d  | d  b  c  a  d2 I  \n")
+      .append(" d2 | d2 c  a  b  I  d  \n");
     
     assertEquals(
       sb.toString(),
