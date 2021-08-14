@@ -2,7 +2,7 @@ package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
-import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 
@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class Remapper {
   private final BinaryOperatorValidator validator = new BinaryOperatorValidator();
@@ -80,7 +81,7 @@ public class Remapper {
   }
   
   public BinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
-    BinaryOperator result = ConcreteBinaryOperator.builder()
+    BinaryOperator result = BinaryOperator.builder()
                               .elements(elements)
                               .lookup(reverseLookup)
                               .operator((a, b) -> inverseRemap[binOp.apply(remap[a], remap[b])])
@@ -94,5 +95,15 @@ public class Remapper {
         e
       );
     }
+  }
+  
+  public Set<IntCycle> remapCycles(Set<IntCycle> oldCycles) {
+    return oldCycles.stream()
+             .map(oldCycle -> IntCycle.builder().elements(
+               oldCycle.getElements().stream()
+                 .map(i -> inverseRemap[i])
+                 .collect(Collectors.toList())
+             ).build())
+             .collect(Collectors.toSet());
   }
 }

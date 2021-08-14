@@ -1,9 +1,5 @@
 package org.dexenjaeger.algebra.model.cycle;
 
-import org.dexenjaeger.algebra.model.OrderedPair;
-
-import java.util.Map;
-
 public class StringCycleBuilder extends AbstractCycleBuilder<String, StringCycle> {
   
   @Override
@@ -18,12 +14,13 @@ public class StringCycleBuilder extends AbstractCycleBuilder<String, StringCycle
   
   @Override
   public StringCycle build() {
-    OrderedPair<int[], Map<Integer, Integer>> generatorArrays = resolveGenerators();
+    CycleSpec<String> spec = resolveGenerators();
     return new StringCycle(
       elements.length,
       elements,
-      generatorArrays.getLeft(),
-      generatorArrays.getRight()
+      spec.getLookup(),
+      spec.getGeneratorArray(),
+      spec.getSubCycleGenerators()
     );
   }
 }

@@ -3,7 +3,7 @@ package org.dexenjaeger.algebra.model;
 import lombok.Builder;
 import lombok.Getter;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.Map;
 import java.util.Set;
@@ -12,9 +12,8 @@ import java.util.Set;
 @Builder
 public class BinaryOperatorSummary {
   private final BinaryOperator binaryOperator;
-  private final Map<String, String> displayInversesMap;
   private final Map<Integer, Integer> inversesMap;
   private final Map<String, Integer> lookupMap;
-  private final Set<StringCycle> cycles;
+  private final Set<IntCycle> cycles;
   private final String identityDisplay;
 }

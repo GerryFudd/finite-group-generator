@@ -9,7 +9,7 @@ public class MonoidBuilder extends BaseMonoidBuilder<Monoid> {
   public Monoid build() {
     return new ConcreteMonoid(
       operatorSymbol, resolveSize(), resolveElements(),
-      resolveLookup(), resolveMultiplicationTable(), identity
+      identity, resolveLookup(), resolveMultiplicationTable()
     );
   }
 }

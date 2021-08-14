@@ -7,7 +7,7 @@ import com.google.inject.TypeLiteral;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +43,9 @@ class GroupValidatorTest {
     Group group = Group.builder()
                     .inversesMap(Map.of(0, 0, 1, 2, 2, 1, 3, 3))
                     .maximalCycles(Set.of(
-                      StringCycle.builder().elements(List.of("c", "I")).build(),
-                      StringCycle.builder().elements(List.of("a")).build(),
-                      StringCycle.builder().elements(List.of("b")).build()
+                      IntCycle.builder().elements(List.of(3, 0)).build(),
+                      IntCycle.builder().elements(List.of(1)).build(),
+                      IntCycle.builder().elements(List.of(2)).build()
                     ))
                     .lookup(summary.getLookupMap())
                     .operator(summary.getBinaryOperator()::prod)
@@ -67,8 +67,8 @@ class GroupValidatorTest {
   void inverseNotMemberOfGroup() {
     Group group = Group.builder()
                     .inversesMap(Map.of(0, 0, 1, 2))
-                    .maximalCycles(Set.of(StringCycle.builder()
-                    .elements("a", "I")
+                    .maximalCycles(Set.of(IntCycle.builder()
+                    .elements(1, 0)
                     .build()))
                     .elements("I", "a")
                     .operator((a, b) -> (a + b) % 2)
@@ -89,8 +89,8 @@ class GroupValidatorTest {
   void inverseNotPresentInInversesMap() {
     Group group = Group.builder()
                     .inversesMap(Map.of(0, 0))
-                    .maximalCycles(Set.of(StringCycle.builder()
-                                            .elements("a", "I")
+                    .maximalCycles(Set.of(IntCycle.builder()
+                                            .elements(1, 0)
                                             .build()))
                     .elements("I", "a")
                     .operator((a, b) -> (a + b) % 2)

@@ -1,44 +1,22 @@
 package org.dexenjaeger.algebra.categories.objects.semigroup;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
 
 import java.util.Map;
-import java.util.Set;
 
-@RequiredArgsConstructor
-public class ConcreteSemigroup implements Semigroup {
-  @Getter
-  private final String operatorSymbol;
-  @Getter
-  private final int size;
-  private final String[] elements;
-  private final Map<String, Integer> lookup;
-  private final int[][] multiplicationTable;
+public class ConcreteSemigroup extends BaseBinaryOperator implements Semigroup {
   
-  @Override
-  public Set<String> getElementsDisplay() {
-    return Set.of(elements);
-  }
-  
-  @Override
-  public String prod(String a, String b) {
-    return elements[prod(lookup.get(a), lookup.get(b))];
-  }
-  
-  @Override
-  public int prod(int a, int b) {
-    return multiplicationTable[a][b];
-  }
-  
-  @Override
-  public Integer eval(String a) {
-    return lookup.get(a);
-  }
-  
-  @Override
-  public String display(int i) {
-    return elements[i];
+  ConcreteSemigroup(
+    String operatorSymbol,
+    int size,
+    String[] elements,
+    Map<String, Integer> lookup,
+    int[][] multiplicationTable
+  ) {
+    super(
+      operatorSymbol, size, elements,
+      lookup, multiplicationTable
+    );
   }
   
   public static SemigroupBuilder builder() {

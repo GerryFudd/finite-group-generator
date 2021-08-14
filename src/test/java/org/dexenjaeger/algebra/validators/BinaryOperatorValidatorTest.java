@@ -5,7 +5,6 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
-import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -21,7 +20,7 @@ class BinaryOperatorValidatorTest {
   @Test
   void validateBinaryOperator() {
     String[] elements = {"a"};
-    BinaryOperator binaryOperator = ConcreteBinaryOperator.builder()
+    BinaryOperator binaryOperator = BinaryOperator.builder()
       .elements(elements)
       .lookup(Map.of("a", 0))
       .operator((a, b) -> 1)

@@ -2,7 +2,7 @@ package org.dexenjaeger.algebra.model;
 
 import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,8 +25,8 @@ public class HomomorphismSummary {
   private final Map<Integer, Integer> rangeInversesMap = new HashMap<>();
   private final Set<String> kernelElements = new HashSet<>();
   
-  private final Set<StringCycle> rangeCycles = new HashSet<>();
-  private final Set<StringCycle> kernelCycles = new HashSet<>();
+  private final Set<IntCycle> rangeCycles = new HashSet<>();
+  private final Set<IntCycle> kernelCycles = new HashSet<>();
   
   public HomomorphismSummary setRangeIdentity(String rangeIdentityDisplay, int domainIdentity) {
     rangeIdentity = rangeLookup.size();
@@ -64,13 +64,9 @@ public class HomomorphismSummary {
     inverseActionBuilder.put(i, x);
   }
   
-  public HomomorphismSummary addRangeMaximalCycle(List<String> cycle, int domainGenerator) {
-    rangeCycles.add(StringCycle.builder()
-                      .elements(cycle)
-                      .build());
-  
+  public HomomorphismSummary addRangeMaximalCycle(List<String> stringCycleElements, int domainGenerator) {
     int x = domain.getIdentity();
-    LinkedList<String> cycleElements = new LinkedList<>(cycle);
+    LinkedList<String> cycleElements = new LinkedList<>(stringCycleElements);
     cycleElements.removeLast();
     while (!cycleElements.isEmpty()) {
       x = domain.prod(domainGenerator, x);
@@ -81,15 +77,18 @@ public class HomomorphismSummary {
         addRangeAndInverse(y, cycleElements.removeLast(), x);
       }
     }
+    
+    rangeCycles.add(IntCycle.builder()
+                      .elements(stringCycleElements.stream()
+                                  .map(rangeLookup::get)
+                                  .collect(Collectors.toList()))
+                      .build());
     return this;
   }
   
-  public HomomorphismSummary addKernelCycle(List<String> cycle) {
-    kernelCycles.add(StringCycle.builder()
-                       .elements(cycle)
-                       .build());
+  public HomomorphismSummary addKernelCycle(List<String> displayCycleElements) {
     
-    LinkedList<String> cycleElements = new LinkedList<>(cycle);
+    LinkedList<String> cycleElements = new LinkedList<>(displayCycleElements);
     
     cycleElements.removeLast();
     while (!cycleElements.isEmpty()) {
@@ -97,12 +96,19 @@ public class HomomorphismSummary {
       kernelLookup.put(next, kernelElements.size());
       kernelElements.add(next);
     }
+    kernelCycles.add(IntCycle.builder()
+                       .elements(
+                         displayCycleElements.stream()
+                         .map(kernelLookup::get)
+                         .collect(Collectors.toList())
+                       )
+                       .build());
     
     return this;
   }
   
-  private Set<StringCycle> getTrivialCycle(String identityDisplay) {
-    return Set.of(StringCycle.builder().elements(List.of(identityDisplay)).build());
+  private Set<IntCycle> getTrivialCycle(int identity) {
+    return Set.of(IntCycle.builder().elements(identity).build());
   }
   
   private String[] getElements(Map<String, Integer> lookup) {
@@ -118,8 +124,8 @@ public class HomomorphismSummary {
     return Group.builder()
              .inversesMap(rangeInversesMap)
              .maximalCycles(rangeCycles.size() == 0 ?
-                              getTrivialCycle(elements[rangeIdentity]) :
-                             rangeCycles)
+                              getTrivialCycle(rangeIdentity) :
+                              rangeCycles)
              .identity(rangeIdentity)
              .operatorSymbol("x")
              .elements(elements)
@@ -141,8 +147,8 @@ public class HomomorphismSummary {
                ))
              )))
              .maximalCycles(kernelCycles.size() == 0 ?
-                             getTrivialCycle(domain.getIdentityDisplay()) :
-                             kernelCycles)
+                              getTrivialCycle(domain.getIdentity()) :
+                              kernelCycles)
              .identity(kernelLookup.get(domain.getIdentityDisplay()))
              .operatorSymbol(domain.getOperatorSymbol())
              .elements(elements)

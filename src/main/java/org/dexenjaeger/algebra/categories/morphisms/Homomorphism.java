@@ -7,4 +7,8 @@ public interface Homomorphism {
   Group getRange();
   Group getKernel();
   int apply(int in);
+  
+  static HomomorphismBuilder builder() {
+    return new HomomorphismBuilder();
+  }
 }

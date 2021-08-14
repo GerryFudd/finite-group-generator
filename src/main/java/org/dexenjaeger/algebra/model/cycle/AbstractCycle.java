@@ -15,39 +15,45 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public abstract class AbstractCycle<T, U extends Cycle> implements Cycle {
+public abstract class AbstractCycle<T, U extends Cycle<T>> implements Cycle<T> {
   @Getter
   protected final int size;
   protected final T[] elements;
+  protected final Map<T, Integer> lookup;
   protected final int[] generators;
   // Map of cycle size to a representative generator of the cycle of that size
   protected final Map<Integer, Integer> subCycleGenerators;
   protected final Function<List<T>, U> make;
   
+  @Override
   public List<T> getElements() {
     return List.of(elements);
   }
   
+  @Override
   public T get(int i) {
     if (i < 0) {
-      return elements[size - (i % size)];
+      return elements[size - 1 + (i % size)];
     }
     return elements[i % size];
   }
   
+  @Override
   @EqualsAndHashCode.Include
   public Set<T> getElementsSet() {
     return Set.of(elements);
   }
   
+  @Override
   @EqualsAndHashCode.Include
   public Set<T> getGenerators() {
     return Arrays.stream(generators)
-             .mapToObj(i -> elements[i - 1])
+             .mapToObj(i -> get(i - 1))
              .collect(Collectors.toSet());
   }
   
-  private U createCycle(int i) {
+  @Override
+  public U createCycle(int i) {
     LinkedList<T> specList = new LinkedList<>();
     
     int current = i % elements.length;
@@ -61,6 +67,7 @@ public abstract class AbstractCycle<T, U extends Cycle> implements Cycle {
     return make.apply(specList);
   }
   
+  @Override
   public Set<U> getSubCycles() {
     return subCycleGenerators.values()
              .stream()
@@ -68,18 +75,27 @@ public abstract class AbstractCycle<T, U extends Cycle> implements Cycle {
              .collect(Collectors.toSet());
   }
   
+  @Override
   public Optional<U> getSubCycleOfSize(int i) {
     return Optional.ofNullable(subCycleGenerators.get(i))
              .map(this::createCycle);
   }
   
+  @Override
   public List<Integer> getSubCycleSizes() {
     return subCycleGenerators.keySet().stream().sorted().collect(Collectors.toList());
   }
   
-  public boolean isParentOf(U candidate) {
+  @Override
+  public boolean isParentOf(Cycle<T> candidate) {
     return getSubCycleOfSize(candidate.getSize())
              .stream()
              .anyMatch(subCycle -> subCycle.equals(candidate));
+  }
+  
+  @Override
+  public Optional<U> getSubCycleGeneratedBy(T x) {
+    return Optional.ofNullable(lookup.get(x))
+      .map(this::createCycle);
   }
 }

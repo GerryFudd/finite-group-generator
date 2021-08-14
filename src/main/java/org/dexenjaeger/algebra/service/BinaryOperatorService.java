@@ -2,7 +2,6 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.utils.RawBinaryOperatorSummary;
 import org.dexenjaeger.algebra.utils.Remapper;
 
@@ -85,25 +84,22 @@ public class BinaryOperatorService {
       .inversesMap(inversesMap);
     remapper.map("I", identity.get()).orElseThrow();
     
-    Set<StringCycle> cycles = new HashSet<>();
     for (IntCycle intCycle:summary.getCycles()) {
-      List<String> resultCycleElements = new LinkedList<>();
       LinkedList<Integer> indexCycle = new LinkedList<>();
       indexCycle.addLast(remapper.getCurrentIndex());
       String baseValue = remapper.map(intCycle.get(0)).orElseThrow();
-      resultCycleElements.add(baseValue);
       int i = 1;
       while (i < intCycle.getSize() - 1) {
         indexCycle.addLast(remapper.getCurrentIndex());
-        resultCycleElements.add(remapper.map(
+        remapper.map(
           baseValue + (i + 1),
           intCycle.get(i)
-        ).orElseThrow());
+        ).orElseThrow();
         i++;
       }
       
-      if (identity.get().equals(intCycle.get(intCycle.getSize() - 1))) {
-        resultCycleElements.add("I");
+      int last = intCycle.get(intCycle.getSize() - 1);
+      if (identity.get().equals(last)) {
         while (!indexCycle.isEmpty()) {
           Integer valIndex = indexCycle.removeFirst();
           Integer invIndex = indexCycle.isEmpty() ? valIndex : indexCycle.removeLast();
@@ -111,16 +107,16 @@ public class BinaryOperatorService {
           inversesMap.put(valIndex, invIndex);
           inversesMap.put(invIndex, valIndex);
         }
+      } else {
+        remapper.map(last);
       }
-      
-      cycles.add(StringCycle.builder().elements(resultCycleElements).build());
     }
     if (!remapper.getAvailable().isEmpty()) {
       throw new RuntimeException("All permutations should exist in some cycle.");
     }
     return resultBuilder
              .binaryOperator(remapper.createBinaryOperator(binOp))
-             .cycles(cycles)
+             .cycles(remapper.remapCycles(summary.getCycles()))
              .build();
   }
 }

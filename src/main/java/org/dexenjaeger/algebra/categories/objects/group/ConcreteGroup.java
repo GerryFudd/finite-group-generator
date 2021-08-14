@@ -1,9 +1,8 @@
 package org.dexenjaeger.algebra.categories.objects.group;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.List;
 import java.util.Map;
@@ -12,39 +11,35 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class ConcreteGroup implements Group {
-  @Getter
-  private final String operatorSymbol;
-  @Getter
-  private final int size;
-  private final String[] elements;
-  private final Map<String, Integer> lookup;
-  private final int[][] multiplicationTable;
+public class ConcreteGroup extends BaseBinaryOperator implements Group {
   @Getter
   private final int identity;
   private final Map<Integer, Integer> inversesMap;
-  private final Set<StringCycle> maximalCycles;
+  private final Set<IntCycle> maximalCycles;
+  
+  ConcreteGroup(
+    String operatorSymbol,
+    int size,
+    String[] elements,
+    int identity,
+    Map<Integer, Integer> inversesMap,
+    Set<IntCycle> maximalCycles,
+    Map<String, Integer> lookup,
+    int[][] multiplicationTable
+  ) {
+    super(
+      operatorSymbol, size, elements,
+      lookup, multiplicationTable
+    );
+    this.identity = identity;
+    this.inversesMap = inversesMap;
+    this.maximalCycles = maximalCycles;
+  }
   
   
   @Override
   public int getInverse(int element) {
     return inversesMap.get(element);
-  }
-  
-  @Override
-  public int prod(int a, int b) {
-    return multiplicationTable[a][b];
-  }
-  
-  @Override
-  public Integer eval(String a) {
-    return lookup.get(a);
-  }
-  
-  @Override
-  public String display(int i) {
-    return elements[i];
   }
   
   @Override
@@ -60,25 +55,40 @@ public class ConcreteGroup implements Group {
              .collect(Collectors.toList());
   }
   
-  @Override
-  public Set<StringCycle> getNCycles(Integer n) {
+  private Stream<IntCycle> getNCycleStream(int n) {
     return maximalCycles.stream()
              .map(cycle -> cycle.getSize() == n ?
                              Optional.of(cycle) :
                              cycle.getSubCycleOfSize(n))
              .filter(Optional::isPresent)
-             .map(Optional::get)
-             .collect(Collectors.toSet());
+             .map(Optional::get);
   }
   
   @Override
-  public Set<StringCycle> getMaximalCycles() {
+  public Set<IntCycle> getNCycles(int n) {
+    return getNCycleStream(n).collect(Collectors.toSet());
+  }
+  
+  @Override
+  public Set<Integer> getNCycleGenerators(int n) {
+    return getNCycleStream(n)
+      .map(IntCycle::getGenerators)
+      .flatMap(Set::stream)
+      .collect(Collectors.toSet());
+  }
+  
+  @Override
+  public Set<IntCycle> getMaximalCycles() {
     return maximalCycles;
   }
   
   @Override
-  public Set<String> getElementsDisplay() {
-    return Set.of(elements);
+  public Optional<IntCycle> getCycleGeneratedBy(int x) {
+    return maximalCycles.stream()
+      .map(cycle -> cycle.getSubCycleGeneratedBy(x))
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .findAny();
   }
   
   @Override
@@ -89,10 +99,5 @@ public class ConcreteGroup implements Group {
   @Override
   public String getInverse(String element) {
     return elements[getInverse(lookup.get(element))];
-  }
-  
-  @Override
-  public String prod(String a, String b) {
-    return elements[prod(lookup.get(a), lookup.get(b))];
   }
 }

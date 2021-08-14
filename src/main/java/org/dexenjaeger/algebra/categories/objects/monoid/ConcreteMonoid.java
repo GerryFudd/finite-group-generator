@@ -1,46 +1,27 @@
 package org.dexenjaeger.algebra.categories.objects.monoid;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
 
 import java.util.Map;
-import java.util.Set;
 
-@RequiredArgsConstructor
-public class ConcreteMonoid implements Monoid {
-  @Getter
-  private final String operatorSymbol;
-  @Getter
-  private final int size;
-  private final String[] elements;
-  private final Map<String, Integer> lookup;
-  private final int[][] multiplicationTable;
+public class ConcreteMonoid extends BaseBinaryOperator implements Monoid {
   @Getter
   private final int identity;
   
-  @Override
-  public Set<String> getElementsDisplay() {
-    return Set.of(elements);
-  }
-  
-  @Override
-  public String prod(String a, String b) {
-    return elements[prod(lookup.get(a), lookup.get(b))];
-  }
-  
-  @Override
-  public int prod(int a, int b) {
-    return multiplicationTable[a][b];
-  }
-  
-  @Override
-  public Integer eval(String a) {
-    return lookup.get(a);
-  }
-  
-  @Override
-  public String display(int i) {
-    return elements[i];
+  ConcreteMonoid(
+    String operatorSymbol,
+    int size,
+    String[] elements,
+    int identity,
+    Map<String, Integer> lookup,
+    int[][] multiplicationTable
+  ) {
+    super(
+      operatorSymbol, size, elements,
+      lookup, multiplicationTable
+    );
+    this.identity = identity;
   }
   
   @Override

@@ -8,9 +8,9 @@ import java.util.Map;
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class IntCycle extends AbstractCycle<Integer, IntCycle> {
-  public IntCycle(int size, Integer[] elements, int[] generators, Map<Integer, Integer> subCycleGenerators) {
+  public IntCycle(int size, Integer[] elements, Map<Integer, Integer> lookup, int[] generators, Map<Integer, Integer> subCycleGenerators) {
     super(
-      size, elements, generators, subCycleGenerators,
+      size, elements, lookup, generators, subCycleGenerators,
       spec -> builder().elements(spec).build()
     );
   }

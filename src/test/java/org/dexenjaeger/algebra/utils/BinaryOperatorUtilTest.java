@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.binaryoperator.ConcreteBinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,7 +25,7 @@ class BinaryOperatorUtilTest {
     assertEquals(
       sb.toString(),
       BinaryOperatorUtil.printMultiplicationTable(
-        ConcreteBinaryOperator.builder()
+        BinaryOperator.builder()
           .operatorSymbol("+")
           .lookup(Map.of("a", 0, "b", 1, "c", 2))
           .elements(elements)

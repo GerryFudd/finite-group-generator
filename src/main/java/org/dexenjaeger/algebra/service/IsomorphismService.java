@@ -1,9 +1,7 @@
 package org.dexenjaeger.algebra.service;
 
-import org.dexenjaeger.algebra.categories.morphisms.ConcreteIsomorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.validators.IsomorphismValidator;
 import org.dexenjaeger.algebra.validators.ValidationException;
 
@@ -36,12 +34,12 @@ public class IsomorphismService {
   public Isomorphism createIsomorphism(
     Group domain, Group range, Function<Integer, Integer> func, Function<Integer, Integer> inverse
   ) throws ValidationException {
-    Isomorphism automorphism = ConcreteIsomorphism.builder()
-                                  .domain(domain)
-                                  .range(range)
-                                  .act(func)
-                                  .inverseAct(inverse)
-                                  .build();
+    Isomorphism automorphism = Isomorphism.builder()
+                                 .inverseAct(inverse)
+                                 .domain(domain)
+                                 .range(range)
+                                 .act(func)
+                                 .build();
     automorphismValidator.validate(automorphism);
     return automorphism;
   }
@@ -66,15 +64,7 @@ public class IsomorphismService {
       domain,
       Group.builder()
         .inversesMap(rangeInverseMap)
-        .maximalCycles(
-          domain.getMaximalCycles().stream()
-            .map(StringCycle::getElements)
-            .map(domainEls -> domainEls.stream()
-                                .map(el -> func.apply(domain.eval(el)))
-                                .collect(Collectors.toList()))
-            .map(rangeEls -> StringCycle.builder().elements(rangeEls).build())
-            .collect(Collectors.toSet())
-        )
+        .maximalCycles(domain.getMaximalCycles())
         .identity(domain.getIdentity())
         .operatorSymbol("x")
         .elements(elements)

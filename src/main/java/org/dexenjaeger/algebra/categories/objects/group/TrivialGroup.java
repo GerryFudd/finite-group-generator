@@ -2,9 +2,14 @@ package org.dexenjaeger.algebra.categories.objects.group;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -37,17 +42,25 @@ public class TrivialGroup implements Group {
   }
   
   @Override
-  public Set<StringCycle> getNCycles(Integer n) {
+  public Set<IntCycle> getNCycles(int n) {
     return n == 1 ?
-             Set.of(StringCycle.builder().elements(List.of(identityDisplay)).build()) :
+             Set.of(IntCycle.builder().elements(List.of(0)).build()) :
              Set.of();
   }
   
   @Override
-  public Set<StringCycle> getMaximalCycles() {
-    return Set.of(StringCycle.builder()
-                    .elements(List.of(identityDisplay))
-                    .build());
+  public Set<Integer> getNCycleGenerators(int n) {
+    return n == 1 ? Set.of(0) : Set.of();
+  }
+  
+  @Override
+  public Set<IntCycle> getMaximalCycles() {
+    return Set.of(IntCycle.builder().elements(List.of(0)).build());
+  }
+  
+  @Override
+  public Optional<IntCycle> getCycleGeneratedBy(int x) {
+    return x != 0 ? Optional.empty() : Optional.of(IntCycle.builder().elements(0).build());
   }
   
   @Override
@@ -81,7 +94,26 @@ public class TrivialGroup implements Group {
   }
   
   @Override
+  public String printMultiplicationTable() {
+    return BinaryOperatorUtil.printMultiplicationTable(
+      this, identityDisplay
+    );
+  }
+  
+  @Override
   public int getIdentity() {
     return 0;
+  }
+  
+  @Override
+  public int hashCode() {
+    return 23 * Map.of(identityDisplay, 0).hashCode() + Arrays.deepHashCode(new int[][] {new int[]{0}});
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    return (other instanceof BinaryOperator)
+      && ((BinaryOperator) other).getSize() == 1
+      && ((BinaryOperator) other).display(0).equals(identityDisplay);
   }
 }

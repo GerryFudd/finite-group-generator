@@ -1,23 +1,25 @@
 package org.dexenjaeger.algebra.model.cycle;
 
-import org.dexenjaeger.algebra.model.OrderedPair;
-
-import java.util.Map;
-
 public class IntCycleBuilder extends AbstractCycleBuilder<Integer, IntCycle> {
   @Override
   Integer[] makeEmptyArray() {
     return new Integer[0];
   }
   
+  public IntCycleBuilder elements(Integer... elements) {
+    this.elements = elements;
+    return this;
+  }
+  
   @Override
   public IntCycle build() {
-    OrderedPair<int[], Map<Integer, Integer>> generators = resolveGenerators();
+    CycleSpec<Integer> spec = resolveGenerators();
     return new IntCycle(
       elements.length,
       elements,
-      generators.getLeft(),
-      generators.getRight()
+      spec.getLookup(),
+      spec.getGeneratorArray(),
+      spec.getSubCycleGenerators()
     );
   }
 }

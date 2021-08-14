@@ -3,14 +3,18 @@ package org.dexenjaeger.algebra;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
+import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.validators.AutomorphismValidator;
 import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
 import org.dexenjaeger.algebra.validators.GroupValidator;
 import org.dexenjaeger.algebra.validators.HomomorphismValidator;
+import org.dexenjaeger.algebra.validators.IsomorphismValidator;
 import org.dexenjaeger.algebra.validators.MonoidValidator;
 import org.dexenjaeger.algebra.validators.SemigroupValidator;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -23,5 +27,7 @@ public class AlgebraModule extends AbstractModule {
     bind(Key.get(new TypeLiteral<Validator<Monoid>>(){})).to(MonoidValidator.class);
     bind(Key.get(new TypeLiteral<Validator<Group>>(){})).to(GroupValidator.class);
     bind(Key.get(new TypeLiteral<Validator<Homomorphism>>(){})).to(HomomorphismValidator.class);
+    bind(Key.get(new TypeLiteral<Validator<Isomorphism>>(){})).to(IsomorphismValidator.class);
+    bind(Key.get(new TypeLiteral<Validator<Automorphism>>(){})).to(AutomorphismValidator.class);
   }
 }

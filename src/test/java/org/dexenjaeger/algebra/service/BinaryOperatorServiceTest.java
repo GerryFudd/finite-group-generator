@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.junit.jupiter.api.Test;
 
@@ -106,8 +106,8 @@ class BinaryOperatorServiceTest {
     Group result = Group.builder()
                      .inversesMap(summary.getInversesMap())
                      .maximalCycles(Set.of(
-                       StringCycle.builder()
-                         .elements(List.of("a", "b", "c", "I"))
+                       IntCycle.builder()
+                         .elements(List.of(1, 2, 3, 0))
                          .build()))
                      .lookup(summary.getLookupMap())
                      .operator(summary.getBinaryOperator()::prod)

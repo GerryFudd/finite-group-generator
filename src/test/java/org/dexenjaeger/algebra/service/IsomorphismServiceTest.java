@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class IsomorphismServiceTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
   private final GroupService groupService = injector.getInstance(GroupService.class);
-  private final IsomorphismService automorphismService = injector.getInstance(IsomorphismService.class);
+  private final IsomorphismService isomorphismService = injector.getInstance(IsomorphismService.class);
   
   @Test
   void createIsomorphismTest_domainAndFunc() throws ValidationException {
@@ -31,31 +31,44 @@ class IsomorphismServiceTest {
       2, "y",
       3, "z"
     );
-    Isomorphism automorphism = automorphismService.createIsomorphism(
+    Isomorphism isomorphism = isomorphismService.createIsomorphism(
       groupService.getCyclicGroup("I", "a", "b", "c"),
       functionMap::get
     );
     
     assertEquals(
       new HashSet<>(functionMap.values()),
-      automorphism.getRange().getElementsDisplay()
+      isomorphism.getRange().getElementsDisplay()
     );
-    assertEquals(List.of(1, 2, 4), automorphism.getRange().getCycleSizes());
+    assertEquals(List.of(1, 2, 4), isomorphism.getRange().getCycleSizes());
     assertEquals(
-      Set.of(StringCycle.builder().elements(List.of("y", "E")).build()),
-      automorphism.getRange().getNCycles(2)
+      Set.of(IntCycle.builder().elements(2, 0).build()),
+      isomorphism.getRange().getNCycles(2)
     );
     assertEquals(
-      Set.of(StringCycle.builder()
-               .elements(List.of("x", "y", "z", "E"))
+      Set.of(IntCycle.builder()
+               .elements(1, 2, 3, 0)
                .build()),
-      automorphism.getRange().getMaximalCycles()
+      isomorphism.getRange().getMaximalCycles()
     );
+    Isomorphism inverseIso = isomorphism.getInverse();
+    assertEquals(
+      isomorphism.getDomain(),
+      inverseIso.getRange()
+    );
+    assertEquals(
+      isomorphism.getRange(),
+      inverseIso.getDomain()
+    );
+    for (int i = 0; i < 4; i++) {
+      assertEquals(i, inverseIso.apply(isomorphism.apply(i)));
+      assertEquals(i, isomorphism.apply(inverseIso.apply(i)));
+    }
   }
   
   @Test
   void createIsomorphismTest_InvalidDomainAndRange() {
-    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createIsomorphism(
+    ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
       new TrivialGroup("I"),
       groupService.getCyclicGroup("E", "a"),
       x -> 0,
@@ -69,7 +82,7 @@ class IsomorphismServiceTest {
   
   @Test
   void createIsomorphismTest_InvalidInverse() {
-    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createIsomorphism(
+    ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
       groupService.getCyclicGroup("I", "a"),
       groupService.getCyclicGroup("E", "x"),
       Function.identity(),
@@ -83,7 +96,7 @@ class IsomorphismServiceTest {
   
   @Test
   void createIsomorphismTest_notInjection() {
-    ValidationException e = assertThrows(ValidationException.class, () -> automorphismService.createIsomorphism(
+    ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
       groupService.getCyclicGroup("I", "a"),
       groupService.getCyclicGroup("E", "x"),
       x -> 0,

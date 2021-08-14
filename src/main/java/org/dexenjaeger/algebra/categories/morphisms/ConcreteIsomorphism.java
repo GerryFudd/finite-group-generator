@@ -1,37 +1,38 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import lombok.Builder;
-import lombok.Getter;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 
-import java.util.function.Function;
-
-@Builder
-public class ConcreteIsomorphism implements Isomorphism {
-  @Getter
-  private final Group domain;
-  @Getter
-  private final Group range;
-  private final Function<Integer, Integer> act;
-  private final Function<Integer, Integer> inverseAct;
+public class ConcreteIsomorphism extends ConcreteHomomorphism implements Isomorphism {
+  protected final int[] inverseMapping;
+  
+  ConcreteIsomorphism(
+    Group domain,
+    Group range,
+    int[] mapping,
+    String[] image,
+    int[] inverseMapping
+  ) {
+    super(
+      domain, range,
+      new TrivialGroup(domain.getIdentityDisplay()),
+      mapping, image
+    );
+    this.inverseMapping = inverseMapping;
+  }
   
   @Override
   public Isomorphism getInverse() {
-    return ConcreteIsomorphism.builder()
-             .range(range)
-             .domain(domain)
-             .act(inverseAct)
-             .inverseAct(act)
+    return Isomorphism.builder()
+             .inverseMapping(mapping)
+             .range(domain)
+             .domain(range)
+             .mapping(inverseMapping)
              .build();
   }
   
   @Override
-  public int apply(int a) {
-    return act.apply(a);
-  }
-  
-  @Override
-  public int unApply(int b) {
-    return inverseAct.apply(b);
+  public int unApply(int j) {
+    return inverseMapping[j];
   }
 }
