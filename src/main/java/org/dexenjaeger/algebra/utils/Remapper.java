@@ -15,14 +15,12 @@ public class Remapper {
   private final CycleUtils cycleUtils = new CycleUtils();
   @Getter
   private int currentIndex = 0;
-  private int defaultIndicesUsed = 0;
   @Getter
   private final String[] elements;
   private final int[] remap;
   private final int[] inverseRemap;
   @Getter
   private final Map<String, Integer> reverseLookup;
-  @Getter
   private final Set<Integer> available;
   
   private Remapper(String[] elements, int[] remap, int[] inverseRemap, Set<Integer> available, Map<String, Integer> reverseLookup) {
@@ -45,25 +43,6 @@ public class Remapper {
       available,
       new HashMap<>()
     );
-  }
-  
-  private static String getSymbolForNumber(int i) {
-    int n = i;
-    StringBuilder result = new StringBuilder();
-    result.insert(0, (char) (n % 26 + 97));
-    while (n / 26 > 0) {
-      n = n / 26;
-      result.insert(0, (char) ((n - 1) % 26 + 97));
-    }
-    return result.toString();
-  }
-  
-  public Optional<String> map(int oldIndex) {
-    Optional<String> result = map(getSymbolForNumber(defaultIndicesUsed), oldIndex);
-    if (result.isPresent()) {
-      defaultIndicesUsed++;
-    }
-    return result;
   }
   
   public Optional<String> map(String value, int oldIndex) {

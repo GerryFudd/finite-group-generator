@@ -43,11 +43,8 @@ public class FunctionSpaceGenerator {
     return functions;
   }
   public Monoid createFunctionSpace(int n) throws ValidationException {
-    List<Mapping> functions = createFunctionSet(n);
-    
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-      functions.size(),
-      functionsUtil.createBinaryOperatorForFunctionSpace(functions)
+      createFunctionSet(n)
     );
     
     return monoidService.createMonoid(

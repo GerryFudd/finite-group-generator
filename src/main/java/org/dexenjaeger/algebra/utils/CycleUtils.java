@@ -1,7 +1,9 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.model.cycle.Cycle;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.model.cycle.MappingCycle;
 import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.model.spec.CycleSpec;
 
@@ -87,6 +89,20 @@ public class CycleUtils {
              .subCycleGenerators(spec.getSubCycleGenerators())
              .lookup(spec.getLookup())
              .maker(this::createStringCycle)
+             .build();
+  }
+  
+  public MappingCycle createMappingCycle(Mapping... mappings) {
+    return createMappingCycle(List.of(mappings));
+  }
+  public MappingCycle createMappingCycle(List<Mapping> mappings) {
+    CycleSpec<Mapping> spec = resolveGenerators(mappings);
+    return MappingCycle.builder()
+             .elements(mappings)
+             .generators(spec.getGeneratorArray())
+             .subCycleGenerators(spec.getSubCycleGenerators())
+             .lookup(spec.getLookup())
+             .maker(this::createMappingCycle)
              .build();
   }
   

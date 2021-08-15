@@ -5,9 +5,11 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,21 +22,18 @@ class BinaryOperatorServiceTest {
   private final GroupService groupService = injector.getInstance(GroupService.class);
   
   @Test
-  void getSortedAndPrettifiedBinaryOperatorTest_withLeftIdentity() {
-    int[][] product = {
-      {1, 0, 3, 2},
-      {0, 1, 2, 3},
-      {1, 0, 3, 2},
-      {0, 1, 2, 3}
-    };
-    
+  void getSortedAndPrettifiedBinaryOperatorTest_withLeftIdentity_fromMappings() {
     BinaryOperatorSummary result = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> product[i][j]
+      List.of(
+        new Mapping(new int[]{1, 0, 0}),
+        new Mapping(new int[]{0, 1, 1}),
+        new Mapping(new int[]{1, 0, 1}),
+        new Mapping(new int[]{0, 1, 0})
+      )
     );
     
     assertEquals(
-      "L1, L2, a, b",
+      "L, L2, a, b",
       String.join(", ", result.getElements())
     );
     
@@ -43,40 +42,14 @@ class BinaryOperatorServiceTest {
   }
   
   @Test
-  void getSortedAndPrettifiedBinaryOperatorTest_withRightIdentity() {
-    int[][] product = {
-      {1, 0, 1, 0},
-      {0, 1, 0, 1},
-      {3, 2, 3, 2},
-      {2, 3, 2, 3}
-    };
-    
+  void getSortedAndPrettifiedBinaryOperatorTest_withIdentityAndInverses() {
     BinaryOperatorSummary result = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> product[i][j]
-    );
-    
-    assertEquals(
-      "R1, R2, a, b",
-      String.join(", ", result.getElements())
-    );
-    
-    assertNull(result.getIdentityDisplay());
-    assertNull(result.getInversesMap());
-  }
-  
-  @Test
-  void getSortedAndPrettifiedBinaryOperatorTest_withIdentityAndInerses() {
-    int[][] product = {
-      {0, 1, 2, 3},
-      {1, 0, 3, 2},
-      {2, 3, 0, 1},
-      {3, 2, 1, 0}
-    };
-    
-    BinaryOperatorSummary result = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> product[i][j]
+      List.of(
+        new Mapping(new int[]{0, 1, 2, 3}),
+        new Mapping(new int[]{0, 1, 3, 2}),
+        new Mapping(new int[]{1, 0, 2, 3}),
+        new Mapping(new int[]{1, 0, 3, 2})
+      )
     );
     
     assertEquals(
@@ -94,8 +67,12 @@ class BinaryOperatorServiceTest {
   @Test
   void validInverses() throws ValidationException {
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> (i + j) % 4
+      List.of(
+        new Mapping(new int[]{0, 1, 2, 3}),
+        new Mapping(new int[]{1, 2, 3, 0}),
+        new Mapping(new int[]{2, 3, 0, 1}),
+        new Mapping(new int[]{3, 0, 1, 2})
+      )
     );
     
     Group result = groupService.createGroup(

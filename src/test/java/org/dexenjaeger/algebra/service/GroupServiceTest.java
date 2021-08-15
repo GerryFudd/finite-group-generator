@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -24,16 +25,13 @@ class GroupServiceTest {
   private final CycleUtils cycleUtils = injector.getInstance(CycleUtils.class);
   @Test
   void invalidInverses() {
-    int[][] product = {
-      {0, 1, 2, 3},
-      {1, 1, 1, 1},
-      {2, 2, 2, 2},
-      {3, 1, 2, 0}
-    };
-    
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-      4,
-      (i, j) -> product[i][j]
+      List.of(
+        new Mapping(new int[]{0, 1}),
+        new Mapping(new int[]{0, 0}),
+        new Mapping(new int[]{1, 1}),
+        new Mapping(new int[]{1, 0})
+      )
     );
     
     ValidationException e = assertThrows(
@@ -41,11 +39,7 @@ class GroupServiceTest {
       () -> groupService.createSortedGroup(
         summary.getElements(),
         Map.of(0, 0, 1, 2, 2, 1, 3, 3),
-        Set.of(
-          cycleUtils.createIntCycle(List.of(3, 0)),
-          cycleUtils.createIntCycle(List.of(1)),
-          cycleUtils.createIntCycle(List.of(2))
-        ),
+        summary.getCycles(),
         summary.getOperator()
       ));
     
@@ -55,7 +49,8 @@ class GroupServiceTest {
                         " I \\| I a b c \n" +
                         " a \\| a a a a \n" +
                         " b \\| b b b b \n" +
-                        " c \\| c a b I \n").asMatchPredicate().test(e.getMessage())
+                        " c \\| c b a I \n").asMatchPredicate().test(e.getMessage()),
+      String.format("Expected particular validation message. Instead got\n%s", e.getMessage())
     );
   }
   

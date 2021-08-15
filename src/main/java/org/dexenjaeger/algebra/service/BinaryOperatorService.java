@@ -1,12 +1,14 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.model.cycle.AbstractCycle;
-import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.model.cycle.MappingCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
-import org.dexenjaeger.algebra.utils.RawBinaryOperatorSummary;
-import org.dexenjaeger.algebra.utils.Remapper;
+import org.dexenjaeger.algebra.utils.CycleUtils;
+import org.dexenjaeger.algebra.utils.FunctionsUtil;
+import org.dexenjaeger.algebra.utils.MappingUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
@@ -17,7 +19,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -25,138 +26,129 @@ import java.util.stream.Collectors;
 public class BinaryOperatorService {
   private final Validator<BinaryOperator> binaryOperatorValidator;
   private final BinaryOperatorUtil binaryOperatorUtil;
+  private final FunctionsUtil functionsUtil;
+  private final CycleUtils cycleUtils;
   
   @Inject
   public BinaryOperatorService(
     Validator<BinaryOperator> binaryOperatorValidator,
-    BinaryOperatorUtil binaryOperatorUtil
+    BinaryOperatorUtil binaryOperatorUtil,
+    FunctionsUtil functionsUtil, CycleUtils cycleUtils
   ) {
     this.binaryOperatorValidator = binaryOperatorValidator;
     this.binaryOperatorUtil = binaryOperatorUtil;
+    this.functionsUtil = functionsUtil;
+    this.cycleUtils = cycleUtils;
   }
   
-  private BinaryOperatorSummary semigroupPath(RawBinaryOperatorSummary summary, Remapper remapper, BinaryOperatorSummary.BinaryOperatorSummaryBuilder resultBuilder, BiFunction<Integer, Integer, Integer> binOp) {
-    // From here on there is no identity
-    int l = 1;
-    int r = 1;
-    for (int leftIdentity:summary.getLeftIdentities()) {
-      if (remapper.map("L" + l, leftIdentity).isPresent()) {
-        l++;
-      }
-    }
-    for (int rightIdentity:summary.getRightIdentities()) {
-      if (remapper.map("R" + r, rightIdentity).isPresent()) {
-        r++;
-      }
-    }
-    
-    
-    Set<Integer> available = new HashSet<>(remapper.getAvailable());
-    available.forEach(remapper::map);
-    return resultBuilder
-             .elements(remapper.getElements())
-             .operator(remapper.remapBiFunc(binOp))
-             .build();
+  private BiFunction<Integer, Integer, Integer> getBinOp(List<Mapping> mappings) {
+    return (i, j) -> mappings.indexOf(
+      functionsUtil.composeMappings(
+        mappings.get(i), mappings.get(j)
+      )
+    );
+  }
+  
+  private String[] getElements(List<Mapping> mappings) {
+    return mappings.stream().map(Mapping::toString).toArray(String[]::new);
   }
   
   public BinaryOperatorSummary getSortedAndPrettifiedBinaryOperator(
-    int size,
-    BiFunction<Integer, Integer, Integer> binOp
+    List<Mapping> mappings
   ) {
-    Remapper remapper = Remapper.init(size);
-    BinaryOperatorSummary.BinaryOperatorSummaryBuilder resultBuilder = BinaryOperatorSummary.builder()
-                                                                         .lookupMap(remapper.getReverseLookup());
-    
-    RawBinaryOperatorSummary summary = new RawBinaryOperatorSummary();
-    for (int i = 0; i < size; i++) {
-      boolean isLeftIdentity = true;
-      boolean isRightIdentity = true;
-      for (int j = 0; j < size; j++) {
-        isLeftIdentity = isLeftIdentity && binOp.apply(i, j) == j;
-        isRightIdentity = isRightIdentity && binOp.apply(j, i) == j;
+    MappingUtil mappingUtil = MappingUtil.init(mappings);
+    List<Mapping> leftIdentities = new LinkedList<>();
+    List<Mapping> rightIdentities = new LinkedList<>();
+    for (Mapping mapping:mappings) {
+      if (mappings.stream().allMatch(
+        other -> other.equals(functionsUtil.composeMappings(
+          mapping, other
+        ))
+      )) {
+        leftIdentities.add(mapping);
       }
-      if (isLeftIdentity) {
-        summary.getLeftIdentities().add(i);
+      if (mappings.stream().allMatch(
+        other -> other.equals(functionsUtil.composeMappings(
+          other, mapping
+        ))
+      )) {
+        rightIdentities.add(mapping);
       }
-      if (isRightIdentity) {
-        summary.getRightIdentities().add(i);
+      if (!leftIdentities.isEmpty() && !rightIdentities.isEmpty()) {
+        mappingUtil.mapIdentity(mapping, "I");
+        break;
       }
-      
-      List<Integer> cycle = new LinkedList<>();
-      cycle.add(i);
-      int next = binOp.apply(i, i);
-      while (!cycle.contains(next)) {
-        cycle.add(next);
-        next = binOp.apply(i, next);
-      }
-      summary.addCycle(cycle);
     }
-    Optional<Integer> identity = summary.getIdentity();
-    Map<Integer, Integer> inversesMap = new HashMap<>();
-    
-    if (identity.isEmpty()) {
-      return semigroupPath(summary, remapper, resultBuilder, binOp);
-    }
-    
-    // From here on we may assume that there is an identity.
-    inversesMap.put(0, 0);
-    resultBuilder.identityDisplay("I")
-      .inversesMap(inversesMap);
-    remapper.map("I", identity.get()).orElseThrow();
-    
-    if (remapper.getAvailable().isEmpty()) {
-      return resultBuilder
-               .elements(remapper.getElements())
-               .operator(remapper.remapBiFunc(binOp))
-               .cycles(remapper.remapCycles(summary.getCycles()))
+    if (mappingUtil.missingIdentity()) {
+      leftIdentities.forEach(leftIdentity -> mappingUtil.map(leftIdentity, "L"));
+      rightIdentities.forEach(leftIdentity -> mappingUtil.map(leftIdentity, "R"));
+      mappingUtil.mapRemaining();
+      List<Mapping> mapped = mappingUtil.getMapped();
+      return BinaryOperatorSummary.builder()
+               .elements(getElements(mapped))
+               .operator(getBinOp(mapped))
                .build();
     }
     
-    for (IntCycle intCycle:summary
-                             .getCycles()
-                             .stream()
-                             .sorted(
-                               Comparator.comparing(
-                                 AbstractCycle::getSize
-                               )
-                             )
-                             .collect(
-                               Collectors.toList()
-                             )
-    ) {
-      LinkedList<Integer> indexCycle = new LinkedList<>();
-      indexCycle.addLast(remapper.getCurrentIndex());
-      String baseValue = remapper.map(intCycle.get(0)).orElseThrow();
-      int i = 1;
-      while (i < intCycle.getSize() - 1) {
-        indexCycle.addLast(remapper.getCurrentIndex());
-        remapper.map(
-          baseValue + (i + 1),
-          intCycle.get(i)
-        ).orElseThrow();
-        i++;
+    Set<MappingCycle> mappingCycles = new HashSet<>();
+    for (Mapping mapping:mappings) {
+      List<Mapping> cycleElements = new LinkedList<>();
+      cycleElements.add(mapping);
+      Mapping next = functionsUtil.composeMappings(mapping, mapping);
+      while (!cycleElements.contains(next)) {
+        cycleElements.add(next);
+        next = functionsUtil.composeMappings(mapping, next);
       }
-      
-      int last = intCycle.get(intCycle.getSize() - 1);
-      if (identity.get().equals(last)) {
-        while (!indexCycle.isEmpty()) {
-          Integer valIndex = indexCycle.removeFirst();
-          Integer invIndex = indexCycle.isEmpty() ? valIndex : indexCycle.removeLast();
-          
-          inversesMap.put(valIndex, invIndex);
-          inversesMap.put(invIndex, valIndex);
-        }
-      } else {
-        remapper.map(last);
+      MappingCycle candidateCycle = cycleUtils.createMappingCycle(cycleElements);
+      if (mappingCycles.stream().anyMatch(
+        existingCycle -> existingCycle.isParentOf(candidateCycle)
+      )) {
+        continue;
+      }
+      mappingCycles.removeIf(candidateCycle::isParentOf);
+      mappingCycles.add(candidateCycle);
+    }
+    
+    mappingCycles.stream()
+      .sorted(
+        Comparator.comparing(
+          AbstractCycle::toString
+        )
+      )
+      .sorted(
+        Comparator.comparing(
+          AbstractCycle::getSize
+        )
+      )
+      .forEach(mappingUtil::mapCycle);
+    List<Mapping> mapped = mappingUtil.getMapped();
+    Map<Integer, Integer> inverses = new HashMap<>();
+    inverses.put(
+      mapped.indexOf(mappingUtil.getIdentity()),
+      mapped.indexOf(mappingUtil.getIdentity())
+    );
+    for (MappingCycle cycle:mappingCycles) {
+      if (cycle.getElements().get(cycle.getSize() - 1).equals(mappingUtil.getIdentity())) {
+        cycle.getInversePairs().forEach(
+          inversePair -> inverses.put(
+            mapped.indexOf(inversePair.getLeft()),
+            mapped.indexOf(inversePair.getRight())
+          )
+        );
       }
     }
-    if (!remapper.getAvailable().isEmpty()) {
-      throw new RuntimeException("All permutations should exist in some cycle.");
-    }
-    return resultBuilder
-             .elements(remapper.getElements())
-             .operator(remapper.remapBiFunc(binOp))
-             .cycles(remapper.remapCycles(summary.getCycles()))
+    
+    return BinaryOperatorSummary
+             .builder()
+             .identityDisplay(mappingUtil.getIdentity().toString())
+             .operator(getBinOp(mapped))
+             .elements(getElements(mapped))
+             .inversesMap(inverses)
+             .cycles(mappingCycles.stream()
+                       .map(mappingCycle -> cycleUtils.convertToIntCycle(
+                         mapped::indexOf,
+                         mappingCycle
+                       )).collect(Collectors.toSet()))
              .build();
   }
   

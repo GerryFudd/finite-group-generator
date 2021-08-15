@@ -53,11 +53,8 @@ public class SymmetryGroupGenerator {
   }
   
   public Group createSymmetryGroup(int n) {
-    List<Mapping> permutations = getPermutationList(n);
-  
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-        permutations.size(),
-        functionsUtil.createBinaryOperatorForFunctionSpace(permutations)
+      getPermutationList(n)
       );
   
     try {
