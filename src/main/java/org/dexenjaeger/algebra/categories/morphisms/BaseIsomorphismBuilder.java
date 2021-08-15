@@ -17,40 +17,10 @@ public abstract class BaseIsomorphismBuilder<T extends Isomorphism> extends Base
     return this;
   }
   
-  private int[] inverseMapping;
+  protected int[] inverseMapping;
   
   public BaseIsomorphismBuilder<T> inverseMapping(int[] inverseMapping) {
     this.inverseMapping = inverseMapping;
     return this;
-  }
-  
-  protected String[] resolveImage() {
-    if (image != null) {
-      return image;
-    }
-    image = new String[domain.getSize()];
-    
-    for (int i = 0; i < domain.getSize(); i++) {
-      image[i] = range.display(mapping[i]);
-    }
-    
-    return image;
-  }
-  
-  protected int[] resolveInverseMapping() {
-    if (inverseMapping != null) {
-      return inverseMapping;
-    }
-    inverseMapping = new int[range.getSize()];
-    
-    for (int i = 0; i < range.getSize(); i++) {
-      if (inverseAct == null) {
-        inverseMapping[mapping[i]] = i;
-      } else {
-        inverseMapping[i] = inverseAct.apply(i);
-      }
-    }
-    
-    return inverseMapping;
   }
 }

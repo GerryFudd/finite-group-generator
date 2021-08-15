@@ -1,16 +1,21 @@
 package org.dexenjaeger.algebra.categories.objects.group;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
-import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.service.BinaryOperatorService;
+import org.dexenjaeger.algebra.service.GroupService;
+import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class TrivialGroupTest {
+  private final Injector injector = Guice.createInjector(new AlgebraModule());
+  private final GroupService groupService = injector.getInstance(GroupService.class);
+  private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
   @Test
   void equalsItself() {
     assertEquals(
@@ -28,11 +33,10 @@ class TrivialGroupTest {
   }
   
   @Test
-  void equalsEquivalentBinaryOperator() {
-    BinaryOperator byAnotherName = BinaryOperator.builder()
-                                     .lookup(Map.of("a", 0))
-                                     .operator((i, j) -> 0)
-                                     .build();
+  void equalsEquivalentBinaryOperator() throws ValidationException {
+    BinaryOperator byAnotherName = binaryOperatorService.createBinaryOperator(
+      new String[]{"a"}, (i, j) -> 0
+    );
     assertEquals(
       byAnotherName,
       new TrivialGroup("a")
@@ -50,16 +54,7 @@ class TrivialGroupTest {
   @Test
   void behavesLikeEquivalentGroup() {
     TrivialGroup trivialGroup = new TrivialGroup("a");
-    Group byAnotherName = Group.builder()
-                            .inversesMap(Map.of(0, 0))
-                            .maximalCycles(Set.of(
-                              IntCycle.builder()
-                              .elements(0)
-                              .build()
-                            ))
-                            .lookup(Map.of("a", 0))
-                            .operator((i, j) -> 0)
-                            .build();
+    Group byAnotherName = groupService.createCyclicGroup("a");
     assertEquals(
       byAnotherName.getSize(),
       trivialGroup.getSize()

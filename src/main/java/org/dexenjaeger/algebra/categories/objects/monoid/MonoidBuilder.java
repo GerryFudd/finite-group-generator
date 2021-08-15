@@ -8,8 +8,8 @@ public class MonoidBuilder extends BaseMonoidBuilder<Monoid> {
   @Override
   public Monoid build() {
     return new ConcreteMonoid(
-      operatorSymbol, resolveSize(), resolveElements(),
-      identity, resolveLookup(), resolveMultiplicationTable()
+      operatorSymbol, size, elements,
+      identity, lookup, multiplicationTable
     );
   }
 }

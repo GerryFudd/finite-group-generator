@@ -22,16 +22,6 @@ public class ConcreteIsomorphism extends ConcreteHomomorphism implements Isomorp
   }
   
   @Override
-  public Isomorphism getInverse() {
-    return Isomorphism.builder()
-             .inverseMapping(mapping)
-             .range(domain)
-             .domain(range)
-             .mapping(inverseMapping)
-             .build();
-  }
-  
-  @Override
   public int unApply(int j) {
     return inverseMapping[j];
   }

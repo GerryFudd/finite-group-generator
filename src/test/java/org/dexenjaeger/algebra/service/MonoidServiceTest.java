@@ -1,24 +1,18 @@
-package org.dexenjaeger.algebra.validators;
+package org.dexenjaeger.algebra.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import org.dexenjaeger.algebra.AlgebraModule;
-import org.dexenjaeger.algebra.categories.objects.monoid.ConcreteMonoid;
-import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.service.BinaryOperatorService;
+import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class MonoidValidatorTest {
+class MonoidServiceTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
-  @SuppressWarnings("Convert2Diamond") // The diamond doesn't work here
-  private final Validator<Monoid> validator = injector.getInstance(Key.get(new TypeLiteral<Validator<Monoid>>() {
-  }));
+  private final MonoidService monoidService = injector.getInstance(MonoidService.class);
   private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
   @Test
   void invalidIdentity() {
@@ -34,13 +28,13 @@ class MonoidValidatorTest {
       (i, j) -> product[i][j]
     );
     
-    Monoid monoid = ConcreteMonoid.builder()
-                      .identity(summary.getLookupMap().get("L1"))
-                      .lookup(summary.getLookupMap())
-                      .operator(summary.getBinaryOperator()::prod)
-                      .build();
-    
-    ValidationException e = assertThrows(ValidationException.class, () -> validator.validate(monoid));
+    ValidationException e = assertThrows(
+      ValidationException.class,
+      () -> monoidService.createMonoid(
+        summary.getLookupMap().get("L1"),
+        summary.getElements(),
+        summary.getOperator()
+      ));
     
     assertEquals(
       "The element L1 is not an identity in this Monoid\n\n" +

@@ -27,8 +27,8 @@ class InnerAutomorphismServiceTest {
         // fixes the cycle that i belongs to.
         if (i == s3.getIdentity()) {
           assertEquals(
-            automorphism,
-            automorphism.getInverse()
+            automorphism.getDomain().getSize(),
+            automorphism.fixedElements().size()
           );
         } else {
           assertEquals(

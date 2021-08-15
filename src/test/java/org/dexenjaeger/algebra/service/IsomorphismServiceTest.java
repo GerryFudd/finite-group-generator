@@ -32,7 +32,7 @@ class IsomorphismServiceTest {
       3, "z"
     );
     Isomorphism isomorphism = isomorphismService.createIsomorphism(
-      groupService.getCyclicGroup("I", "a", "b", "c"),
+      groupService.createCyclicGroup("I", "a", "b", "c"),
       functionMap::get
     );
     
@@ -51,7 +51,7 @@ class IsomorphismServiceTest {
                .build()),
       isomorphism.getRange().getMaximalCycles()
     );
-    Isomorphism inverseIso = isomorphism.getInverse();
+    Isomorphism inverseIso = isomorphismService.getInverse(isomorphism);
     assertEquals(
       isomorphism.getDomain(),
       inverseIso.getRange()
@@ -70,7 +70,7 @@ class IsomorphismServiceTest {
   void createIsomorphismTest_InvalidDomainAndRange() {
     ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
       new TrivialGroup("I"),
-      groupService.getCyclicGroup("E", "a"),
+      groupService.createCyclicGroup("E", "a"),
       x -> 0,
       y -> 0
     ));
@@ -83,8 +83,8 @@ class IsomorphismServiceTest {
   @Test
   void createIsomorphismTest_InvalidInverse() {
     ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
-      groupService.getCyclicGroup("I", "a"),
-      groupService.getCyclicGroup("E", "x"),
+      groupService.createCyclicGroup("I", "a"),
+      groupService.createCyclicGroup("E", "x"),
       Function.identity(),
       y -> 0
     ));
@@ -97,8 +97,8 @@ class IsomorphismServiceTest {
   @Test
   void createIsomorphismTest_notInjection() {
     ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
-      groupService.getCyclicGroup("I", "a"),
-      groupService.getCyclicGroup("E", "x"),
+      groupService.createCyclicGroup("I", "a"),
+      groupService.createCyclicGroup("E", "x"),
       x -> 0,
       Function.identity()
     ));

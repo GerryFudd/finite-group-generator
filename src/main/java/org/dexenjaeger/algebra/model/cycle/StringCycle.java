@@ -1,11 +1,9 @@
 package org.dexenjaeger.algebra.model.cycle;
 
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.Map;
 
-@ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class StringCycle extends AbstractCycle<String, StringCycle> {
   
@@ -18,5 +16,13 @@ public class StringCycle extends AbstractCycle<String, StringCycle> {
   
   public static StringCycleBuilder builder() {
     return new StringCycleBuilder();
+  }
+  
+  @Override
+  public String toString() {
+    return new StringBuilder("(")
+      .append(String.join("", elements))
+      .append(")")
+      .toString();
   }
 }

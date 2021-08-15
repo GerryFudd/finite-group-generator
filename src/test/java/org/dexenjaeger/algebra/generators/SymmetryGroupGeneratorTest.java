@@ -4,19 +4,17 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SymmetryGroupGeneratorTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
   private final SymmetryGroupGenerator symmetryGroupGenerator = injector.getInstance(SymmetryGroupGenerator.class);
+  private final BinaryOperatorUtil binaryOperatorUtil = injector.getInstance(BinaryOperatorUtil.class);
   
   @Test
   void createS2() {
@@ -56,40 +54,31 @@ class SymmetryGroupGeneratorTest {
   void createS4() {
     Group s4 = symmetryGroupGenerator.createSymmetryGroup(4);
     
-    Set<String> elements = s4.getElementsDisplay();
-    Map<Integer, Set<String>> groupOrderCount = new HashMap<>();
-    for (String element:elements) {
-      List<String> cycle = s4.getCycleElementsDisplay(element);
-      groupOrderCount.compute(cycle.size(), (key, set) -> {
-        if (set == null) {
-          set = new HashSet<>();
-        }
-        set.add(element);
-        return set;
-      });
-    }
+    assertEquals(
+      4 * 3 * 2,
+      s4.getSize()
+    );
+    List<Integer> cycleSizes = s4.getCycleSizes();
+    assertEquals(
+      List.of(1, 2, 3, 4),
+      cycleSizes
+    );
     
     assertEquals(
       1,
-      groupOrderCount.get(1).size()
+      s4.getNCycles(1).size()
     );
     assertEquals(
       9,
-      groupOrderCount.get(2).size()
+      s4.getNCycles(2).size()
     );
     assertEquals(
-      8,
-      groupOrderCount.get(3).size()
+      4,
+      s4.getNCycles(3).size()
     );
     assertEquals(
-      6,
-      groupOrderCount.get(4).size()
-    );
-    assertEquals(
-      groupOrderCount.values().stream()
-        .map(Set::size)
-        .reduce(0, Integer::sum),
-      elements.size()
+      3,
+      s4.getNCycles(4).size()
     );
   }
 }

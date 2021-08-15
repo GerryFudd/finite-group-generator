@@ -10,7 +10,7 @@ public class IsomorphismBuilder extends BaseIsomorphismBuilder<Isomorphism> {
     
     return new ConcreteIsomorphism(
       domain, range, mapping,
-      resolveImage(), resolveInverseMapping()
+      image, inverseMapping
     );
   }
 }

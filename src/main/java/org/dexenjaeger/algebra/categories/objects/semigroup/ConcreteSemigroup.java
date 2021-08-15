@@ -18,8 +18,4 @@ public class ConcreteSemigroup extends BaseBinaryOperator implements Semigroup {
       lookup, multiplicationTable
     );
   }
-  
-  public static SemigroupBuilder builder() {
-    return new SemigroupBuilder();
-  }
 }

@@ -7,8 +7,8 @@ public class SemigroupBuilder extends BaseBinaryOperatorBuilder<Semigroup> {
   @Override
   public Semigroup build() {
     return new ConcreteSemigroup(
-      operatorSymbol, resolveSize(), resolveElements(),
-      resolveLookup(), resolveMultiplicationTable()
+      operatorSymbol, size, elements,
+      lookup, multiplicationTable
     );
   }
 }

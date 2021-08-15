@@ -2,43 +2,44 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.validators.IsomorphismValidator;
+import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
+import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class IsomorphismService {
-  private final HomomorphismService homomorphismService;
-  private final IsomorphismValidator automorphismValidator;
+  private final FunctionsUtil functionsUtil;
+  private final GroupService groupService;
+  private final Validator<Isomorphism> automorphismValidator;
   
   @Inject
-  public IsomorphismService(HomomorphismService homomorphismService, IsomorphismValidator automorphismValidator) {
-    this.homomorphismService = homomorphismService;
+  public IsomorphismService(
+    FunctionsUtil functionsUtil,
+    GroupService groupService,
+    Validator<Isomorphism> automorphismValidator
+  ) {
+    this.functionsUtil = functionsUtil;
+    this.groupService = groupService;
     this.automorphismValidator = automorphismValidator;
-  }
-  
-  private Set<List<String>> convertCycles(Set<List<String>> cycles, Function<String, String> func) {
-    return cycles.stream()
-             .map(cycle -> cycle.stream()
-                             .map(func)
-                             .collect(Collectors.toList()))
-             .collect(Collectors.toSet());
   }
   
   public Isomorphism createIsomorphism(
     Group domain, Group range, Function<Integer, Integer> func, Function<Integer, Integer> inverse
   ) throws ValidationException {
+    int[] mapping = functionsUtil.getMapping(domain.getSize(), func);
     Isomorphism automorphism = Isomorphism.builder()
-                                 .inverseAct(inverse)
+                                 .inverseMapping(functionsUtil.getMapping(domain.getSize(), inverse))
                                  .domain(domain)
                                  .range(range)
-                                 .act(func)
+                                 .image(functionsUtil.createImage(
+                                   domain.getSize(), i -> range.display(mapping[i])
+                                 ))
+                                 .mapping(mapping)
                                  .build();
     automorphismValidator.validate(automorphism);
     return automorphism;
@@ -62,16 +63,33 @@ public class IsomorphismService {
     
     return createIsomorphism(
       domain,
-      Group.builder()
-        .inversesMap(rangeInverseMap)
-        .maximalCycles(domain.getMaximalCycles())
-        .identity(domain.getIdentity())
-        .operatorSymbol("x")
-        .elements(elements)
-        .operator(domain::prod)
-        .build(),
+      groupService.createGroup(
+        "x",
+        domain.getIdentity(),
+        elements,
+        rangeInverseMap,
+        domain.getMaximalCycles(),
+        domain::prod
+      ),
       Function.identity(),
       Function.identity()
     );
+  }
+  
+  public Isomorphism getInverse(Isomorphism isomorphism) {
+    return Isomorphism.builder()
+             .inverseMapping(functionsUtil.getMapping(
+               isomorphism.getDomain().getSize(), isomorphism::apply
+             ))
+             .mapping(functionsUtil.getMapping(
+               isomorphism.getDomain().getSize(), isomorphism::unApply
+             ))
+             .domain(isomorphism.getRange())
+             .range(isomorphism.getDomain())
+             .image(functionsUtil.createImage(
+               isomorphism.getDomain().getSize(),
+               i -> isomorphism.getDomain().display(isomorphism.unApply(i))
+             ))
+      .build();
   }
 }

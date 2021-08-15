@@ -8,8 +8,8 @@ public class BinaryOperatorBuilder extends BaseBinaryOperatorBuilder<BinaryOpera
   @Override
   public BinaryOperator build() {
     return new ConcreteBinaryOperator(
-      operatorSymbol, resolveSize(), resolveElements(),
-      resolveLookup(), resolveMultiplicationTable()
+      operatorSymbol, size, elements,
+      lookup, multiplicationTable
     );
   }
 }

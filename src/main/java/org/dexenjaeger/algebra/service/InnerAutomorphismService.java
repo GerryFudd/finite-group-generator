@@ -4,7 +4,6 @@ import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
-import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
 import java.util.Comparator;
@@ -13,33 +12,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InnerAutomorphismService {
-  private final Validator<Automorphism> automorphismValidator;
   private final GroupService groupService;
-  private final HomomorphismService homomorphismService;
   private final AutomorphismService automorphismService;
   
   @Inject
   public InnerAutomorphismService(
-    Validator<Automorphism> automorphismValidator, GroupService groupService,
-    HomomorphismService homomorphismService, AutomorphismService automorphismService
+    GroupService groupService, AutomorphismService automorphismService
   ) {
-    this.automorphismValidator = automorphismValidator;
     this.groupService = groupService;
-    this.homomorphismService = homomorphismService;
     this.automorphismService = automorphismService;
   }
   
-  public Automorphism createInnerAutomorphism(Group group, int i) {
-    Automorphism result = Automorphism.builder()
-                            .domain(group)
-                            .act(a -> group.prod(i, group.prod(a, group.getInverse(i))))
-                            .build();
-    try {
-      automorphismValidator.validate(result);
-    } catch (ValidationException e) {
-      throw new RuntimeException("Result is not a valid automorphism.", e);
-    }
-    return result;
+  public Automorphism createInnerAutomorphism(Group group, int element) {
+    return automorphismService.create(
+      group, a -> group.prod(element, group.prod(a, group.getInverse(element)))
+    );
   }
   
   public Group createInnerAutomorphismGroup(Group group) throws ValidationException {

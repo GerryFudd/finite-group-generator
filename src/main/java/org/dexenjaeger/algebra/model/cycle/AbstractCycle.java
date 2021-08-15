@@ -3,6 +3,7 @@ package org.dexenjaeger.algebra.model.cycle;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@ToString(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class AbstractCycle<T, U extends Cycle<T>> implements Cycle<T> {
@@ -26,6 +28,7 @@ public abstract class AbstractCycle<T, U extends Cycle<T>> implements Cycle<T> {
   protected final Function<List<T>, U> make;
   
   @Override
+  @ToString.Include
   public List<T> getElements() {
     return Arrays.asList(elements);
   }

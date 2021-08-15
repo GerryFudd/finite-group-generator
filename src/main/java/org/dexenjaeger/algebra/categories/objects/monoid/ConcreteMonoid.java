@@ -28,8 +28,4 @@ public class ConcreteMonoid extends BaseBinaryOperator implements Monoid {
   public String getIdentityDisplay() {
     return elements[identity];
   }
-  
-  public static MonoidBuilder builder() {
-    return new MonoidBuilder();
-  }
 }

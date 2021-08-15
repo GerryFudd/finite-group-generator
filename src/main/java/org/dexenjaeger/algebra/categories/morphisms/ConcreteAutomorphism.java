@@ -6,13 +6,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ConcreteAutomorphism extends ConcreteIsomorphism implements Automorphism {
+  private final CyclePresentation cyclePresentation;
   ConcreteAutomorphism(
     Group domain,
     int[] mapping,
     String[] image,
-    int[] inverseMapping
+    int[] inverseMapping,
+    CyclePresentation cyclePresentation
   ) {
     super(domain, domain, mapping, image, inverseMapping);
+    this.cyclePresentation = cyclePresentation;
   }
   
   @Override
@@ -23,15 +26,6 @@ public class ConcreteAutomorphism extends ConcreteIsomorphism implements Automor
   @Override
   public int unApply(int j) {
     return inverseMapping[j];
-  }
-  
-  @Override
-  public Automorphism getInverse() {
-    return Automorphism.builder()
-             .inverseMapping(mapping)
-             .mapping(inverseMapping)
-             .domain(domain)
-             .build();
   }
   
   @Override
@@ -47,27 +41,6 @@ public class ConcreteAutomorphism extends ConcreteIsomorphism implements Automor
   
   @Override
   public String toString() {
-    Set<String> elementsDisplay = new HashSet<>(domain.getElementsDisplay());
-    StringBuilder sb = new StringBuilder();
-    while (!elementsDisplay.isEmpty()) {
-      String seed = elementsDisplay.stream().findAny().orElseThrow();
-      elementsDisplay.remove(seed);
-      String next = domain.display(mapping[domain.eval(seed)]);
-      if (seed.equals(next)) {
-        continue;
-      }
-      sb.append("(")
-        .append(seed);
-      while (!next.equals(seed)) {
-        elementsDisplay.remove(next);
-        sb.append(next);
-        next = domain.display(mapping[domain.eval(next)]);
-      }
-      sb.append(")");
-    }
-    if (sb.length() == 0) {
-      sb.append("I");
-    }
-    return sb.toString();
+    return cyclePresentation.toString();
   }
 }

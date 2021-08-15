@@ -1,10 +1,17 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.cycle.AbstractCycle;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.RawBinaryOperatorSummary;
 import org.dexenjaeger.algebra.utils.Remapper;
+import org.dexenjaeger.algebra.validators.ValidationException;
+import org.dexenjaeger.algebra.validators.Validator;
 
+import javax.inject.Inject;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -13,8 +20,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class BinaryOperatorService {
+  private final Validator<BinaryOperator> binaryOperatorValidator;
+  private final BinaryOperatorUtil binaryOperatorUtil;
+  
+  @Inject
+  public BinaryOperatorService(
+    Validator<BinaryOperator> binaryOperatorValidator,
+    BinaryOperatorUtil binaryOperatorUtil
+  ) {
+    this.binaryOperatorValidator = binaryOperatorValidator;
+    this.binaryOperatorUtil = binaryOperatorUtil;
+  }
   
   private BinaryOperatorSummary semigroupPath(RawBinaryOperatorSummary summary, Remapper remapper, BinaryOperatorSummary.BinaryOperatorSummaryBuilder resultBuilder, BiFunction<Integer, Integer, Integer> binOp) {
     // From here on there is no identity
@@ -35,7 +54,8 @@ public class BinaryOperatorService {
     Set<Integer> available = new HashSet<>(remapper.getAvailable());
     available.forEach(remapper::map);
     return resultBuilder
-             .binaryOperator(remapper.createBinaryOperator(binOp))
+             .elements(remapper.getElements())
+             .operator(remapper.remapBiFunc(binOp))
              .build();
   }
   
@@ -84,7 +104,18 @@ public class BinaryOperatorService {
       .inversesMap(inversesMap);
     remapper.map("I", identity.get()).orElseThrow();
     
-    for (IntCycle intCycle:summary.getCycles()) {
+    for (IntCycle intCycle:summary
+                             .getCycles()
+                             .stream()
+                             .sorted(
+                               Comparator.comparing(
+                                 AbstractCycle::getSize
+                               )
+                             )
+                             .collect(
+                               Collectors.toList()
+                             )
+    ) {
       LinkedList<Integer> indexCycle = new LinkedList<>();
       indexCycle.addLast(remapper.getCurrentIndex());
       String baseValue = remapper.map(intCycle.get(0)).orElseThrow();
@@ -103,7 +134,7 @@ public class BinaryOperatorService {
         while (!indexCycle.isEmpty()) {
           Integer valIndex = indexCycle.removeFirst();
           Integer invIndex = indexCycle.isEmpty() ? valIndex : indexCycle.removeLast();
-    
+          
           inversesMap.put(valIndex, invIndex);
           inversesMap.put(invIndex, valIndex);
         }
@@ -115,8 +146,32 @@ public class BinaryOperatorService {
       throw new RuntimeException("All permutations should exist in some cycle.");
     }
     return resultBuilder
-             .binaryOperator(remapper.createBinaryOperator(binOp))
+             .elements(remapper.getElements())
+             .operator(remapper.remapBiFunc(binOp))
              .cycles(remapper.remapCycles(summary.getCycles()))
              .build();
+  }
+  
+  public BinaryOperator createBinaryOperator(
+    String[] elements, BiFunction<Integer, Integer, Integer> operator
+  ) throws ValidationException {
+    return createBinaryOperator("*", elements, operator);
+  }
+  
+  public BinaryOperator createBinaryOperator(
+    String operatorSymbol, String[] elements, BiFunction<Integer, Integer, Integer> operator
+  ) throws ValidationException {
+    
+    BinaryOperator result = BinaryOperator.builder()
+                              .operatorSymbol(operatorSymbol)
+                              .size(elements.length)
+                              .elements(elements)
+                              .lookup(binaryOperatorUtil.createLookup(elements))
+                              .multiplicationTable(binaryOperatorUtil.getMultiplicationTable(
+                                elements.length, operator
+                              ))
+                              .build();
+    binaryOperatorValidator.validate(result);
+    return result;
   }
 }

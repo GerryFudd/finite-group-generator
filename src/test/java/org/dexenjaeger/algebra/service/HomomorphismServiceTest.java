@@ -50,7 +50,7 @@ class HomomorphismServiceTest {
     assertThrows(
       ValidationException.class,
       () -> homomorphismService.createHomomorphism(
-        groupService.getCyclicGroup("I", "a", "b"),
+        groupService.createCyclicGroup("I", "a", "b"),
         (a) -> a == 2 ? "B" : "E"
       )
     );
@@ -66,13 +66,13 @@ class HomomorphismServiceTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> homomorphismService.createHomomorphism(
-        groupService.getCyclicGroup(
+        groupService.createCyclicGroup(
           "I", "a", "b", "c", "d", "e"
         ),
-        groupService.getCyclicGroup(
+        groupService.createCyclicGroup(
           "E", "C"
         ),
-        groupService.getCyclicGroup(
+        groupService.createCyclicGroup(
           "I", "d", "e"
         ),
         i -> i % 2
@@ -100,7 +100,7 @@ class HomomorphismServiceTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> homomorphismService.createHomomorphism(
-        groupService.getCyclicGroup(elements),
+        groupService.createCyclicGroup(elements),
         new TrivialGroup("E"),
         groupService.constructGroupFromElementsAndMultiplicationTable(
           elements, kernelMult
@@ -116,7 +116,7 @@ class HomomorphismServiceTest {
   
   @Test
   void trivialHomomorphismCreatesKernelThatEqualsGroup() throws ValidationException {
-    Group group = groupService.getCyclicGroup(
+    Group group = groupService.createCyclicGroup(
       "I", "a", "b"
     );
     Homomorphism result = homomorphismService.createHomomorphism(
@@ -131,7 +131,7 @@ class HomomorphismServiceTest {
   
   @Test
   void functionImageOutsideRange() {
-    Group domain = groupService.getCyclicGroup("I", "a");
+    Group domain = groupService.createCyclicGroup("I", "a");
     ValidationException e = assertThrows(ValidationException.class, () -> homomorphismService.createHomomorphism(
       domain,
       new TrivialGroup("I"),
@@ -148,8 +148,8 @@ class HomomorphismServiceTest {
   void functionImageNotGroup() {
     String[] rangeElements = {"I", "a", "b"};
     ValidationException e = assertThrows(ValidationException.class, () -> homomorphismService.createHomomorphism(
-      groupService.getCyclicGroup("I", "a"),
-      groupService.getCyclicGroup(rangeElements, "x"),
+      groupService.createCyclicGroup("I", "a"),
+      groupService.createCyclicGroup(rangeElements, "x"),
       new TrivialGroup("I"),
       Function.identity()
     ));

@@ -1,10 +1,8 @@
 package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
-import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
-import org.dexenjaeger.algebra.validators.ValidationException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +17,7 @@ public class Remapper {
   @Getter
   private int currentIndex = 0;
   private int defaultIndicesUsed = 0;
+  @Getter
   private final String[] elements;
   private final int[] remap;
   private final int[] inverseRemap;
@@ -80,21 +79,8 @@ public class Remapper {
     return Optional.empty();
   }
   
-  public BinaryOperator createBinaryOperator(BiFunction<Integer, Integer, Integer> binOp) {
-    BinaryOperator result = BinaryOperator.builder()
-                              .elements(elements)
-                              .lookup(reverseLookup)
-                              .operator((a, b) -> inverseRemap[binOp.apply(remap[a], remap[b])])
-                              .build();
-    try {
-      validator.validate(result);
-      return result;
-    } catch (ValidationException e) {
-      throw new RuntimeException(
-        "Binary operator failed to validate",
-        e
-      );
-    }
+  public BiFunction<Integer, Integer, Integer> remapBiFunc(BiFunction<Integer, Integer, Integer> biFunction) {
+    return (a, b) -> inverseRemap[biFunction.apply(remap[a], remap[b])];
   }
   
   public Set<IntCycle> remapCycles(Set<IntCycle> oldCycles) {

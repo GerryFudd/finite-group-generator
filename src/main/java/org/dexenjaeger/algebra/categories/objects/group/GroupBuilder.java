@@ -28,9 +28,9 @@ public class GroupBuilder extends BaseMonoidBuilder<Group> {
   @Override
   public Group build() {
     return new ConcreteGroup(
-      operatorSymbol, resolveSize(), resolveElements(), identity,
+      operatorSymbol, size, elements, identity,
       inversesMap, maximalCycles,
-      resolveLookup(), resolveMultiplicationTable()
+      lookup, multiplicationTable
     );
   }
 }

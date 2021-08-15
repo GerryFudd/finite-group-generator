@@ -20,16 +20,19 @@ public class HomomorphismService {
   private final Validator<Group> groupValidator;
   private final Validator<Homomorphism> homomorphismValidator;
   private final GroupService groupService;
+  private final BinaryOperatorUtil binaryOperatorUtil;
   
   @Inject
   public HomomorphismService(
     Validator<Group> groupValidator,
     Validator<Homomorphism> homomorphismValidator,
-    GroupService groupService
+    GroupService groupService,
+    BinaryOperatorUtil binaryOperatorUtil
   ) {
     this.groupValidator = groupValidator;
     this.homomorphismValidator = homomorphismValidator;
     this.groupService = groupService;
+    this.binaryOperatorUtil = binaryOperatorUtil;
   }
   
   private Homomorphism doCreateHomomorphism(
@@ -74,14 +77,14 @@ public class HomomorphismService {
     HomomorphismSummary summary = constructRangeAndKernel(
       domain, act
     );
-    SortedGroupResult sortedRange = groupService.constructSortedGroup(
+    SortedGroupResult sortedRange = groupService.createSortedGroup(
       "x",
       summary.getRangeElementsArray(),
       summary.getRangeInversesMap(),
       summary.getRangeMaximalCycles(),
       summary::rangeProd
     );
-    SortedGroupResult sortedKernel = groupService.constructSortedGroup(
+    SortedGroupResult sortedKernel = groupService.createSortedGroup(
       domain.getOperatorSymbol(),
       summary.getKernelElementsArray(),
       summary.getKernelInversesMap(),
@@ -162,7 +165,7 @@ public class HomomorphismService {
       a.getRange(),
       groupService.constructGroupFromElementsAndMultiplicationTable(
         kernelElements.toArray(new String[0]),
-        BinaryOperatorUtil.getMultiplicationTable(
+        binaryOperatorUtil.getMultiplicationTable(
           kernelElements.size(),
           (i, j) -> kernelLookup.get(b.getDomain().prod(
             b.getDomain().eval(kernelElements.get(i)),

@@ -3,7 +3,6 @@ package org.dexenjaeger.algebra.utils;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -42,9 +41,6 @@ public class BinaryOperatorUtil {
   }
   
   public static Comparator<String> getElementComparator(String identity) {
-    if (identity == null) {
-      return Comparator.naturalOrder();
-    }
     return  (a, b) -> {
       if (a.equals(identity) && !b.equals(identity)) {
         return -1;
@@ -54,11 +50,6 @@ public class BinaryOperatorUtil {
       }
       return a.compareTo(b);
     };
-  }
-  
-  public static List<String> getSortedElements(Collection<String> elements, String identity) {
-    return elements.stream()
-             .sorted(getElementComparator(identity)).collect(Collectors.toList());
   }
   
   public static String printMultiplicationTable(
@@ -129,7 +120,7 @@ public class BinaryOperatorUtil {
     return sb.toString();
   }
   
-  public static List<String> getCycle(String element, BiFunction<String, String, String> binaryOperator) {
+  public List<String> getCycle(String element, BiFunction<String, String, String> binaryOperator) {
     List<String> cycle = new LinkedList<>();
     cycle.add(element);
     String current = binaryOperator.apply(element, element);
@@ -140,7 +131,7 @@ public class BinaryOperatorUtil {
     return cycle;
   }
   
-  public static BiFunction<String, String, String> createOperator(
+  public BiFunction<String, String, String> createOperator(
     String[] elements, BiFunction<Integer, Integer, Integer> intOp
   ) {
     Map<String, Integer> lookup = new HashMap<>();
@@ -150,7 +141,7 @@ public class BinaryOperatorUtil {
     return (a, b) -> elements[intOp.apply(lookup.get(a), lookup.get(b))];
   }
   
-  public static int[][] getMultiplicationTable(int size, BiFunction<Integer, Integer, Integer> operator) {
+  public int[][] getMultiplicationTable(int size, BiFunction<Integer, Integer, Integer> operator) {
     int[][] multiplicationTable = new int[size][size];
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
@@ -160,15 +151,7 @@ public class BinaryOperatorUtil {
     return multiplicationTable;
   }
   
-  public static String[] createElementsList(Map<String, Integer> lookup) {
-    String[] elements = new String[lookup.size()];
-    for (Map.Entry<String, Integer> entry:lookup.entrySet()) {
-      elements[entry.getValue()] = entry.getKey();
-    }
-    return elements;
-  }
-  
-  public static Map<String, Integer> createLookup(String[] elements) {
+  public Map<String, Integer> createLookup(String[] elements) {
     Map<String, Integer> lookup = new HashMap<>();
     for (int i = 0; i < elements.length; i++) {
       lookup.put(elements[i], i);

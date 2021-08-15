@@ -3,6 +3,7 @@ package org.dexenjaeger.algebra.generators;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.service.BinaryOperatorService;
+import org.dexenjaeger.algebra.service.GroupService;
 import org.dexenjaeger.algebra.utils.MoreMath;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -14,13 +15,16 @@ import java.util.Map;
 public class SymmetryGroupGenerator {
   private final Validator<Group> groupValidator;
   private final BinaryOperatorService binaryOperatorService;
+  private final GroupService groupService;
   
   @Inject
   public SymmetryGroupGenerator(
-    Validator<Group> groupValidator, BinaryOperatorService binaryOperatorService
+    Validator<Group> groupValidator, BinaryOperatorService binaryOperatorService,
+    GroupService groupService
   ) {
     this.groupValidator = groupValidator;
     this.binaryOperatorService = binaryOperatorService;
+    this.groupService = groupService;
   }
   
   private int[][] getPermutationSet(int n) {
@@ -89,29 +93,25 @@ public class SymmetryGroupGenerator {
         ));
       }
     }
-    
+  
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
-      permutations.length,
-      (a,b) -> binOp[a][b]
-    );
-    
-    Group result = Group.builder()
-                     .inversesMap(summary.getInversesMap())
-                     .maximalCycles(summary.getCycles())
-                     .identity(0)
-                     .operatorSymbol("o")
-                     .lookup(summary.getLookupMap())
-                     .operator(summary.getBinaryOperator()::prod)
-                     .build();
+        permutations.length,
+        (a,b) -> binOp[a][b]
+      );
   
     try {
-      groupValidator.validate(result);
+      return groupService.createGroup(
+        "o",
+        0,
+        summary.getElements(),
+        summary.getInversesMap(),
+        summary.getCycles(),
+        summary.getOperator()
+      );
     } catch (ValidationException e) {
       throw new RuntimeException(
         "Generated group didn't validate", e
       );
     }
-  
-    return result;
   }
 }

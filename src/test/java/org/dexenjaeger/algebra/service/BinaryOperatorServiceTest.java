@@ -5,24 +5,19 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.cycle.IntCycle;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BinaryOperatorServiceTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
   private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
-  
-  private String getElements(BinaryOperatorSummary summary) {
-    return String.join(", ", BinaryOperatorUtil.getSortedElements(summary.getBinaryOperator().getElementsDisplay(), summary.getIdentityDisplay()));
-  }
+  private final GroupService groupService = injector.getInstance(GroupService.class);
   
   @Test
   void getSortedAndPrettifiedBinaryOperatorTest_withLeftIdentity() {
@@ -40,7 +35,7 @@ class BinaryOperatorServiceTest {
     
     assertEquals(
       "L1, L2, a, b",
-      getElements(result)
+      String.join(", ", result.getElements())
     );
     
     assertNull(result.getIdentityDisplay());
@@ -63,7 +58,7 @@ class BinaryOperatorServiceTest {
     
     assertEquals(
       "R1, R2, a, b",
-      getElements(result)
+      String.join(", ", result.getElements())
     );
     
     assertNull(result.getIdentityDisplay());
@@ -86,7 +81,7 @@ class BinaryOperatorServiceTest {
     
     assertEquals(
       "I, a, b, c",
-      getElements(result)
+      String.join(", ", result.getElements())
     );
     
     assertEquals("I", result.getIdentityDisplay());
@@ -97,21 +92,19 @@ class BinaryOperatorServiceTest {
   }
   
   @Test
-  void validInverses() {
+  void validInverses() throws ValidationException {
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       4,
       (i, j) -> (i + j) % 4
     );
     
-    Group result = Group.builder()
-                     .inversesMap(summary.getInversesMap())
-                     .maximalCycles(Set.of(
-                       IntCycle.builder()
-                         .elements(List.of(1, 2, 3, 0))
-                         .build()))
-                     .lookup(summary.getLookupMap())
-                     .operator(summary.getBinaryOperator()::prod)
-                     .build();
+    Group result = groupService.createGroup(
+      "*", 0,
+      summary.getElements(),
+      summary.getInversesMap(),
+      summary.getCycles(),
+      summary.getOperator()
+    );
     
     result.getElementsDisplay().forEach(element -> assertEquals(
       result.getIdentityDisplay(),
@@ -130,5 +123,49 @@ class BinaryOperatorServiceTest {
         )
       );
     }
+  }
+  
+  @Test
+  void getBinaryOperatorTest_invalidProduct() {
+    ValidationException e = assertThrows(
+      ValidationException.class,
+      () -> binaryOperatorService
+              .createBinaryOperator(new String[]{"a"}, (a, b) -> 1)
+    );
+    
+    assertEquals(
+      "The product of a and a doesn't exist in this binary operator\n\n" +
+        "_*____|_a____\n" +
+        " a    | [1?] \n", e.getMessage()
+    );
+  }
+  
+  @Test
+  void getMultiplicationTableTest() throws ValidationException {
+    assertEquals(
+      new StringBuilder("\n")
+        .append("_+_|_a_b_c_\n")
+        .append(" a | a b c \n")
+        .append(" b | b c a \n")
+        .append(" c | c a b \n")
+        .toString(),
+      binaryOperatorService.createBinaryOperator(
+        "+", new String[]{"a", "b", "c"},
+        (i, j) -> (i + j) % 3
+      ).printMultiplicationTable()
+    );
+  }
+  
+  @Test
+  void validateBinaryOperator() {
+    ValidationException e = assertThrows(ValidationException.class, () -> binaryOperatorService.createBinaryOperator(
+      new String[]{"a"}, (a, b) -> 1
+    ));
+    
+    assertEquals(
+      "The product of a and a doesn't exist in this binary operator\n\n" +
+        "_*____|_a____\n" +
+        " a    | [1?] \n", e.getMessage()
+    );
   }
 }

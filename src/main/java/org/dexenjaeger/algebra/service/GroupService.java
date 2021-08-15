@@ -3,6 +3,7 @@ package org.dexenjaeger.algebra.service;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.Remapper;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -21,17 +22,22 @@ import java.util.stream.Stream;
 
 public class GroupService {
   private final Validator<Group> groupValidator;
+  private final BinaryOperatorUtil binaryOperatorUtil;
   
   @Inject
-  public GroupService(Validator<Group> groupValidator) {
+  public GroupService(
+    Validator<Group> groupValidator,
+    BinaryOperatorUtil binaryOperatorUtil
+  ) {
     this.groupValidator = groupValidator;
+    this.binaryOperatorUtil = binaryOperatorUtil;
   }
   
-  public Group getCyclicGroup(String... elements) {
-    return getCyclicGroup(elements, "*");
+  public Group createCyclicGroup(String... elements) {
+    return createCyclicGroup(elements, "*");
   }
   
-  public Group getCyclicGroup(String[] elements, String operatorSymbol) {
+  public Group createCyclicGroup(String[] elements, String operatorSymbol) {
     int n = elements.length;
     LinkedList<Integer> cycle = new LinkedList<>();
     Map<Integer, Integer> inverses = new HashMap<>();
@@ -47,24 +53,83 @@ public class GroupService {
              .identity(0)
              .operatorSymbol(operatorSymbol)
              .elements(elements)
-             .operator((a, b) -> (a + b) % n)
+             .size(n)
+             .lookup(binaryOperatorUtil.createLookup(elements))
+             .multiplicationTable(
+               binaryOperatorUtil.getMultiplicationTable(
+                 n, (a, b) -> (a + b) % n
+               )
+             )
              .build();
   }
   
-  public SortedGroupResult constructSortedGroup(
-             String operatorSymbol,
-             String[] elements,
-             Map<Integer, Integer> inversesMap,
-             Set<IntCycle> maximalCycles,
-             BiFunction<Integer, Integer, Integer> operator
+  public Group createGroup(
+    String operatorSymbol,
+    int identity,
+    String[] elements,
+    Map<Integer, Integer> inversesMap,
+    Set<IntCycle> maximalCycles,
+    BiFunction<Integer, Integer, Integer> operator
+  ) throws ValidationException {
+    return createGroup(
+      operatorSymbol, identity, elements,
+      binaryOperatorUtil.createLookup(elements),
+      inversesMap, maximalCycles, operator
+    );
+  }
+  
+  private Group createGroup(
+    String operatorSymbol,
+    int identity,
+    String[] elements,
+    Map<String, Integer> lookup,
+    Map<Integer, Integer> inversesMap,
+    Set<IntCycle> maximalCycles,
+    BiFunction<Integer, Integer, Integer> operator
+  ) throws ValidationException {
+    Group result = Group.builder()
+                    .inversesMap(inversesMap)
+                    .maximalCycles(maximalCycles)
+                    .identity(identity)
+                    .size(elements.length)
+                    .elements(elements)
+                    .operatorSymbol(operatorSymbol)
+                    .lookup(lookup)
+                    .multiplicationTable(binaryOperatorUtil.getMultiplicationTable(
+                      elements.length,
+                      operator
+                    ))
+                    .build();
+  
+    groupValidator.validate(result);
+    return result;
+  }
+  
+  public SortedGroupResult createSortedGroup(
+    String[] elements,
+    Map<Integer, Integer> inversesMap,
+    Set<IntCycle> maximalCycles,
+    BiFunction<Integer, Integer, Integer> operator
+  ) throws ValidationException {
+    return createSortedGroup(
+      "*", elements, inversesMap, maximalCycles, operator
+    );
+  }
+  
+  public SortedGroupResult createSortedGroup(
+    String operatorSymbol,
+    String[] elements,
+    Map<Integer, Integer> inversesMap,
+    Set<IntCycle> maximalCycles,
+    BiFunction<Integer, Integer, Integer> operator
   ) throws ValidationException {
     Remapper remapper = Remapper.init(elements.length);
     Map<Integer, Set<Integer>> nCycleGenerators = new HashMap<>();
     for (IntCycle cycle:maximalCycles.stream()
-      .flatMap(cycle -> Stream.concat(
-        Stream.of(cycle),
-        cycle.getSubCycles().stream()
-      )).collect(Collectors.toSet())) {
+                          .flatMap(cycle -> Stream.concat(
+                            Stream.of(cycle),
+                            cycle.getSubCycles().stream()
+                          )).collect(Collectors.toSet())) {
       nCycleGenerators.computeIfPresent(cycle.getSize(), (n, generators) -> {
         generators.addAll(cycle.getGenerators());
         return generators;
@@ -77,21 +142,20 @@ public class GroupService {
       .sorted(Map.Entry.comparingByKey())
       .map(Map.Entry::getValue)
       .forEach(nGenerators -> nGenerators.stream()
-      .sorted(Comparator.comparing(i -> elements[i]))
-      .forEach(generator -> remapper.map(elements[generator], generator)));
+                                .sorted(Comparator.comparing(i -> elements[i]))
+                                .forEach(generator -> remapper.map(elements[generator], generator)));
     
-    Group group = Group.builder()
-                     .inversesMap(remapper.remapInverses(inversesMap))
-                     .maximalCycles(remapper.remapCycles(maximalCycles))
-                     .identity(0)// The identity will be the only 1-cycle in a valid group
-                     .operatorSymbol(operatorSymbol)
-                     .lookup(remapper.getReverseLookup())
-                     .operator(remapper.createBinaryOperator(operator)::prod)
-      .build();
     
-    groupValidator.validate(group);
     return new SortedGroupResult(
-      group, remapper
+      createGroup(
+        operatorSymbol,
+        0, // The identity will be the only 1-cycle in a valid group
+        remapper.getElements(),
+        remapper.getReverseLookup(),
+        remapper.remapInverses(inversesMap),
+        remapper.remapCycles(maximalCycles),
+        remapper.remapBiFunc(operator)
+      ), remapper
     );
   }
   
@@ -141,7 +205,7 @@ public class GroupService {
         }
       }
     }
-    Group result = constructSortedGroup(
+    Group result = createSortedGroup(
       operatorSymbol,
       elements,
       inversesMap,
