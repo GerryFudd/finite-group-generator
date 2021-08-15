@@ -104,6 +104,14 @@ public class BinaryOperatorService {
       .inversesMap(inversesMap);
     remapper.map("I", identity.get()).orElseThrow();
     
+    if (remapper.getAvailable().isEmpty()) {
+      return resultBuilder
+               .elements(remapper.getElements())
+               .operator(remapper.remapBiFunc(binOp))
+               .cycles(remapper.remapCycles(summary.getCycles()))
+               .build();
+    }
+    
     for (IntCycle intCycle:summary
                              .getCycles()
                              .stream()

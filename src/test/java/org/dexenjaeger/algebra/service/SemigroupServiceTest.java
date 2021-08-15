@@ -39,4 +39,6 @@ class SemigroupServiceTest {
         " z | x y z \n", e.getMessage()
     );
   }
+  
+  
 }

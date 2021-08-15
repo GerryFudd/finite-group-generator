@@ -12,7 +12,9 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 class MoreMathTest {
   @Test
   void factorialInvalidInput() {
@@ -21,11 +23,16 @@ class MoreMathTest {
   
   @Test
   void factorialOverflow() {
+    int THIRTEEN = MoreMath.factorial(13);
     assertEquals(
       1932053504,
-      MoreMath.factorial(13)
+      THIRTEEN
     );
     assertThrows(RuntimeException.class, () -> MoreMath.factorial(14));
+    assertTrue(
+      Integer.MAX_VALUE / 14 < THIRTEEN,
+      "13! is greater than 1/14th max int"
+    );
   }
   
   @Test
@@ -66,6 +73,101 @@ class MoreMathTest {
       MoreMath.gcd(
         inputs.get(0), inputs.get(1)
       )
+    );
+  }
+  
+  @Test
+  void gcd_invalidInput() {
+    RuntimeException e1 = assertThrows(
+      RuntimeException.class,
+      () -> MoreMath.gcd(-1, 3)
+    );
+    RuntimeException e2 = assertThrows(
+      RuntimeException.class,
+      () -> MoreMath.gcd(5, -3)
+    );
+    
+    assertEquals(
+      "This method is only implemented for positive inputs.",
+      e1.getMessage()
+    );
+    assertEquals(
+      e1.getMessage(),
+      e2.getMessage()
+    );
+  }
+  
+  @Test
+  void pow_invalidBaseInput() {
+    RuntimeException e = assertThrows(
+      RuntimeException.class,
+      () -> MoreMath.pow(-1, 5)
+    );
+    
+    assertEquals(
+      "Exponential expressions may not have negative bases.",
+      e.getMessage()
+    );
+  }
+  
+  @Test
+  void pow_invalidExponentInput() {
+    RuntimeException e = assertThrows(
+      RuntimeException.class,
+      () -> MoreMath.pow(2, -3)
+    );
+    
+    assertEquals(
+      "Negative exponents are not defined for natural number bases above one.",
+      e.getMessage()
+    );
+  }
+  
+  @Test
+  void pow_zeroOrOneBaseWithNegative() {
+    assertEquals(
+      0, MoreMath.pow(0, -8)
+    );
+    assertEquals(
+      1, MoreMath.pow(1, -8)
+    );
+  }
+  
+  @Test
+  void pow_basicCases() {
+    assertEquals(
+      27,
+      MoreMath.pow(3, 3)
+    );
+    assertEquals(
+      32,
+      MoreMath.pow(2, 5)
+    );
+    assertEquals(
+      125,
+      MoreMath.pow(5, 3)
+    );
+  }
+  
+  @Test
+  void pow_overflowException() {
+    RuntimeException e = assertThrows(
+      RuntimeException.class,
+      () -> MoreMath.pow(200, 5)
+    );
+    
+    assertEquals(
+      "Exponent 200^5 overflowed max int 2147483647.", e.getMessage()
+    );
+    
+    int previous = MoreMath.pow(200, 4);
+    assertTrue(
+      previous < Integer.MAX_VALUE,
+      "The previous exponent is less than max."
+    );
+    assertTrue(
+      previous > Integer.MAX_VALUE / 200,
+      "The previous exponent is more than 1/200th of the max value."
     );
   }
 }

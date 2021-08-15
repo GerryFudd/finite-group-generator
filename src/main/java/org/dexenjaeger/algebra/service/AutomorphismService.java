@@ -100,8 +100,8 @@ public class AutomorphismService {
              .collect(Collectors.toSet());
   }
   
-  public Automorphism getInverse(Automorphism automorphism) {
-    return Automorphism.builder()
+  public Automorphism getInverse(Automorphism automorphism) throws ValidationException {
+    Automorphism result =  Automorphism.builder()
              .withStringCycles(convertCycles(
                automorphism.getCyclePresentation().getCycles(),
                automorphism::unApply
@@ -120,5 +120,7 @@ public class AutomorphismService {
                i -> automorphism.getDomain().display(automorphism.unApply(i))
              ))
              .build();
+    automorphismValidator.validate(result);
+    return result;
   }
 }

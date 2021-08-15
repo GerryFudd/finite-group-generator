@@ -1,8 +1,14 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.model.Mapping;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class FunctionsUtil {
@@ -43,5 +49,40 @@ public class FunctionsUtil {
       }
     }
     return result;
+  }
+  
+  public int[] composeMappings(int[] a, int[] b) {
+    int[] prod = new int[b.length];
+    for (int i = 0; i < b.length; i++) {
+      prod[i] = a[b[i]];
+    }
+    return prod;
+  }
+  
+  public Mapping composeMappings(Mapping a, Mapping b) {
+    return new Mapping(composeMappings(a.getArray(), b.getArray()));
+  }
+  
+  public BiFunction<Integer, Integer, Integer> createBinaryOperatorForFunctionSpace(
+    List<Mapping> mappings
+  ) {
+    Map<Mapping, Integer> reverseLookup = new HashMap<>();
+    for (int i = 0; i < mappings.size(); i++) {
+      reverseLookup.put(
+        mappings.get(i),
+        i
+      );
+    }
+  
+    int[][] binOp = new int[mappings.size()][mappings.size()];
+    for (int i = 0; i < mappings.size(); i++) {
+      for (int j = 0; j < mappings.size(); j++) {
+        binOp[i][j] = reverseLookup.get(composeMappings(
+          mappings.get(i),
+          mappings.get(j)
+        ));
+      }
+    }
+    return (i, j) -> binOp[i][j];
   }
 }

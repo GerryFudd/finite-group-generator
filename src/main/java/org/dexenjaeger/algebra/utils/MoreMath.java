@@ -21,7 +21,7 @@ public class MoreMath {
         int result = n * previous;
         if (result < previous) {
           throw new RuntimeException(String.format(
-            "Computing %d! overflowed max long %d",
+            "Computing %d! overflowed max int %d",
             n, Integer.MAX_VALUE
           ));
         }
@@ -48,7 +48,7 @@ public class MoreMath {
   
   public static int gcd(int m, int n) {
     if (m < 0 || n < 0) {
-      throw new RuntimeException("No.");
+      throw new RuntimeException("This method is only implemented for positive inputs.");
     }
     int a = m;
     int b = n;
@@ -62,5 +62,31 @@ public class MoreMath {
       return b;
     }
     return a;
+  }
+  
+  public static int pow(int b, int n) {
+    if (b < 0) {
+      throw new RuntimeException("Exponential expressions may not have negative bases.");
+    }
+    if (b == 0) {
+      return 0;
+    }
+    if (b == 1) {
+      return 1;
+    }
+    if (n < 0) {
+      throw new RuntimeException("Negative exponents are not defined for natural number bases above one.");
+    }
+    int result = 1;
+    for (int i = 0; i < n; i++) {
+      result *= b;
+      if (result < 0) {
+        throw new RuntimeException(String.format(
+          "Exponent %d^%d overflowed max int %d.",
+          b, i + 1, Integer.MAX_VALUE
+        ));
+      }
+    }
+    return result;
   }
 }

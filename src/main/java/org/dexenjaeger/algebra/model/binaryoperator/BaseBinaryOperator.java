@@ -83,6 +83,9 @@ public abstract class BaseBinaryOperator implements BinaryOperator {
     if (!(other instanceof BinaryOperator)) {
       return false;
     }
+    if (size != ((BinaryOperator) other).getSize()) {
+      return false;
+    }
     
     for (int i = 0; i < getSize(); i++) {
       if (!display(i).equals(((BinaryOperator) other).display(i))) {
