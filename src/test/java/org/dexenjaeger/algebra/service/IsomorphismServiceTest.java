@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
-import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IsomorphismServiceTest {
+  private final CycleUtils cycleUtils = new CycleUtils();
   private final Injector injector = Guice.createInjector(new AlgebraModule());
   private final GroupService groupService = injector.getInstance(GroupService.class);
   private final IsomorphismService isomorphismService = injector.getInstance(IsomorphismService.class);
@@ -42,13 +43,11 @@ class IsomorphismServiceTest {
     );
     assertEquals(List.of(1, 2, 4), isomorphism.getRange().getCycleSizes());
     assertEquals(
-      Set.of(IntCycle.builder().elements(2, 0).build()),
+      Set.of(cycleUtils.createIntCycle(2, 0)),
       isomorphism.getRange().getNCycles(2)
     );
     assertEquals(
-      Set.of(IntCycle.builder()
-               .elements(1, 2, 3, 0)
-               .build()),
+      cycleUtils.createSingleIntCycle(1, 2, 3, 0),
       isomorphism.getRange().getMaximalCycles()
     );
     Isomorphism inverseIso = isomorphismService.getInverse(isomorphism);

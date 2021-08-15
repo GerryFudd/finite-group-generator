@@ -4,6 +4,7 @@ import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.utils.Remapper;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -21,14 +22,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GroupService {
+  private final CycleUtils cycleUtils;
   private final Validator<Group> groupValidator;
   private final BinaryOperatorUtil binaryOperatorUtil;
   
   @Inject
   public GroupService(
+    CycleUtils cycleUtils,
     Validator<Group> groupValidator,
     BinaryOperatorUtil binaryOperatorUtil
   ) {
+    this.cycleUtils = cycleUtils;
     this.groupValidator = groupValidator;
     this.binaryOperatorUtil = binaryOperatorUtil;
   }
@@ -49,7 +53,7 @@ public class GroupService {
     cycle.addLast(0);
     return Group.builder()
              .inversesMap(inverses)
-             .maximalCycles(Set.of(IntCycle.builder().elements(cycle).build()))
+             .maximalCycles(Set.of(cycleUtils.createIntCycle(cycle)))
              .identity(0)
              .operatorSymbol(operatorSymbol)
              .elements(elements)
@@ -210,9 +214,7 @@ public class GroupService {
       elements,
       inversesMap,
       cycles.stream()
-        .map(cycle -> IntCycle.builder()
-                        .elements(cycle)
-                        .build())
+        .map(cycleUtils::createIntCycle)
         .collect(Collectors.toSet()),
       (i, j) -> multiplicationTable[i][j]
     ).getGroup();

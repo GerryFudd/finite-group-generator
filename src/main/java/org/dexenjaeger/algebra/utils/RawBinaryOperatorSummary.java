@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class RawBinaryOperatorSummary {
+  private final CycleUtils cycleUtils = new CycleUtils();
   @Getter
   private final Set<Integer> leftIdentities = new HashSet<>();
   @Getter
@@ -21,7 +22,7 @@ public class RawBinaryOperatorSummary {
     if (cycleElements.isEmpty()) {
       return;
     }
-    IntCycle candidateCycle = IntCycle.builder().elements(cycleElements).build();
+    IntCycle candidateCycle = cycleUtils.createIntCycle(cycleElements);
     for (IntCycle cycle:cycles) {
       if (cycle.isParentOf(candidateCycle)) {
         return;

@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +21,7 @@ class GroupServiceTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
   private final GroupService groupService = injector.getInstance(GroupService.class);
   private final BinaryOperatorService binaryOperatorService = injector.getInstance(BinaryOperatorService.class);
+  private final CycleUtils cycleUtils = injector.getInstance(CycleUtils.class);
   @Test
   void invalidInverses() {
     int[][] product = {
@@ -41,9 +42,9 @@ class GroupServiceTest {
         summary.getElements(),
         Map.of(0, 0, 1, 2, 2, 1, 3, 3),
         Set.of(
-          IntCycle.builder().elements(List.of(3, 0)).build(),
-          IntCycle.builder().elements(List.of(1)).build(),
-          IntCycle.builder().elements(List.of(2)).build()
+          cycleUtils.createIntCycle(List.of(3, 0)),
+          cycleUtils.createIntCycle(List.of(1)),
+          cycleUtils.createIntCycle(List.of(2))
         ),
         summary.getOperator()
       ));
@@ -66,9 +67,7 @@ class GroupServiceTest {
         "*", 0,
         new String[]{"I", "a"},
         Map.of(0, 0, 1, 2),
-        Set.of(IntCycle.builder()
-                 .elements(1, 0)
-                 .build()),
+        Set.of(cycleUtils.createIntCycle(1, 0)),
         (a, b) -> (a + b) % 2
       ));
     
@@ -88,9 +87,7 @@ class GroupServiceTest {
       () -> groupService.createSortedGroup(
         new String[]{"I", "a"},
         Map.of(0, 0),
-        Set.of(IntCycle.builder()
-                 .elements(1, 0)
-                 .build()),
+        Set.of(cycleUtils.createIntCycle(1, 0)),
         (a, b) -> (a + b) % 2
       ));
     

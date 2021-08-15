@@ -13,13 +13,13 @@ public class IntCycleBuilder extends AbstractCycleBuilder<Integer, IntCycle> {
   
   @Override
   public IntCycle build() {
-    CycleSpec<Integer> spec = resolveGenerators();
     return new IntCycle(
       elements.length,
       elements,
-      spec.getLookup(),
-      spec.getGeneratorArray(),
-      spec.getSubCycleGenerators()
+      lookup,
+      generators,
+      subCycleGenerators,
+      maker
     );
   }
 }

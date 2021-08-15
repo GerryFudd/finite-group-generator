@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.utils.CycleUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 @RequiredArgsConstructor
 public class TrivialGroup implements Group {
+  private final CycleUtils cycleUtils = new CycleUtils();
   @Getter
   private final String operatorSymbol;
   @Getter
@@ -44,7 +46,7 @@ public class TrivialGroup implements Group {
   @Override
   public Set<IntCycle> getNCycles(int n) {
     return n == 1 ?
-             Set.of(IntCycle.builder().elements(List.of(0)).build()) :
+             cycleUtils.createSingleIntCycle(0) :
              Set.of();
   }
   
@@ -55,12 +57,12 @@ public class TrivialGroup implements Group {
   
   @Override
   public Set<IntCycle> getMaximalCycles() {
-    return Set.of(IntCycle.builder().elements(List.of(0)).build());
+    return cycleUtils.createSingleIntCycle(0);
   }
   
   @Override
   public Optional<IntCycle> getCycleGeneratedBy(int x) {
-    return x != 0 ? Optional.empty() : Optional.of(IntCycle.builder().elements(0).build());
+    return x != 0 ? Optional.empty() : Optional.of(cycleUtils.createIntCycle(0));
   }
   
   @Override

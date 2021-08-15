@@ -14,13 +14,13 @@ public class StringCycleBuilder extends AbstractCycleBuilder<String, StringCycle
   
   @Override
   public StringCycle build() {
-    CycleSpec<String> spec = resolveGenerators();
     return new StringCycle(
       elements.length,
       elements,
-      spec.getLookup(),
-      spec.getGeneratorArray(),
-      spec.getSubCycleGenerators()
+      lookup,
+      generators,
+      subCycleGenerators,
+      maker
     );
   }
 }

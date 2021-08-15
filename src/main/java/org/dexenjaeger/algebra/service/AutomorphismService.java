@@ -4,6 +4,7 @@ import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.AutomorphismBuilder;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -17,14 +18,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AutomorphismService {
+  private final CycleUtils cycleUtils;
   private final Validator<Automorphism> automorphismValidator;
   private final FunctionsUtil functionsUtil;
   
   @Inject
   public AutomorphismService(
+    CycleUtils cycleUtils,
     Validator<Automorphism> automorphismValidator,
     FunctionsUtil functionsUtil
   ) {
+    this.cycleUtils = cycleUtils;
     this.automorphismValidator = automorphismValidator;
     this.functionsUtil = functionsUtil;
   }
@@ -59,7 +63,7 @@ public class AutomorphismService {
       }
       if (currentCycle.size() > 1) {
         resultBuilder.withStringCycles(
-          StringCycle.builder().elements(currentCycle).build()
+          cycleUtils.createStringCycle(currentCycle)
         );
       }
     }
@@ -92,9 +96,7 @@ public class AutomorphismService {
                              .stream()
                              .map(func)
                              .collect(Collectors.toList()))
-             .map(elements -> StringCycle.builder()
-                                .elements(elements)
-                                .build())
+             .map(cycleUtils::createStringCycle)
              .collect(Collectors.toSet());
   }
   

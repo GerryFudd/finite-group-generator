@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.utils.CycleUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class HomomorphismSummary {
+  private final CycleUtils cycleUtils = new CycleUtils();
   private final Group domain;
   private int rangeIdentity;
   private final Map<String, Integer> rangeLookup = new HashMap<>();
@@ -78,11 +80,7 @@ public class HomomorphismSummary {
       }
     }
     
-    rangeCycles.add(IntCycle.builder()
-                      .elements(stringCycleElements.stream()
-                                  .map(rangeLookup::get)
-                                  .collect(Collectors.toList()))
-                      .build());
+    rangeCycles.add(cycleUtils.convertToIntCycle(rangeLookup::get, stringCycleElements));
     return this;
   }
   
@@ -96,19 +94,9 @@ public class HomomorphismSummary {
       kernelLookup.put(next, kernelElements.size());
       kernelElements.add(next);
     }
-    kernelCycles.add(IntCycle.builder()
-                       .elements(
-                         displayCycleElements.stream()
-                         .map(kernelLookup::get)
-                         .collect(Collectors.toList())
-                       )
-                       .build());
+    kernelCycles.add(cycleUtils.convertToIntCycle(kernelLookup::get, displayCycleElements));
     
     return this;
-  }
-  
-  private Set<IntCycle> getTrivialCycle(int identity) {
-    return Set.of(IntCycle.builder().elements(identity).build());
   }
   
   private String[] getElements(Map<String, Integer> lookup) {
@@ -125,7 +113,7 @@ public class HomomorphismSummary {
   
   public Set<IntCycle> getRangeMaximalCycles() {
     return rangeCycles.size() == 0 ?
-             getTrivialCycle(rangeIdentity) :
+             cycleUtils.createSingleIntCycle(rangeIdentity) :
              rangeCycles;
   }
   
@@ -156,7 +144,7 @@ public class HomomorphismSummary {
   
   public Set<IntCycle> getKernelMaximalCycles() {
     return kernelCycles.size() == 0 ?
-             getTrivialCycle(domain.getIdentity()) :
+             cycleUtils.createSingleIntCycle(domain.getIdentity()) :
              kernelCycles;
   }
   

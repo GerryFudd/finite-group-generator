@@ -2,15 +2,21 @@ package org.dexenjaeger.algebra.model.cycle;
 
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class StringCycle extends AbstractCycle<String, StringCycle> {
   
-  public StringCycle(int size, String[] elements, Map<String, Integer> lookup, int[] generators, Map<Integer, Integer> subCycleGenerators) {
+  public StringCycle(
+    int size, String[] elements, Map<String, Integer> lookup,
+    int[] generators, Map<Integer, Integer> subCycleGenerators,
+    Function<List<String>, StringCycle> make
+    ) {
     super(
       size, elements, lookup, generators, subCycleGenerators,
-      spec -> builder().elements(spec).build()
+      make
     );
   }
   

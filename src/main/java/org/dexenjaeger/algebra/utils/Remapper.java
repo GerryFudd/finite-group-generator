@@ -2,7 +2,6 @@ package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
-import org.dexenjaeger.algebra.validators.BinaryOperatorValidator;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +12,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class Remapper {
-  private final BinaryOperatorValidator validator = new BinaryOperatorValidator();
+  private final CycleUtils cycleUtils = new CycleUtils();
   @Getter
   private int currentIndex = 0;
   private int defaultIndicesUsed = 0;
@@ -85,11 +84,7 @@ public class Remapper {
   
   public Set<IntCycle> remapCycles(Set<IntCycle> oldCycles) {
     return oldCycles.stream()
-             .map(oldCycle -> IntCycle.builder().elements(
-               oldCycle.getElements().stream()
-                 .map(i -> inverseRemap[i])
-                 .collect(Collectors.toList())
-             ).build())
+             .map(oldCycle -> cycleUtils.convertToIntCycle(i -> inverseRemap[i], oldCycle))
              .collect(Collectors.toSet());
   }
   
