@@ -3,6 +3,7 @@ package org.dexenjaeger.algebra.service;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.utils.Remapper;
@@ -76,32 +77,31 @@ public class GroupService {
     BiFunction<Integer, Integer, Integer> operator
   ) throws ValidationException {
     return createGroup(
-      operatorSymbol, identity, elements,
-      binaryOperatorUtil.createLookup(elements),
-      inversesMap, maximalCycles, operator
+      new GroupSpec()
+      .setOperatorSymbol(operatorSymbol)
+      .setIdentity(identity)
+      .setElements(elements)
+      .setInversesMap(inversesMap)
+      .setMaximalCycles(maximalCycles)
+      .setOperator(operator)
+      .setLookup(binaryOperatorUtil.createLookup(elements))
     );
   }
   
-  private Group createGroup(
-    String operatorSymbol,
-    int identity,
-    String[] elements,
-    Map<String, Integer> lookup,
-    Map<Integer, Integer> inversesMap,
-    Set<IntCycle> maximalCycles,
-    BiFunction<Integer, Integer, Integer> operator
+  public Group createGroup(
+    GroupSpec spec
   ) throws ValidationException {
     Group result = Group.builder()
-                    .inversesMap(inversesMap)
-                    .maximalCycles(maximalCycles)
-                    .identity(identity)
-                    .size(elements.length)
-                    .elements(elements)
-                    .operatorSymbol(operatorSymbol)
-                    .lookup(lookup)
+                    .inversesMap(spec.getInversesMap())
+                    .maximalCycles(spec.getMaximalCycles())
+                    .identity(spec.getIdentity())
+                    .size(spec.getElements().length)
+                    .elements(spec.getElements())
+                    .operatorSymbol(spec.getOperatorSymbol())
+                    .lookup(spec.getLookup())
                     .multiplicationTable(binaryOperatorUtil.getMultiplicationTable(
-                      elements.length,
-                      operator
+                      spec.getElements().length,
+                      spec.getOperator()
                     ))
                     .build();
   
@@ -152,13 +152,14 @@ public class GroupService {
     
     return new SortedGroupResult(
       createGroup(
-        operatorSymbol,
-        0, // The identity will be the only 1-cycle in a valid group
-        remapper.getElements(),
-        remapper.getReverseLookup(),
-        remapper.remapInverses(inversesMap),
-        remapper.remapCycles(maximalCycles),
-        remapper.remapBiFunc(operator)
+        new GroupSpec()
+        .setOperatorSymbol(operatorSymbol)
+        .setIdentity(0) // The identity will be the only 1-cycle in a valid group
+        .setElements(remapper.getElements())
+        .setOperator(remapper.remapBiFunc(operator))
+        .setLookup(remapper.getReverseLookup())
+        .setInversesMap(remapper.remapInverses(inversesMap))
+        .setMaximalCycles(remapper.remapCycles(maximalCycles))
       ), remapper
     );
   }

@@ -1,9 +1,9 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.model.cycle.Cycle;
-import org.dexenjaeger.algebra.model.cycle.CycleSpec;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.spec.CycleSpec;
 
 import java.util.HashMap;
 import java.util.LinkedList;

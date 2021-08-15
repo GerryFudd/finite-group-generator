@@ -1,4 +1,4 @@
-package org.dexenjaeger.algebra.model.cycle;
+package org.dexenjaeger.algebra.model.spec;
 
 import lombok.Getter;
 import lombok.Setter;

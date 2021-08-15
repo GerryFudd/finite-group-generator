@@ -24,9 +24,15 @@ public class InnerAutomorphismService {
   }
   
   public Automorphism createInnerAutomorphism(Group group, int element) {
-    return automorphismService.createAutomorphism(
-      group, a -> group.prod(element, group.prod(a, group.getInverse(element)))
-    );
+    try {
+      return automorphismService.createAutomorphism(
+        group, a -> group.prod(element, group.prod(a, group.getInverse(element)))
+      );
+    } catch (ValidationException e) {
+      throw new RuntimeException(String.format(
+        "Failed to create inner automorphism from %d", element
+      ), e);
+    }
   }
   
   public Group createInnerAutomorphismGroup(Group group) throws ValidationException {

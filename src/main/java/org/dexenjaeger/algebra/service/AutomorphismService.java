@@ -44,7 +44,7 @@ public class AutomorphismService {
     return result;
   }
   
-  public Automorphism createAutomorphism(Group domain, Function<Integer, Integer> act) {
+  public Automorphism createAutomorphism(Group domain, Function<Integer, Integer> act) throws ValidationException {
     int[] mapping = functionsUtil.createMapping(domain.getSize(), act);
     
     AutomorphismBuilder resultBuilder = Automorphism.builder();
@@ -56,7 +56,7 @@ public class AutomorphismService {
       currentCycle.addLast(seed);
       remainingElements.remove(seed);
       String current = domain.display(act.apply(domain.eval(seed)));
-      while (!seed.equals(current)) {
+      while (!seed.equals(current) && !domain.getIdentityDisplay().equals(current)) {
         currentCycle.addLast(current);
         remainingElements.remove(current);
         current = domain.display(act.apply(domain.eval(current)));
@@ -82,11 +82,7 @@ public class AutomorphismService {
                             ))
                             .build();
     
-    try {
-      automorphismValidator.validate(result);
-    } catch (ValidationException e) {
-      throw new RuntimeException("Result is not a valid automorphism.", e);
-    }
+    automorphismValidator.validate(result);
     return result;
   }
   
@@ -102,24 +98,25 @@ public class AutomorphismService {
   
   public Automorphism getInverse(Automorphism automorphism) throws ValidationException {
     Automorphism result =  Automorphism.builder()
-             .withStringCycles(convertCycles(
-               automorphism.getCyclePresentation().getCycles(),
-               automorphism::unApply
-             ))
-             .fixedElements(automorphism.getFixedElements())
-             .inverseMapping(functionsUtil.createMapping(
-               automorphism.getDomain().getSize(),
-               automorphism::apply
-             ))
-             .mapping(functionsUtil.createMapping(
-               automorphism.getDomain().getSize(),
-               automorphism::unApply
-             ))
-             .image(functionsUtil.createImage(
-               automorphism.getDomain().getSize(),
-               i -> automorphism.getDomain().display(automorphism.unApply(i))
-             ))
-             .build();
+                             .withStringCycles(convertCycles(
+                               automorphism.getCyclePresentation().getCycles(),
+                               automorphism::unApply
+                             ))
+                             .fixedElements(automorphism.getFixedElements())
+                             .inverseMapping(functionsUtil.createMapping(
+                               automorphism.getDomain().getSize(),
+                               automorphism::apply
+                             ))
+                             .domain(automorphism.getDomain())
+                             .mapping(functionsUtil.createMapping(
+                               automorphism.getDomain().getSize(),
+                               automorphism::unApply
+                             ))
+                             .image(functionsUtil.createImage(
+                               automorphism.getDomain().getSize(),
+                               i -> automorphism.getDomain().display(automorphism.unApply(i))
+                             ))
+                             .build();
     automorphismValidator.validate(result);
     return result;
   }
