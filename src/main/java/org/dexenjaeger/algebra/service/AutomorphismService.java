@@ -9,6 +9,7 @@ import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -32,17 +33,18 @@ public class AutomorphismService {
     if (!a.getDomain().equals(b.getDomain())) {
       throw new RuntimeException("No.");
     }
-    Automorphism result = create(
+    Automorphism result = createAutomorphism(
       b.getDomain(), i -> a.apply(b.apply(i))
     );
     automorphismValidator.validate(result);
     return result;
   }
   
-  public Automorphism create(Group domain, Function<Integer, Integer> act) {
-    int[] mapping = functionsUtil.getMapping(domain.getSize(), act);
+  public Automorphism createAutomorphism(Group domain, Function<Integer, Integer> act) {
+    int[] mapping = functionsUtil.createMapping(domain.getSize(), act);
+    
     AutomorphismBuilder resultBuilder = Automorphism.builder();
-  
+    
     Set<String> remainingElements = new HashSet<>(domain.getElementsDisplay());
     while (!remainingElements.isEmpty()) {
       String seed = remainingElements.stream().findAny().orElseThrow();
@@ -63,6 +65,9 @@ public class AutomorphismService {
     }
     
     Automorphism result = resultBuilder
+                            .fixedElements(functionsUtil.getFixedElements(
+                              domain.getSize(), i -> mapping[i]
+                            ))
                             .inverseMapping(functionsUtil.createInverseMapping(
                               domain.getSize(), i -> mapping[i]
                             ))
@@ -71,7 +76,7 @@ public class AutomorphismService {
                             .image(functionsUtil.createImage(
                               domain.getSize(), i -> domain.display(mapping[i])
                             ))
-      .build();
+                            .build();
     
     try {
       automorphismValidator.validate(result);
@@ -81,7 +86,7 @@ public class AutomorphismService {
     return result;
   }
   
-  private Set<StringCycle> convertCycles(Set<StringCycle> cycles, Function<String, String> func) {
+  private Set<StringCycle> convertCycles(Collection<StringCycle> cycles, Function<String, String> func) {
     return cycles.stream()
              .map(cycle -> cycle.getElements()
                              .stream()
@@ -95,7 +100,23 @@ public class AutomorphismService {
   
   public Automorphism getInverse(Automorphism automorphism) {
     return Automorphism.builder()
-             .withStringCycles()
+             .withStringCycles(convertCycles(
+               automorphism.getCyclePresentation().getCycles(),
+               automorphism::unApply
+             ))
+             .fixedElements(automorphism.getFixedElements())
+             .inverseMapping(functionsUtil.createMapping(
+               automorphism.getDomain().getSize(),
+               automorphism::apply
+             ))
+             .mapping(functionsUtil.createMapping(
+               automorphism.getDomain().getSize(),
+               automorphism::unApply
+             ))
+             .image(functionsUtil.createImage(
+               automorphism.getDomain().getSize(),
+               i -> automorphism.getDomain().display(automorphism.unApply(i))
+             ))
              .build();
   }
 }

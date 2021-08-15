@@ -28,12 +28,12 @@ class InnerAutomorphismServiceTest {
         if (i == s3.getIdentity()) {
           assertEquals(
             automorphism.getDomain().getSize(),
-            automorphism.fixedElements().size()
+            automorphism.getFixedElements().size()
           );
         } else {
           assertEquals(
             s3.getCycleGeneratedBy(i).orElseThrow().getElementsSet(),
-            automorphism.fixedElements()
+            automorphism.getFixedElements()
           );
         }
       });

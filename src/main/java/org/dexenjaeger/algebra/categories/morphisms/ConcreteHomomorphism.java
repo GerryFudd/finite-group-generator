@@ -35,6 +35,11 @@ public class ConcreteHomomorphism implements Homomorphism {
   }
   
   @Override
+  public String apply(String x) {
+    return range.display(mapping[domain.eval(x)]);
+  }
+  
+  @Override
   public int hashCode() {
     return 29 * domain.hashCode()
              + Arrays.hashCode(mapping)

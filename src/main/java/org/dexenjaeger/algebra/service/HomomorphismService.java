@@ -6,6 +6,7 @@ import org.dexenjaeger.algebra.model.HomomorphismSummary;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
+import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
@@ -21,28 +22,25 @@ public class HomomorphismService {
   private final Validator<Homomorphism> homomorphismValidator;
   private final GroupService groupService;
   private final BinaryOperatorUtil binaryOperatorUtil;
+  private final FunctionsUtil functionsUtil;
   
   @Inject
   public HomomorphismService(
     Validator<Group> groupValidator,
     Validator<Homomorphism> homomorphismValidator,
     GroupService groupService,
-    BinaryOperatorUtil binaryOperatorUtil
+    BinaryOperatorUtil binaryOperatorUtil,
+    FunctionsUtil functionsUtil
   ) {
     this.groupValidator = groupValidator;
     this.homomorphismValidator = homomorphismValidator;
     this.groupService = groupService;
     this.binaryOperatorUtil = binaryOperatorUtil;
+    this.functionsUtil = functionsUtil;
   }
   
   private Homomorphism doCreateHomomorphism(
     Group domain, Group range, Group kernel, Function<Integer, Integer> act
-  ) throws ValidationException {
-    return doCreateHomomorphism(domain, range, kernel, act, null);
-  }
-  
-  private Homomorphism doCreateHomomorphism(
-    Group domain, Group range, Group kernel, Function<Integer, Integer> act, Function<Integer, String> imageFunc
   ) throws ValidationException {
     Homomorphism result;
     try {
@@ -50,8 +48,12 @@ public class HomomorphismService {
                  .domain(domain)
                  .range(range)
                  .kernel(kernel)
-                 .act(act)
-                 .imageFunc(imageFunc)
+                 .mapping(functionsUtil.createMapping(
+                   domain.getSize(), act
+                 ))
+                 .image(functionsUtil.createImage(
+                   domain.getSize(), i -> range.display(act.apply(i))
+                 ))
                  .build();
     } catch (NullPointerException e) {
       throw new ValidationException("It is not possible to construct this homomorphism.", e);
@@ -98,8 +100,7 @@ public class HomomorphismService {
       domain,
       sortedRange.getGroup(),
       sortedKernel.getGroup(),
-      i -> sortedRange.getRemapper().getReverseLookup().get(act.apply(i)),
-      act
+      i -> sortedRange.getRemapper().getReverseLookup().get(act.apply(i))
     );
   }
   

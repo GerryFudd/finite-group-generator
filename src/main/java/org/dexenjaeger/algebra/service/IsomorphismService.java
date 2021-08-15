@@ -31,9 +31,9 @@ public class IsomorphismService {
   public Isomorphism createIsomorphism(
     Group domain, Group range, Function<Integer, Integer> func, Function<Integer, Integer> inverse
   ) throws ValidationException {
-    int[] mapping = functionsUtil.getMapping(domain.getSize(), func);
+    int[] mapping = functionsUtil.createMapping(domain.getSize(), func);
     Isomorphism automorphism = Isomorphism.builder()
-                                 .inverseMapping(functionsUtil.getMapping(domain.getSize(), inverse))
+                                 .inverseMapping(functionsUtil.createMapping(domain.getSize(), inverse))
                                  .domain(domain)
                                  .range(range)
                                  .image(functionsUtil.createImage(
@@ -78,10 +78,10 @@ public class IsomorphismService {
   
   public Isomorphism getInverse(Isomorphism isomorphism) {
     return Isomorphism.builder()
-             .inverseMapping(functionsUtil.getMapping(
+             .inverseMapping(functionsUtil.createMapping(
                isomorphism.getDomain().getSize(), isomorphism::apply
              ))
-             .mapping(functionsUtil.getMapping(
+             .mapping(functionsUtil.createMapping(
                isomorphism.getDomain().getSize(), isomorphism::unApply
              ))
              .domain(isomorphism.getRange())

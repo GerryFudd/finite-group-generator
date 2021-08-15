@@ -1,6 +1,5 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class CyclePresentation {
   @EqualsAndHashCode.Include
-  @Getter(AccessLevel.PROTECTED)
+  @Getter
   private final List<StringCycle> cycles;
   
   @Override

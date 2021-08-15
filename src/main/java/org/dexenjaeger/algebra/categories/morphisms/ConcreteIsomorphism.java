@@ -25,4 +25,9 @@ public class ConcreteIsomorphism extends ConcreteHomomorphism implements Isomorp
   public int unApply(int j) {
     return inverseMapping[j];
   }
+  
+  @Override
+  public String unApply(String j) {
+    return domain.display(inverseMapping[range.eval(j)]);
+  }
 }

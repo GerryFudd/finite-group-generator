@@ -24,7 +24,7 @@ public class InnerAutomorphismService {
   }
   
   public Automorphism createInnerAutomorphism(Group group, int element) {
-    return automorphismService.create(
+    return automorphismService.createAutomorphism(
       group, a -> group.prod(element, group.prod(a, group.getInverse(element)))
     );
   }
@@ -35,7 +35,7 @@ public class InnerAutomorphismService {
       .map(i -> createInnerAutomorphism(group, i))
       .collect(Collectors.toSet());
     Automorphism identity = elements.stream()
-      .filter(aut -> aut.fixedElements().size() == group.getSize())
+      .filter(aut -> aut.getFixedElements().size() == group.getSize())
       .findAny().orElseThrow();
     Comparator<String> comparator = BinaryOperatorUtil.getElementComparator(identity.toString());
     List<Automorphism> elementsList = elements.stream()

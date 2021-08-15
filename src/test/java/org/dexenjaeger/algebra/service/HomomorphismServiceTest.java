@@ -4,7 +4,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
-import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
@@ -22,6 +21,7 @@ class HomomorphismServiceTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
   private final GroupService groupService = injector.getInstance(GroupService.class);
   private final HomomorphismService homomorphismService = injector.getInstance(HomomorphismService.class);
+  private final IsomorphismService isomorphismService = injector.getInstance(IsomorphismService.class);
   private final SymmetryGroupGenerator symmetryGroupGenerator = injector.getInstance(SymmetryGroupGenerator.class);
   
   @Test
@@ -164,10 +164,10 @@ class HomomorphismServiceTest {
     Group s3 = symmetryGroupGenerator.createSymmetryGroup(3);
     Function<Integer, String> act = a -> {
       if (s3.display(a).equals("d")) {
-        return "d2";
+        return "f2";
       }
       if (s3.display(a).equals("d2")) {
-        return "d";
+        return "f";
       }
       return s3.display(a);
     };
@@ -176,23 +176,16 @@ class HomomorphismServiceTest {
       s3, act
     );
     
-    Isomorphism result = Isomorphism.builder()
-                           .inverseAct(homomorphism::apply)
-                           .domain(homomorphism.getDomain())
-                           .range(homomorphism.getRange())
-                           .act(homomorphism::apply)
-                           .build();
-    
     assertEquals(
       "\n" +
-        "_x__|_I__a__b__c__d__d2_\n" +
-        " I  | I  a  b  c  d  d2 \n" +
-        " a  | a  I  d  d2 b  c  \n" +
-        " b  | b  d2 I  d  c  a  \n" +
-        " c  | c  d  d2 I  a  b  \n" +
-        " d  | d  c  a  b  d2 I  \n" +
-        " d2 | d2 b  c  a  I  d  \n",
-      result.getRange().printMultiplicationTable()
+        "_x__|_I__a__b__c__f__f2_\n" +
+        " I  | I  a  b  c  f  f2 \n" +
+        " a  | a  I  f  f2 b  c  \n" +
+        " b  | b  f2 I  f  c  a  \n" +
+        " c  | c  f  f2 I  a  b  \n" +
+        " f  | f  c  a  b  f2 I  \n" +
+        " f2 | f2 b  c  a  I  f  \n",
+      homomorphism.getRange().printMultiplicationTable()
     );
   }
 }

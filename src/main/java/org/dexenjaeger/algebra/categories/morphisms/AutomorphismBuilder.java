@@ -11,6 +11,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
+  private Set<Integer> fixedElements;
+  
+  public AutomorphismBuilder fixedElements(Set<Integer> fixedElements) {
+    this.fixedElements = fixedElements;
+    return this;
+  }
+  
   private final Set<StringCycle> stringCycles = new HashSet<>();
   @Override
   public AutomorphismBuilder range(Group range) {
@@ -30,6 +37,7 @@ public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
   public Automorphism build() {
     return new ConcreteAutomorphism(
       domain, mapping, image, inverseMapping,
+      fixedElements,
       new CyclePresentation(stringCycles.stream()
                               .sorted(Comparator.comparing(StringCycle::toString))
                               .sorted(Comparator.comparing(AbstractCycle::getSize))

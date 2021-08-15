@@ -1,6 +1,8 @@
 package org.dexenjaeger.algebra.utils;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.function.Function;
 
 public class FunctionsUtil {
@@ -14,7 +16,7 @@ public class FunctionsUtil {
     return imageList.toArray(new String[0]);
   }
   
-  public int[] getMapping(int size, Function<Integer, Integer> act) {
+  public int[] createMapping(int size, Function<Integer, Integer> act) {
     int[] mapping = new int[size];
     
     for (int i = 0; i < size; i++) {
@@ -31,5 +33,15 @@ public class FunctionsUtil {
     }
     
     return inverseMapping;
+  }
+  
+  public Set<Integer> getFixedElements(int size, Function<Integer, Integer> act) {
+    Set<Integer> result = new HashSet<>();
+    for (int i = 0; i < size; i++) {
+      if (i == act.apply(i)) {
+        result.add(i);
+      }
+    }
+    return result;
   }
 }
