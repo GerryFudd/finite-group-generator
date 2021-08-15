@@ -153,21 +153,21 @@ class MoreMathTest {
   void pow_overflowException() {
     RuntimeException e = assertThrows(
       RuntimeException.class,
-      () -> MoreMath.pow(200, 5)
+      () -> MoreMath.pow(13, 12)
     );
     
     assertEquals(
-      "Exponent 200^5 overflowed max int 2147483647.", e.getMessage()
+      "Exponent 13^12 overflowed max int 2147483647.", e.getMessage()
     );
     
-    int previous = MoreMath.pow(200, 4);
+    int previous = MoreMath.pow(13, 11);
     assertTrue(
       previous < Integer.MAX_VALUE,
       "The previous exponent is less than max."
     );
     assertTrue(
-      previous > Integer.MAX_VALUE / 200,
-      "The previous exponent is more than 1/200th of the max value."
+      previous > Integer.MAX_VALUE / 13,
+      "The previous exponent is more than 1/13th of the max value."
     );
   }
 }
