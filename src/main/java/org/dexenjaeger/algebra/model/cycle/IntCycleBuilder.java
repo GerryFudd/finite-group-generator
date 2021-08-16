@@ -6,11 +6,6 @@ public class IntCycleBuilder extends AbstractCycleBuilder<Integer, IntCycle> {
     return new Integer[0];
   }
   
-  public IntCycleBuilder elements(Integer... elements) {
-    this.elements = elements;
-    return this;
-  }
-  
   @Override
   public IntCycle build() {
     return new IntCycle(

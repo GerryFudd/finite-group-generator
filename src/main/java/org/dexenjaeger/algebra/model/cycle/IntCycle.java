@@ -22,4 +22,9 @@ public class IntCycle extends AbstractCycle<Integer, IntCycle> {
   public static IntCycleBuilder builder() {
     return new IntCycleBuilder();
   }
+  
+  @Override
+  public String toString() {
+    return getElements().toString();
+  }
 }

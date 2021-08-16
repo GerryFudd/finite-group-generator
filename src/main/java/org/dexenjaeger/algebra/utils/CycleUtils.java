@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 public class CycleUtils {
   private <T> CycleSpec<T> resolveGenerators(List<T> elements) {
     int n = elements.size();
+    if (n == 0) {
+      throw new RuntimeException("Empty cycles are not allowed.");
+    }
     if (n == 1) {
       return new CycleSpec<T>()
                .setGeneratorArray(new int[]{0})
@@ -92,9 +95,6 @@ public class CycleUtils {
              .build();
   }
   
-  public MappingCycle createMappingCycle(Mapping... mappings) {
-    return createMappingCycle(List.of(mappings));
-  }
   public MappingCycle createMappingCycle(List<Mapping> mappings) {
     CycleSpec<Mapping> spec = resolveGenerators(mappings);
     return MappingCycle.builder()

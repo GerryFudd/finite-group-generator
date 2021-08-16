@@ -3,13 +3,10 @@ package org.dexenjaeger.algebra.validators;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
-import org.dexenjaeger.algebra.utils.MoreMath;
 
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public class GroupValidator implements Validator<Group> {
@@ -24,80 +21,51 @@ public class GroupValidator implements Validator<Group> {
     return new ValidationException(String.format("Invalid cycle: %s.", reason));
   }
   
-  private ValidationException getMaximalCyclesException(String reason) {
-    return new ValidationException(String.format("Invalid maximal cycles: %s.", reason));
-  }
-  
-  private Optional<ValidationException> validateCycle(Group item, IntCycle cycle) {
-    try {
-      validateCycleElements(item, cycle.getElements());
-      cycle.getSubCycles().forEach(subcycle -> validateCycle(item, subcycle));
-    } catch (ValidationException e) {
-      return Optional.of(e);
-    }
-    return Optional.empty();
-  }
-  
-  private void validateCycleElements(Group item, List<Integer> cycleElements) throws ValidationException {
-  
-    if (cycleElements.isEmpty()) {
-      throw getCycleException("cycle is empty");
-    }
-    LinkedList<Integer> linkedCycle = new LinkedList<>(cycleElements);
-    if (!linkedCycle.removeLast().equals(item.getIdentity())) {
-      throw getCycleException(String.format(
-        "cycle %s doesn't end with identity", cycleElements
-      ));
-    }
-    Integer generator = null;
-    Integer previous = null;
-    while (!linkedCycle.isEmpty()) {
-      Integer a = linkedCycle.removeFirst();
-      if (generator == null) {
-        generator = a;
-        previous = a;
-      } else if (!a.equals(item.prod(generator, previous))) {
-        throw getCycleException(String.format(
-          "cycle %s is improperly generated",
-          cycleElements
-        ));
-      } else {
-        previous = a;
-      }
-      if (linkedCycle.isEmpty()) {
-        if (!a.equals(item.getInverse(a))) {
-          throw getCycleException(String.format(
-            "cycle %s doesn't contain the inverse of each element",
-            cycleElements
-          ));
-        }
-      } else if (!linkedCycle.removeLast().equals(item.getInverse(a))) {
-        throw getCycleException(String.format(
-          "cycle %s doesn't contain the inverse of each element",
-          cycleElements
-        ));
-      }
-    }
-  }
-  
   private void validateMaximalCycles(Group item) throws ValidationException {
     Set<IntCycle> maximalCycles = item.getMaximalCycles();
-    if (maximalCycles.isEmpty()) {
-      throw getMaximalCyclesException("there is an empty maximal cycle");
-    }
     Set<Integer> coveredElements = new HashSet<>();
     for (IntCycle cycle:maximalCycles) {
-      Set<Integer> intersection = MoreMath.intersection(coveredElements, cycle.getElements());
-      if (intersection.size() > 1) {
-        throw getMaximalCyclesException(String.format(
-          "cycle %s intersects with the other maximal cycles in more than one element %s",
-            cycle, intersection
+      LinkedList<Integer> linkedCycle = new LinkedList<>(cycle.getElements());
+      Integer generator = null;
+      Integer previous = null;
+      while (!linkedCycle.isEmpty()) {
+        Integer a = linkedCycle.removeFirst();
+        if (a < 0 || item.getSize() <= a) {
+          throw getCycleException(String.format(
+            "cycle contains %s, which is outside group",
+            a
           ));
+        }
+        if (!coveredElements.add(a) && item.getIdentity() != a) {
+          throw getCycleException(String.format(
+            "%d is covered by more than one maximal cycle", a
+          ));
+        }
+        if (generator == null) {
+          generator = a;
+          previous = a;
+        } else if (!a.equals(item.prod(generator, previous))) {
+          // TODO: test or remove this
+          throw getCycleException(String.format(
+            "cycle %s is improperly generated",
+            cycle
+          ));
+        } else {
+          previous = a;
+        }
       }
-      Optional<ValidationException> e = validateCycle(item, cycle);
-      if (e.isPresent()) {
-        throw e.get();
+  
+      if (generator == null || generator != item.prod(
+        generator,
+        previous
+      )) {
+        throw getCycleException(String.format("cycle %s ends prematurely", cycle));
       }
+    }
+    if (coveredElements.size() < item.getSize()) {
+      throw new ValidationException(
+        "Cycles don't cover group."
+      );
     }
   }
   

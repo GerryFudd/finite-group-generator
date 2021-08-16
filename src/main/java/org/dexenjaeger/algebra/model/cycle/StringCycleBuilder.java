@@ -7,11 +7,6 @@ public class StringCycleBuilder extends AbstractCycleBuilder<String, StringCycle
     return new String[0];
   }
   
-  public StringCycleBuilder elements(String... elements) {
-    this.elements = elements;
-    return this;
-  }
-  
   @Override
   public StringCycle build() {
     return new StringCycle(

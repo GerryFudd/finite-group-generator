@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -64,12 +65,13 @@ public class IsomorphismService {
     return createIsomorphism(
       domain,
       groupService.createGroup(
-        "x",
-        domain.getIdentity(),
-        elements,
-        rangeInverseMap,
-        domain.getMaximalCycles(),
-        domain::prod
+        new GroupSpec()
+        .setOperatorSymbol("x")
+        .setIdentity(domain.getIdentity())
+        .setElements(elements)
+        .setInversesMap(rangeInverseMap)
+        .setMaximalCycles(domain.getMaximalCycles())
+        .setOperator(domain::prod)
       ),
       Function.identity(),
       Function.identity()

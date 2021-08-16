@@ -6,14 +6,13 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.Mapping;
+import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BinaryOperatorServiceTest {
@@ -36,9 +35,6 @@ class BinaryOperatorServiceTest {
       "L, L2, a, b",
       String.join(", ", result.getElements())
     );
-    
-    assertNull(result.getIdentityDisplay());
-    assertNull(result.getInversesMap());
   }
   
   @Test
@@ -56,12 +52,6 @@ class BinaryOperatorServiceTest {
       "I, a, b, c",
       String.join(", ", result.getElements())
     );
-    
-    assertEquals("I", result.getIdentityDisplay());
-    assertEquals(
-      Map.of(0, 0, 1, 1, 2, 2, 3, 3),
-      result.getInversesMap()
-    );
   }
   
   @Test
@@ -76,11 +66,11 @@ class BinaryOperatorServiceTest {
     );
     
     Group result = groupService.createGroup(
-      "*", 0,
-      summary.getElements(),
-      summary.getInversesMap(),
-      summary.getCycles(),
-      summary.getOperator()
+      new GroupSpec()
+      .setIdentity(0)
+      .setElements(summary.getElements())
+      .setMaximalCycles(summary.getCycles())
+      .setOperator(summary.getOperator())
     );
     
     result.getElementsDisplay().forEach(element -> assertEquals(
@@ -143,6 +133,20 @@ class BinaryOperatorServiceTest {
       "The product of a and a doesn't exist in this binary operator\n\n" +
         "_*____|_a____\n" +
         " a    | [1?] \n", e.getMessage()
+    );
+  }
+  
+  @Test
+  void validateBinaryOperator_functionNotDefinedOnDomain() {
+    RuntimeException e = assertThrows(RuntimeException.class, () -> binaryOperatorService.createBinaryOperator(
+      new String[]{"a", "b", "c"}, (a, b) -> new int[][]{
+        {0, 1},
+        {1, 2}
+      }[a][b]
+    ));
+    
+    assertEquals(
+      "Failed to build multiplication table.", e.getMessage()
     );
   }
 }

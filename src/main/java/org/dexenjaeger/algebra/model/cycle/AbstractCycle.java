@@ -4,10 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.dexenjaeger.algebra.model.OrderedPair;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -102,22 +100,5 @@ public abstract class AbstractCycle<T, U extends Cycle<T>> implements Cycle<T> {
   public Optional<U> getSubCycleGeneratedBy(T x) {
     return Optional.ofNullable(lookup.get(x))
       .map(this::createCycle);
-  }
-  
-  public Set<OrderedPair<T, T>> getInversePairs() {
-    Set<OrderedPair<T, T>> result = new HashSet<>();
-    LinkedList<T> elements = new LinkedList<>(getElements());
-    elements.removeLast();
-    while (!elements.isEmpty()) {
-      T x = elements.removeFirst();
-      if (!elements.isEmpty()) {
-        T inv = elements.removeLast();
-        result.add(new OrderedPair<>(x, inv));
-        result.add(new OrderedPair<>(inv, x));
-      } else {
-        result.add(new OrderedPair<>(x, x));
-      }
-    }
-    return result;
   }
 }

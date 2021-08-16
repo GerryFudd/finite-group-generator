@@ -1,18 +1,22 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BinaryOperatorUtil {
+  private final CycleUtils cycleUtils = new CycleUtils();
   private static String padOperator(String operatorSymbol, int width) {
     return padOperator(operatorSymbol, ' ', width);
   }
@@ -142,13 +146,17 @@ public class BinaryOperatorUtil {
   }
   
   public int[][] getMultiplicationTable(int size, BiFunction<Integer, Integer, Integer> operator) {
-    int[][] multiplicationTable = new int[size][size];
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
-        multiplicationTable[i][j] = operator.apply(i, j);
+    try {
+      int[][] multiplicationTable = new int[size][size];
+      for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+          multiplicationTable[i][j] = operator.apply(i, j);
+        }
       }
+      return multiplicationTable;
+    } catch (RuntimeException e) {
+      throw new RuntimeException("Failed to build multiplication table.", e);
     }
-    return multiplicationTable;
   }
   
   public Map<String, Integer> createLookup(String[] elements) {
@@ -157,5 +165,52 @@ public class BinaryOperatorUtil {
       lookup.put(elements[i], i);
     }
     return lookup;
+  }
+  
+  public Set<IntCycle> getMaximalCycles(
+    int size, BiFunction<Integer, Integer, Integer> operator
+  ) {
+    Set<IntCycle> result = new HashSet<>();
+    for (int i = 0; i < size; i++) {
+      List<Integer> cycleElements = new LinkedList<>();
+      cycleElements.add(i);
+      int next = operator.apply(i, i);
+      while (!cycleElements.contains(next)) {
+        cycleElements.add(next);
+        next = operator.apply(i, next);
+      }
+      IntCycle candidateCycle = cycleUtils.createIntCycle(cycleElements);
+      if (result.stream().anyMatch(
+        existingCycle -> existingCycle.isParentOf(candidateCycle)
+      )) {
+        continue;
+      }
+      result.removeIf(candidateCycle::isParentOf);
+      result.add(candidateCycle);
+    }
+    return result;
+  }
+  
+  public Map<Integer, Integer> getInversesMap(
+    int size, int identity,
+    BiFunction<Integer, Integer, Integer> operator) {
+    Map<Integer, Integer> result = new HashMap<>();
+    result.put(identity, identity);
+    for (int i = 0; i < size; i++) {
+      if (result.containsKey(i)) {
+        continue;
+      }
+      for (int j = 0; j < size; j++) {
+        if (result.containsKey(j)) {
+          continue;
+        }
+        if (identity == operator.apply(i, j)) {
+          result.put(i, j);
+          result.put(j, i);
+          break;
+        }
+      }
+    }
+    return result;
   }
 }

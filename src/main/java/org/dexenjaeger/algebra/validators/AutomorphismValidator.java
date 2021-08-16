@@ -16,10 +16,5 @@ public class AutomorphismValidator implements Validator<Automorphism> {
   @Override
   public void validate(Automorphism item) throws ValidationException {
     isomorphismValidator.validate(item);
-    
-    // Check that the automorphism points at itself.
-    if (!item.getDomain().equals(item.getRange())) {
-      throw new ValidationException("The range of an automorphism must equal the domain.");
-    }
   }
 }

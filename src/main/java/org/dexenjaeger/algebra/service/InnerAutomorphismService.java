@@ -28,6 +28,7 @@ public class InnerAutomorphismService {
       return automorphismService.createAutomorphism(
         group, a -> group.prod(element, group.prod(a, group.getInverse(element)))
       );
+      // TODO: test this
     } catch (ValidationException e) {
       throw new RuntimeException(String.format(
         "Failed to create inner automorphism from %d", element

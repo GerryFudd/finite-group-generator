@@ -17,12 +17,8 @@ public class IsomorphismValidator implements Validator<Isomorphism> {
   public void validate(Isomorphism item) throws ValidationException {
     homomorphismValidator.validate(item);
     
-    // Check that the automorphism is injective.
-    if (item.getKernel().getElementsDisplay().size() > 1) {
-      throw new ValidationException("The kernel of an automorphism must be trivial.");
-    }
     // This Isomorphism has already been validated as
-    // a function and the function is an injection. If the
+    // a function and the function is an injection (since the kernel is necessarily trivial). If the
     // domain and range are the same size, this is a
     // bijection.
     if (item.getDomain().getElementsDisplay().size()

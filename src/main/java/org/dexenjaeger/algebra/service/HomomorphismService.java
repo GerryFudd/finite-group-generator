@@ -11,10 +11,8 @@ import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public class HomomorphismService {
@@ -145,36 +143,5 @@ public class HomomorphismService {
       }
     }
     return summary;
-  }
-  
-  public Homomorphism compose(Homomorphism a, Homomorphism b) throws ValidationException {
-    if (!a.getDomain().equals(b.getRange())) {
-      throw new RuntimeException("No.");
-    }
-    Map<Integer, Integer> kernelLookup = new HashMap<>();
-    LinkedList<String> kernelElements = new LinkedList<>();
-    
-    for (int i = 0; i < b.getDomain().getSize(); i++) {
-      if (a.apply(b.apply(i)) == a.getRange().getIdentity()) {
-        kernelLookup.put(i, kernelLookup.size());
-        kernelElements.addLast(b.getDomain().display(i));
-      }
-    }
-    
-    return doCreateHomomorphism(
-      b.getDomain(),
-      a.getRange(),
-      groupService.constructGroupFromElementsAndMultiplicationTable(
-        kernelElements.toArray(new String[0]),
-        binaryOperatorUtil.getMultiplicationTable(
-          kernelElements.size(),
-          (i, j) -> kernelLookup.get(b.getDomain().prod(
-            b.getDomain().eval(kernelElements.get(i)),
-            b.getDomain().eval(kernelElements.get(i))
-          ))
-        )
-      ),
-      i -> a.apply(b.apply(i))
-    );
   }
 }

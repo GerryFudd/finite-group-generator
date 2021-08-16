@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,29 +70,37 @@ public class GroupService {
              .build();
   }
   
-  public Group createGroup(
-    String operatorSymbol,
-    int identity,
-    String[] elements,
-    Map<Integer, Integer> inversesMap,
-    Set<IntCycle> maximalCycles,
-    BiFunction<Integer, Integer, Integer> operator
-  ) throws ValidationException {
-    return createGroup(
-      new GroupSpec()
-      .setOperatorSymbol(operatorSymbol)
-      .setIdentity(identity)
-      .setElements(elements)
-      .setInversesMap(inversesMap)
-      .setMaximalCycles(maximalCycles)
-      .setOperator(operator)
-      .setLookup(binaryOperatorUtil.createLookup(elements))
-    );
+  private <T> void setIfNull(Supplier<T> getter, Consumer<T> setter, Supplier<T> source) {
+    if (getter.get() == null) {
+      setter.accept(source.get());
+    }
   }
   
   public Group createGroup(
     GroupSpec spec
   ) throws ValidationException {
+    setIfNull(
+      spec::getLookup,
+      spec::setLookup,
+      () -> binaryOperatorUtil.createLookup(spec.getElements())
+    );
+    setIfNull(
+      spec::getMaximalCycles,
+      spec::setMaximalCycles,
+      () -> binaryOperatorUtil.getMaximalCycles(
+        spec.getElements().length,
+        spec.getOperator()
+      )
+    );
+    setIfNull(
+      spec::getInversesMap,
+      spec::setInversesMap,
+      () -> binaryOperatorUtil.getInversesMap(
+        spec.getElements().length,
+        spec.getIdentity(),
+        spec.getOperator()
+      )
+    );
     Group result = Group.builder()
                     .inversesMap(spec.getInversesMap())
                     .maximalCycles(spec.getMaximalCycles())
