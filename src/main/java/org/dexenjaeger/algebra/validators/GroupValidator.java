@@ -45,7 +45,6 @@ public class GroupValidator implements Validator<Group> {
           generator = a;
           previous = a;
         } else if (!a.equals(item.prod(generator, previous))) {
-          // TODO: test or remove this
           throw getCycleException(String.format(
             "cycle %s is improperly generated",
             cycle

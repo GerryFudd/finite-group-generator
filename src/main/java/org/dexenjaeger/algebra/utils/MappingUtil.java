@@ -45,7 +45,6 @@ public class MappingUtil {
     if (mapping.equals(identity)) {
       return;
     }
-    // TODO: test this
     if (!unmapped.remove(mapping)) {
       Mapping mappedVersion = mapped.get(mapped.indexOf(mapping));
       throw new MappingException(String.format(

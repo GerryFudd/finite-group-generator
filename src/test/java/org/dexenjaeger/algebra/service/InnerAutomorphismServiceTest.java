@@ -10,6 +10,7 @@ import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class InnerAutomorphismServiceTest {
   private final Injector injector = Guice.createInjector(new AlgebraModule());
@@ -55,6 +56,21 @@ class InnerAutomorphismServiceTest {
         " (abc)     | (abc)     (ac)(dd2) (bc)(dd2) (ab)(dd2) (acb)     I         \n" +
         " (acb)     | (acb)     (bc)(dd2) (ab)(dd2) (ac)(dd2) I         (abc)     \n",
       inn3.toString()
+    );
+  }
+  
+  @Test
+  void createInnerAutomorphism_FailsWithInvalidElement() {
+    RuntimeException e = assertThrows(
+      RuntimeException.class,
+      () -> innerAutomorphismService.createInnerAutomorphism(
+        symmetryGroupGenerator.createSymmetryGroup(3),
+        6
+      )
+    );
+    
+    assertEquals(
+      "Failed to create inner automorphism from 6", e.getMessage()
     );
   }
 }
