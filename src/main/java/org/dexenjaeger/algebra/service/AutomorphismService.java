@@ -160,8 +160,6 @@ public class AutomorphismService {
         }
       ));
     } catch (ValidationException e) {
-      System.out.printf("\nMapping %s failed to generate an automorphism.\n", mapping);
-      System.out.print(e.getMessage());
       return Optional.empty();
     }
   }

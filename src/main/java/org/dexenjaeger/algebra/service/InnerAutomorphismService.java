@@ -47,4 +47,13 @@ public class InnerAutomorphismService {
       )))
     ).getGroup();
   }
+  
+  public Group createOuterAutomorphismGroup(Group group) {
+    Group inn = createInnerAutomorphismGroup(group);
+    Group aut = automorphismService.createAutomorphismGroup(group);
+    
+    return groupService.createQuotientGroup(
+      aut, inn.getSortedElements()
+    );
+  }
 }

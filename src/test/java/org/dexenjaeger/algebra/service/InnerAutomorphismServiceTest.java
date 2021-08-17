@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
 import org.junit.jupiter.api.Test;
 
@@ -70,6 +71,26 @@ class InnerAutomorphismServiceTest {
     
     assertEquals(
       "Failed to create inner automorphism from 6", e.getMessage()
+    );
+  }
+  
+  @Test
+  void createOuterAutomorphismServiceTest() {
+    assertEquals(
+      new TrivialGroup("[I]"),
+      innerAutomorphismService.createOuterAutomorphismGroup(
+        symmetryGroupGenerator.createSymmetryGroup(3)
+      )
+    );
+  }
+  
+  @Test
+  void createOuterAutomorphismServiceTest_moreComplex() {
+    assertEquals(
+      new TrivialGroup("[I]"),
+      innerAutomorphismService.createOuterAutomorphismGroup(
+        symmetryGroupGenerator.createSymmetryGroup(4)
+      )
     );
   }
 }

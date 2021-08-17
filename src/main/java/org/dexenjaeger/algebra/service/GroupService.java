@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.service;
 
+import com.google.common.collect.Sets;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
@@ -11,10 +12,12 @@ import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -193,5 +196,88 @@ public class GroupService {
     
     groupValidator.validate(result);
     return result;
+  }
+  
+  private void validateSubGroup(Group group, List<String> subset) {
+    if (subset.isEmpty()) {
+      throw new ValidationException("Subgroups may not be empty.");
+    }
+    ValidationException e = new ValidationException(String.format(
+      "The set %s is not a subgroup.",
+      subset
+    ));
+    for (String x:subset) {
+      if (!subset.contains(group.getInverse(x))) {
+        throw e;
+      }
+      for (String y:subset) {
+        if (!subset.contains(group.prod(x, y))) {
+          throw e;
+        }
+      }
+    }
+  }
+  
+  private Map<String, Set<String>> getValidatedCosets(Group group, List<String> subgroup) {
+    Map<String, Set<String>> leftCosets = new HashMap<>();
+    for (String a:group.getElementsDisplay()) {
+      if (leftCosets.containsKey(a)) {
+        continue;
+      }
+      boolean inCoset = false;
+      for (String b:subgroup) {
+        if (leftCosets.containsKey(group.prod(a, b))) {
+          leftCosets.computeIfPresent(group.prod(a, b), (key, val) -> {
+            val.add(a);
+            return val;
+          });
+          inCoset = true;
+          break;
+        }
+      }
+      if (inCoset) {
+        continue;
+      }
+      leftCosets.computeIfAbsent(a, key -> Sets.newHashSet(a));
+    }
+    for (Map.Entry<String, Set<String>> leftCoset: leftCosets.entrySet()) {
+      for (String el:leftCoset.getValue()) {
+        if (subgroup.stream().noneMatch(x -> leftCoset.getKey().equals(group.prod(x, el)))) {
+          throw new ValidationException(String.format(
+            "The value %s belongs to [%sH] but not [H%s] for subgroup H=%s.",
+            el, leftCoset.getKey(), leftCoset.getKey(), subgroup
+          ));
+        }
+      }
+    }
+    return leftCosets;
+  }
+  
+  public Group createQuotientGroup(Group group, List<String> normalSubgroup) {
+    validateSubGroup(group, normalSubgroup);
+    Map<String, Set<String>> cosets = getValidatedCosets(group, normalSubgroup);
+    List<String> elements = new ArrayList<>(cosets.size());
+    Map<String, Integer> lookup = new HashMap<>();
+    String id = group.display(group.getIdentity());
+    for (Map.Entry<String, Set<String>> entry:cosets.entrySet()) {
+      String representative = null;
+      for (String member:entry.getValue().stream().sorted().toArray(String[]::new)) {
+        if (representative == null) {
+          representative = member;
+        }
+        if (id.equals(member)) {
+          representative = member;
+        }
+        lookup.put(member, elements.size());
+      }
+      elements.add(representative);
+    }
+    
+    return createSortedGroup(
+      new GroupSpec()
+      .setOperatorSymbol(group.getOperatorSymbol())
+      .setElements(elements.stream().map(el -> String.format("[%s]", el)).toArray(String[]::new))
+      .setOperator((i, j) -> lookup.get(group.prod(elements.get(i), elements.get(j))))
+    ).getGroup();
   }
 }
