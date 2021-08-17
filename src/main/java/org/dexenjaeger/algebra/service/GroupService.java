@@ -15,10 +15,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -76,22 +74,28 @@ public class GroupService {
     }
   }
   
-  public Group createGroup(
-    GroupSpec spec
-  ) throws ValidationException {
+  private void resolveMaximalCycles(GroupSpec spec) throws ValidationException {
+    try {
+      setIfNull(
+        spec::getMaximalCycles,
+        spec::setMaximalCycles,
+        () -> binaryOperatorUtil.getMaximalCycles(
+          spec.getElements().length,
+          spec.getOperator()
+        )
+      );
+    } catch (RuntimeException e) {
+      throw new ValidationException("Couldn't generate cycles from binary operator.", e);
+    }
+  }
+  
+  private void completeGroupSpec(GroupSpec spec) throws ValidationException {
     setIfNull(
       spec::getLookup,
       spec::setLookup,
       () -> binaryOperatorUtil.createLookup(spec.getElements())
     );
-    setIfNull(
-      spec::getMaximalCycles,
-      spec::setMaximalCycles,
-      () -> binaryOperatorUtil.getMaximalCycles(
-        spec.getElements().length,
-        spec.getOperator()
-      )
-    );
+    resolveMaximalCycles(spec);
     setIfNull(
       spec::getInversesMap,
       spec::setInversesMap,
@@ -101,49 +105,41 @@ public class GroupService {
         spec.getOperator()
       )
     );
-    Group result = Group.builder()
-                    .inversesMap(spec.getInversesMap())
-                    .maximalCycles(spec.getMaximalCycles())
-                    .identity(spec.getIdentity())
-                    .size(spec.getElements().length)
-                    .elements(spec.getElements())
-                    .operatorSymbol(spec.getOperatorSymbol())
-                    .lookup(spec.getLookup())
-                    .multiplicationTable(binaryOperatorUtil.getMultiplicationTable(
-                      spec.getElements().length,
-                      spec.getOperator()
-                    ))
-                    .build();
+  }
   
+  public Group createGroup(
+    GroupSpec spec
+  ) throws ValidationException {
+    completeGroupSpec(spec);
+    Group result = Group.builder()
+                     .inversesMap(spec.getInversesMap())
+                     .maximalCycles(spec.getMaximalCycles())
+                     .identity(spec.getIdentity())
+                     .size(spec.getElements().length)
+                     .elements(spec.getElements())
+                     .operatorSymbol(spec.getOperatorSymbol())
+                     .lookup(spec.getLookup())
+                     .multiplicationTable(binaryOperatorUtil.getMultiplicationTable(
+                       spec.getElements().length,
+                       spec.getOperator()
+                     ))
+                     .build();
+    
     groupValidator.validate(result);
     return result;
   }
   
   public SortedGroupResult createSortedGroup(
-    String[] elements,
-    Map<Integer, Integer> inversesMap,
-    Set<IntCycle> maximalCycles,
-    BiFunction<Integer, Integer, Integer> operator
+    GroupSpec spec
   ) throws ValidationException {
-    return createSortedGroup(
-      "*", elements, inversesMap, maximalCycles, operator
-    );
-  }
-  
-  public SortedGroupResult createSortedGroup(
-    String operatorSymbol,
-    String[] elements,
-    Map<Integer, Integer> inversesMap,
-    Set<IntCycle> maximalCycles,
-    BiFunction<Integer, Integer, Integer> operator
-  ) throws ValidationException {
-    Remapper remapper = Remapper.init(elements.length);
+    resolveMaximalCycles(spec);
+    Remapper remapper = Remapper.init(spec.getElements().length);
     Map<Integer, Set<Integer>> nCycleGenerators = new HashMap<>();
-    for (IntCycle cycle:maximalCycles.stream()
-                          .flatMap(cycle -> Stream.concat(
-                            Stream.of(cycle),
-                            cycle.getSubCycles().stream()
-                          )).collect(Collectors.toSet())) {
+    for (IntCycle cycle: spec.getMaximalCycles().stream()
+                           .flatMap(cycle -> Stream.concat(
+                             Stream.of(cycle),
+                             cycle.getSubCycles().stream()
+                           )).collect(Collectors.toSet())) {
       nCycleGenerators.computeIfPresent(cycle.getSize(), (n, generators) -> {
         generators.addAll(cycle.getGenerators());
         return generators;
@@ -156,20 +152,17 @@ public class GroupService {
       .sorted(Map.Entry.comparingByKey())
       .map(Map.Entry::getValue)
       .forEach(nGenerators -> nGenerators.stream()
-                                .sorted(Comparator.comparing(i -> elements[i]))
-                                .forEach(generator -> remapper.map(elements[generator], generator)));
+                                .sorted(Comparator.comparing(i -> spec.getElements()[i]))
+                                .forEach(generator -> remapper.map(spec.getElements()[generator], generator)));
     
     
     return new SortedGroupResult(
       createGroup(
         new GroupSpec()
-        .setOperatorSymbol(operatorSymbol)
-        .setIdentity(0) // The identity will be the only 1-cycle in a valid group
-        .setElements(remapper.getElements())
-        .setOperator(remapper.remapBiFunc(operator))
-        .setLookup(remapper.getReverseLookup())
-        .setInversesMap(remapper.remapInverses(inversesMap))
-        .setMaximalCycles(remapper.remapCycles(maximalCycles))
+          .setOperatorSymbol(spec.getOperatorSymbol())
+          .setIdentity(0) // The identity will be the only 1-cycle in a valid group
+          .setElements(remapper.getElements())
+          .setOperator(remapper.remapBiFunc(spec.getOperator()))
       ), remapper
     );
   }
@@ -191,43 +184,11 @@ public class GroupService {
     if (elements.length != multiplicationTable.length) {
       throw new RuntimeException("No.");
     }
-    Map<Integer, Integer> inversesMap = new HashMap<>();
-    inversesMap.put(0, 0);
-    
-    Set<List<Integer>> cycles = new HashSet<>();
-    for (int i = 1; i < elements.length; i++) {
-      int curr = i;
-      if (cycles.stream().noneMatch(otherCycle -> otherCycle.contains(curr))) {
-        LinkedList<Integer> intCycle = new LinkedList<>();
-        intCycle.addLast(i);
-        int newEl = multiplicationTable[i][i];
-        while (!intCycle.contains(newEl)) {
-          intCycle.addLast(newEl);
-          newEl = multiplicationTable[i][newEl];
-        }
-        cycles.removeIf(intCycle::containsAll);
-        cycles.add(List.copyOf(intCycle));
-        intCycle.removeLast();
-        while (!intCycle.isEmpty()) {
-          int x = intCycle.removeFirst();
-          if (!intCycle.isEmpty()) {
-            int inverseX = intCycle.removeLast();
-            inversesMap.put(x, inverseX);
-            inversesMap.put(inverseX, x);
-          } else {
-            inversesMap.put(x, x);
-          }
-        }
-      }
-    }
     Group result = createSortedGroup(
-      operatorSymbol,
-      elements,
-      inversesMap,
-      cycles.stream()
-        .map(cycleUtils::createIntCycle)
-        .collect(Collectors.toSet()),
-      (i, j) -> multiplicationTable[i][j]
+      new GroupSpec()
+        .setOperatorSymbol(operatorSymbol)
+        .setElements(elements)
+        .setOperator((i, j) -> multiplicationTable[i][j])
     ).getGroup();
     
     groupValidator.validate(result);

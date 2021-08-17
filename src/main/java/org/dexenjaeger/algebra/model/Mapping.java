@@ -55,4 +55,13 @@ public class Mapping {
     }
     return arrayString();
   }
+  
+  public boolean isIdentity() {
+    for (int i = 0; i < array.length; i++) {
+      if (i != array[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

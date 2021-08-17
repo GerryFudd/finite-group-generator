@@ -39,14 +39,14 @@ class GroupServiceTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> groupService.createSortedGroup(
-        summary.getElements(),
-        Map.of(0, 0, 1, 2, 2, 1, 3, 3),
-        summary.getCycles(),
-        summary.getOperator()
+        new GroupSpec()
+        .setElements(summary.getElements())
+        .setOperator(summary.getOperator())
+        .setInversesMap(Map.of(0, 0, 1, 2, 2, 1, 3, 3))
       ));
     
     assertTrue(
-      Pattern.compile("The value [ab] is not the inverse of the element [ab] in Group\n\n" +
+      Pattern.compile("The inverse of element [ab] not found in inverses map for Group\n\n" +
                         "_\\*_\\|_I_a_b_c_\n" +
                         " I \\| I a b c \n" +
                         " a \\| a a a a \n" +
@@ -72,25 +72,6 @@ class GroupServiceTest {
     assertEquals(
       "The inverse of element a not found in inverses map for Group\n" +
         "\n" +
-        "_*_|_I_a_\n" +
-        " I | I a \n" +
-        " a | a I \n", e.getMessage()
-    );
-  }
-  
-  @Test
-  void inverseNotPresentInInversesMap() {
-    ValidationException e = assertThrows(
-      ValidationException.class,
-      () -> groupService.createSortedGroup(
-        new String[]{"I", "a"},
-        Map.of(0, 0),
-        Set.of(cycleUtils.createIntCycle(1, 0)),
-        (a, b) -> (a + b) % 2
-      ));
-    
-    assertEquals(
-      "The inverse of element a not found in inverses map for Group\n\n" +
         "_*_|_I_a_\n" +
         " I | I a \n" +
         " a | a I \n", e.getMessage()

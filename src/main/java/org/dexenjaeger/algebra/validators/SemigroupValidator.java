@@ -23,8 +23,8 @@ public class SemigroupValidator implements Validator<Semigroup> {
             !item.prod(item.prod(a, b), c).equals(item.prod(a, item.prod(b, c)))
           ) {
             throw new ValidationException(String.format(
-              "Binary operator is not associative\n%s",
-              item.printMultiplicationTable()
+              "Binary operator is not associative (%s, %s, %s)\n%s",
+              a, b, c, item.printMultiplicationTable()
             ));
           }
         }

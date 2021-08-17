@@ -33,6 +33,13 @@ public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
     return this;
   }
   
+  private boolean identity;
+  
+  public AutomorphismBuilder identity(boolean identity) {
+    this.identity = identity;
+    return this;
+  }
+  
   @Override
   public Automorphism build() {
     return new ConcreteAutomorphism(
@@ -41,7 +48,8 @@ public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
       new CyclePresentation(stringCycles.stream()
                               .sorted(Comparator.comparing(StringCycle::toString))
                               .sorted(Comparator.comparing(AbstractCycle::getSize))
-                              .collect(Collectors.toList()))
+                              .collect(Collectors.toList())),
+      identity
     );
   }
 }

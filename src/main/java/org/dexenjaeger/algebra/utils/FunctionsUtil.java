@@ -18,13 +18,13 @@ public class FunctionsUtil {
     return imageList.toArray(new String[0]);
   }
   
-  public int[] createMapping(int size, Function<Integer, Integer> act) {
+  public Mapping createMapping(int size, Function<Integer, Integer> act) {
     int[] mapping = new int[size];
     
     for (int i = 0; i < size; i++) {
       mapping[i] = act.apply(i);
     }
-    return mapping;
+    return new Mapping(mapping);
   }
   
   public int[] createInverseMapping(int size, Function<Integer, Integer> act) {

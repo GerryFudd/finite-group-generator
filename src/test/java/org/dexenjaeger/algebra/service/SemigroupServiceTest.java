@@ -6,8 +6,10 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.regex.Pattern;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SemigroupServiceTest {
   public final Injector injector = Guice.createInjector(new AlgebraModule());
@@ -31,12 +33,13 @@ class SemigroupServiceTest {
         this::nonAssociative
       ));
     
-    assertEquals(
-      "Binary operator is not associative\n\n" +
-        "_*_|_x_y_z_\n" +
-        " x | x y z \n" +
-        " y | x x x \n" +
-        " z | x y z \n", e.getMessage()
+    assertTrue(
+      Pattern.matches("Binary operator is not associative \\(\\w, \\w, \\w\\)\\n\\n" +
+        "_\\*_\\|_x_y_z_\\n" +
+        " x \\| x y z \\n" +
+        " y \\| x x x \\n" +
+        " z \\| x y z \\n", e.getMessage()),
+      String.format("Expected exception to match pattern, instead got\n%s", e.getMessage())
     );
   }
   

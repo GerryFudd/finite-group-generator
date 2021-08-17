@@ -10,6 +10,8 @@ public class ConcreteAutomorphism extends ConcreteIsomorphism implements Automor
   private final CyclePresentation cyclePresentation;
   @Getter
   private final Set<Integer> fixedElements;
+  @Getter
+  private final boolean identity;
   
   ConcreteAutomorphism(
     Group domain,
@@ -17,11 +19,13 @@ public class ConcreteAutomorphism extends ConcreteIsomorphism implements Automor
     String[] image,
     int[] inverseMapping,
     Set<Integer> fixedElements,
-    CyclePresentation cyclePresentation
+    CyclePresentation cyclePresentation,
+    boolean identity
   ) {
     super(domain, domain, mapping, image, inverseMapping);
     this.fixedElements = fixedElements;
     this.cyclePresentation = cyclePresentation;
+    this.identity = identity;
   }
   
   @Override

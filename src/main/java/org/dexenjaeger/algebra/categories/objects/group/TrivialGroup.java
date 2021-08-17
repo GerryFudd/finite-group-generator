@@ -121,4 +121,9 @@ public class TrivialGroup implements Group {
       && ((BinaryOperator) other).getSize() == 1
       && ((BinaryOperator) other).display(0).equals(identityDisplay);
   }
+  
+  @Override
+  public String toString() {
+    return printMultiplicationTable();
+  }
 }

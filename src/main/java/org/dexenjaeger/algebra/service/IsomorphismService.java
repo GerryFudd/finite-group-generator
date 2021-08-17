@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
@@ -32,15 +33,15 @@ public class IsomorphismService {
   public Isomorphism createIsomorphism(
     Group domain, Group range, Function<Integer, Integer> func, Function<Integer, Integer> inverse
   ) throws ValidationException {
-    int[] mapping = functionsUtil.createMapping(domain.getSize(), func);
+    Mapping mapping = functionsUtil.createMapping(domain.getSize(), func);
     Isomorphism automorphism = Isomorphism.builder()
-                                 .inverseMapping(functionsUtil.createMapping(domain.getSize(), inverse))
+                                 .inverseMapping(functionsUtil.createMapping(domain.getSize(), inverse).getArray())
                                  .domain(domain)
                                  .range(range)
                                  .image(functionsUtil.createImage(
-                                   domain.getSize(), i -> range.display(mapping[i])
+                                   domain.getSize(), i -> range.display(mapping.get(i))
                                  ))
-                                 .mapping(mapping)
+                                 .mapping(mapping.getArray())
                                  .build();
     automorphismValidator.validate(automorphism);
     return automorphism;
@@ -82,10 +83,10 @@ public class IsomorphismService {
     return Isomorphism.builder()
              .inverseMapping(functionsUtil.createMapping(
                isomorphism.getDomain().getSize(), isomorphism::apply
-             ))
+             ).getArray())
              .mapping(functionsUtil.createMapping(
                isomorphism.getDomain().getSize(), isomorphism::unApply
-             ))
+             ).getArray())
              .domain(isomorphism.getRange())
              .range(isomorphism.getDomain())
              .image(functionsUtil.createImage(
