@@ -5,7 +5,6 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.service.MonoidService;
-import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,14 +14,14 @@ class FunctionSpaceGeneratorTest {
   private final FunctionSpaceGenerator functionSpaceGenerator = injector.getInstance(FunctionSpaceGenerator.class);
   private final MonoidService monoidService = injector.getInstance(MonoidService.class);
   @Test
-  void  generatesTheTrivialMonoid() throws ValidationException {
+  void  generatesTheTrivialMonoid() {
     assertEquals(
       new TrivialGroup("I"),
       functionSpaceGenerator.createFunctionSpace(1)
     );
   }
   @Test
-  void  generatesTheCorrectSetOf2Functions() throws ValidationException {
+  void  generatesTheCorrectSetOf2Functions() {
     assertEquals(
       monoidService.createMonoid(
         0, new String[]{"I", "a", "b", "c"},

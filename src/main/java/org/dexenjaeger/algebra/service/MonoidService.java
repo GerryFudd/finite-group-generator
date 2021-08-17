@@ -2,7 +2,6 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
-import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
@@ -24,7 +23,7 @@ public class MonoidService {
   public Monoid createMonoid(
     int identity, String[] elements,
     BiFunction<Integer, Integer, Integer> operator
-    ) throws ValidationException {
+    ) {
     Monoid result = Monoid.builder()
       .identity(identity)
       .elements(elements)

@@ -5,7 +5,6 @@ import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
-import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
@@ -32,7 +31,7 @@ public class IsomorphismService {
   
   public Isomorphism createIsomorphism(
     Group domain, Group range, Function<Integer, Integer> func, Function<Integer, Integer> inverse
-  ) throws ValidationException {
+  ) {
     Mapping mapping = functionsUtil.createMapping(domain.getSize(), func);
     Isomorphism automorphism = Isomorphism.builder()
                                  .inverseMapping(functionsUtil.createMapping(domain.getSize(), inverse).getArray())
@@ -49,7 +48,7 @@ public class IsomorphismService {
   
   public Isomorphism createIsomorphism(
     Group domain, Function<Integer, String> func
-  ) throws ValidationException {
+  ) {
     Map<String, Integer> rangeLookup = new HashMap<>();
     String[] elements = new String[domain.getSize()];
     for (int i = 0; i < domain.getSize(); i++) {

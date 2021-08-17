@@ -6,7 +6,6 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
-import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +40,7 @@ class InnerAutomorphismServiceTest {
   }
   
   @Test
-  void createInnerAutomorphismGroup() throws ValidationException {
+  void createInnerAutomorphismGroup() {
     Group inn3 = innerAutomorphismService.createInnerAutomorphismGroup(
       symmetryGroupGenerator.createSymmetryGroup(3)
     );

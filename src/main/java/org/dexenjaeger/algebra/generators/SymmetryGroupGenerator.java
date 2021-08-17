@@ -7,7 +7,6 @@ import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.dexenjaeger.algebra.service.GroupService;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.utils.PermutationUtil;
-import org.dexenjaeger.algebra.validators.ValidationException;
 
 import javax.inject.Inject;
 
@@ -30,20 +29,14 @@ public class SymmetryGroupGenerator {
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       PermutationUtil.getPermutationList(n)
     );
-  
-    try {
-      return groupService.createGroup(
-        new GroupSpec()
+    
+    return groupService.createGroup(
+      new GroupSpec()
         .setOperatorSymbol("o")
         .setIdentity(0)
         .setElements(summary.getElements())
         .setMaximalCycles(summary.getCycles())
         .setOperator(summary.getOperator())
-      );
-    } catch (ValidationException e) {
-      throw new RuntimeException(
-        "Generated group didn't validate", e
-      );
-    }
+    );
   }
 }

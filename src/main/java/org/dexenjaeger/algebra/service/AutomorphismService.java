@@ -41,7 +41,7 @@ public class AutomorphismService {
     this.groupService = groupService;
   }
   
-  public Automorphism compose(Automorphism a, Automorphism b) throws ValidationException {
+  public Automorphism compose(Automorphism a, Automorphism b) {
     if (!a.getDomain().equals(b.getDomain())) {
       throw new RuntimeException("No.");
     }
@@ -58,7 +58,7 @@ public class AutomorphismService {
     );
   }
   
-  public Automorphism createAutomorphism(Group domain, Function<Integer, Integer> act) throws ValidationException {
+  public Automorphism createAutomorphism(Group domain, Function<Integer, Integer> act) {
     Automorphism result = doCreateAutomorphism(domain, act);
     
     automorphismValidator.validate(result);
@@ -115,7 +115,7 @@ public class AutomorphismService {
              .collect(Collectors.toSet());
   }
   
-  public Automorphism getInverse(Automorphism automorphism) throws ValidationException {
+  public Automorphism getInverse(Automorphism automorphism) {
     Automorphism result =  Automorphism.builder()
                              .withStringCycles(convertCycles(
                                automorphism.getCyclePresentation().getCycles(),
@@ -160,13 +160,13 @@ public class AutomorphismService {
         }
       ));
     } catch (ValidationException e) {
-      System.out.printf("Mapping %s failed to generate an automorphism.", mapping);
+      System.out.printf("\nMapping %s failed to generate an automorphism.\n", mapping);
       System.out.print(e.getMessage());
       return Optional.empty();
     }
   }
   
-  public Group createAutomorphismGroup(Group group) throws ValidationException {
+  public Group createAutomorphismGroup(Group group) {
     if (group.getSize() < 2) {
       return new TrivialGroup();
     }

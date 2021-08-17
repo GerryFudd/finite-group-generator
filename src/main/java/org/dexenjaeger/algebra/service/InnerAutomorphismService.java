@@ -26,14 +26,14 @@ public class InnerAutomorphismService {
       return automorphismService.createAutomorphism(
         group, a -> group.prod(element, group.prod(a, group.getInverse(element)))
       );
-    } catch (ValidationException | NullPointerException e) {
-      throw new RuntimeException(String.format(
+    } catch (NullPointerException e) {
+      throw new ValidationException(String.format(
         "Failed to create inner automorphism from %d", element
       ), e);
     }
   }
   
-  public Group createInnerAutomorphismGroup(Group group) throws ValidationException {
+  public Group createInnerAutomorphismGroup(Group group) {
     List<Automorphism> elements = group.getElementsDisplay().stream()
       .map(group::eval)
       .map(i -> createInnerAutomorphism(group, i))
@@ -42,18 +42,9 @@ public class InnerAutomorphismService {
       new GroupSpec()
       .setOperatorSymbol("o")
       .setElements(elements.stream().map(Automorphism::toString).toArray(String[]::new))
-      .setOperator((i, j) -> {
-        try {
-          return elements.indexOf(automorphismService.compose(
-            elements.get(i), elements.get(j)
-          ));
-        } catch (ValidationException e) {
-          throw new RuntimeException(String.format(
-            "Failed to evaluate binary operator (%d, %d)",
-            i, j
-          ));
-        }
-      })
+      .setOperator((i, j) -> elements.indexOf(automorphismService.compose(
+        elements.get(i), elements.get(j)
+      )))
     ).getGroup();
   }
 }

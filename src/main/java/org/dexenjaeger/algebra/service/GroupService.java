@@ -74,7 +74,7 @@ public class GroupService {
     }
   }
   
-  private void resolveMaximalCycles(GroupSpec spec) throws ValidationException {
+  private void resolveMaximalCycles(GroupSpec spec) {
     try {
       setIfNull(
         spec::getMaximalCycles,
@@ -89,7 +89,7 @@ public class GroupService {
     }
   }
   
-  private void completeGroupSpec(GroupSpec spec) throws ValidationException {
+  private void completeGroupSpec(GroupSpec spec) {
     setIfNull(
       spec::getLookup,
       spec::setLookup,
@@ -109,7 +109,7 @@ public class GroupService {
   
   public Group createGroup(
     GroupSpec spec
-  ) throws ValidationException {
+  ) {
     completeGroupSpec(spec);
     Group result = Group.builder()
                      .inversesMap(spec.getInversesMap())
@@ -131,7 +131,7 @@ public class GroupService {
   
   public SortedGroupResult createSortedGroup(
     GroupSpec spec
-  ) throws ValidationException {
+  ) {
     resolveMaximalCycles(spec);
     Remapper remapper = Remapper.init(spec.getElements().length);
     Map<Integer, Set<Integer>> nCycleGenerators = new HashMap<>();
@@ -170,7 +170,7 @@ public class GroupService {
   public Group constructGroupFromElementsAndMultiplicationTable(
     String[] elements,
     int[][] multiplicationTable
-  ) throws ValidationException {
+  ) {
     return constructGroupFromElementsAndMultiplicationTable(
       "*", elements, multiplicationTable
     );
@@ -180,7 +180,7 @@ public class GroupService {
     String operatorSymbol,
     String[] elements,
     int[][] multiplicationTable
-  ) throws ValidationException {
+  ) {
     if (elements.length != multiplicationTable.length) {
       throw new RuntimeException("No.");
     }

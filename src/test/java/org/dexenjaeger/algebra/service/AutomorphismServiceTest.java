@@ -21,7 +21,7 @@ public class AutomorphismServiceTest {
   private final SymmetryGroupGenerator symmetryGroupGenerator = injector.getInstance(SymmetryGroupGenerator.class);
   
   @Test
-  void createAutomorphism() throws ValidationException {
+  void createAutomorphism() {
     Automorphism automorphism = automorphismService.createAutomorphism(
       groupService.createCyclicGroup("I", "a", "b", "c"),
       i -> (3 * i) % 4
@@ -55,7 +55,7 @@ public class AutomorphismServiceTest {
   }
   
   @Test
-  void createAutomorphismGroupForTrivialGroup() throws ValidationException {
+  void createAutomorphismGroupForTrivialGroup() {
     Group result = automorphismService.createAutomorphismGroup(new TrivialGroup());
     
     assertEquals(
@@ -64,7 +64,7 @@ public class AutomorphismServiceTest {
   }
   
   @Test
-  void createAutomorphismGroupForS2() throws ValidationException {
+  void createAutomorphismGroupForS2() {
     Group result = automorphismService.createAutomorphismGroup(symmetryGroupGenerator.createSymmetryGroup(2));
     
     assertEquals(
@@ -73,7 +73,7 @@ public class AutomorphismServiceTest {
   }
   
   @Test
-  void createAutomorphismGroupForCyclicGroup3() throws ValidationException {
+  void createAutomorphismGroupForCyclicGroup3() {
     Group result = automorphismService.createAutomorphismGroup(groupService.createCyclicGroup(
       "I", "a", "b"
     ));
@@ -90,7 +90,7 @@ public class AutomorphismServiceTest {
   }
   
   @Test
-  void createAutomorphismGroupForS3() throws ValidationException {
+  void createAutomorphismGroupForS3() {
     Group result = automorphismService.createAutomorphismGroup(symmetryGroupGenerator.createSymmetryGroup(3));
     
     assertEquals(

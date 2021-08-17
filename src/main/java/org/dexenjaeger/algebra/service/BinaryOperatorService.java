@@ -9,7 +9,6 @@ import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.utils.MappingUtil;
-import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
@@ -135,13 +134,13 @@ public class BinaryOperatorService {
   
   public BinaryOperator createBinaryOperator(
     String[] elements, BiFunction<Integer, Integer, Integer> operator
-  ) throws ValidationException {
+  ) {
     return createBinaryOperator("*", elements, operator);
   }
   
   public BinaryOperator createBinaryOperator(
     String operatorSymbol, String[] elements, BiFunction<Integer, Integer, Integer> operator
-  ) throws ValidationException {
+  ) {
     
     BinaryOperator result = BinaryOperator.builder()
                               .operatorSymbol(operatorSymbol)

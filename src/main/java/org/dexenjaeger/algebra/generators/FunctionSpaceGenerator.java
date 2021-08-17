@@ -7,7 +7,6 @@ import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.dexenjaeger.algebra.service.MonoidService;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.utils.MoreMath;
-import org.dexenjaeger.algebra.validators.ValidationException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class FunctionSpaceGenerator {
     }
     return functions;
   }
-  public Monoid createFunctionSpace(int n) throws ValidationException {
+  public Monoid createFunctionSpace(int n) {
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       createFunctionSet(n)
     );

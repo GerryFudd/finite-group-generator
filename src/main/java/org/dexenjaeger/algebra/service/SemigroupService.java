@@ -2,7 +2,6 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
-import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
@@ -23,13 +22,13 @@ public class SemigroupService {
   
   public Semigroup createSemigroup(
     String[] elements, BiFunction<Integer, Integer, Integer> operator
-  ) throws ValidationException {
+  ) {
     return createSemigroup("*", elements, operator);
   }
   
   public Semigroup createSemigroup(
     String operatorSymbol, String[] elements, BiFunction<Integer, Integer, Integer> operator
-  ) throws ValidationException {
+  ) {
     Semigroup result = Semigroup.builder()
                          .operatorSymbol(operatorSymbol)
                          .elements(elements)

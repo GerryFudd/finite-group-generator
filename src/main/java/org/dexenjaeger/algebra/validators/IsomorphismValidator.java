@@ -14,7 +14,7 @@ public class IsomorphismValidator implements Validator<Isomorphism> {
   }
   
   @Override
-  public void validate(Isomorphism item) throws ValidationException {
+  public void validate(Isomorphism item) {
     homomorphismValidator.validate(item);
     
     // This Isomorphism has already been validated as

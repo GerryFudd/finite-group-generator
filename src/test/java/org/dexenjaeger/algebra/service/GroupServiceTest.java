@@ -220,7 +220,7 @@ class GroupServiceTest {
   }
   
   @Test
-  void createGroup_isForgivingOfMissingParametersCyclic() throws ValidationException {
+  void createGroup_isForgivingOfMissingParametersCyclic() {
     Group group = groupService.createGroup(
       new GroupSpec()
       .setIdentity(0)
@@ -263,7 +263,7 @@ class GroupServiceTest {
   }
   
   @Test
-  void createGroup_isForgivingOfMissingParametersMoreCycles() throws ValidationException {
+  void createGroup_isForgivingOfMissingParametersMoreCycles() {
     Group group = groupService.createGroup(
       new GroupSpec()
       .setIdentity(0)

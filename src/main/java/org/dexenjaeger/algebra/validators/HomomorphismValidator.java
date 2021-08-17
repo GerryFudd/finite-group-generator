@@ -11,7 +11,7 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
     ));
   }
   
-  private void validateHomomorphism(Homomorphism item) throws ValidationException {
+  private void validateHomomorphism(Homomorphism item) {
     int rangeSize = item.getRange().getSize();
     for (int i = 0; i < item.getDomain().getSize(); i++) {
       int fi = item.apply(i);
@@ -38,7 +38,7 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
     }
   }
   
-  private void validateInverseImageOfId(Homomorphism item) throws ValidationException {
+  private void validateInverseImageOfId(Homomorphism item) {
     for (String a:item.getDomain().getElementsDisplay()) {
       if (item.getKernel().getElementsDisplay().contains(a)
             != item.getRange()
@@ -49,7 +49,7 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
     }
   }
   
-  public static void validateSubgroup(Homomorphism item) throws ValidationException {
+  public static void validateSubgroup(Homomorphism item) {
     for (String a:item.getKernel().getElementsDisplay()) {
       for (String b:item.getKernel().getElementsDisplay()) {
         String c = item.getDomain().prod(a, b);
@@ -61,7 +61,7 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
   }
   
   @Override
-  public void validate(Homomorphism item) throws ValidationException {
+  public void validate(Homomorphism item) {
     validateHomomorphism(item);
     validateInverseImageOfId(item);
     validateSubgroup(item);

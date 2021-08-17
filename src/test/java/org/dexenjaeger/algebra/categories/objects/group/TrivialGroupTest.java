@@ -6,7 +6,6 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.dexenjaeger.algebra.service.GroupService;
-import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +32,7 @@ class TrivialGroupTest {
   }
   
   @Test
-  void equalsEquivalentBinaryOperator() throws ValidationException {
+  void equalsEquivalentBinaryOperator() {
     BinaryOperator byAnotherName = binaryOperatorService.createBinaryOperator(
       new String[]{"a"}, (i, j) -> 0
     );

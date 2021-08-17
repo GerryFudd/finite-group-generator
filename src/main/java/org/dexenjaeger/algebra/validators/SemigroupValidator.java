@@ -14,7 +14,7 @@ public class SemigroupValidator implements Validator<Semigroup> {
   }
   
   @Override
-  public void validate(Semigroup item) throws ValidationException {
+  public void validate(Semigroup item) {
     binaryOperatorValidator.validate(item);
     for (String a:item.getElementsDisplay()) {
       for (String b:item.getElementsDisplay()) {

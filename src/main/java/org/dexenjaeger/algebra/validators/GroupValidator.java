@@ -21,7 +21,7 @@ public class GroupValidator implements Validator<Group> {
     return new ValidationException(String.format("Invalid cycle: %s.", reason));
   }
   
-  private void validateMaximalCycles(Group item) throws ValidationException {
+  private void validateMaximalCycles(Group item) {
     Set<IntCycle> maximalCycles = item.getMaximalCycles();
     Set<Integer> coveredElements = new HashSet<>();
     for (IntCycle cycle:maximalCycles) {
@@ -68,7 +68,7 @@ public class GroupValidator implements Validator<Group> {
     }
   }
   
-  private void validateInverses(Group item) throws ValidationException {
+  private void validateInverses(Group item) {
     for (String a: item.getElementsDisplay()) {
       String inverse;
       try {
@@ -93,7 +93,7 @@ public class GroupValidator implements Validator<Group> {
   }
   
   @Override
-  public void validate(Group item) throws ValidationException {
+  public void validate(Group item) {
     monoidValidator.validate(item);
     validateInverses(item);
     validateMaximalCycles(item);

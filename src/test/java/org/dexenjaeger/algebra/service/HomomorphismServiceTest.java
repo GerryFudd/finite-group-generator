@@ -25,7 +25,7 @@ class HomomorphismServiceTest {
   private final SymmetryGroupGenerator symmetryGroupGenerator = injector.getInstance(SymmetryGroupGenerator.class);
   
   @Test
-  void createHomomorphismTest() throws ValidationException {
+  void createHomomorphismTest() {
     Homomorphism validatedHomomorphism = homomorphismService.createHomomorphism(
       new TrivialGroup(),
       a -> "E"
@@ -115,7 +115,7 @@ class HomomorphismServiceTest {
   }
   
   @Test
-  void trivialHomomorphismCreatesKernelThatEqualsGroup() throws ValidationException {
+  void trivialHomomorphismCreatesKernelThatEqualsGroup() {
     Group group = groupService.createCyclicGroup(
       "I", "a", "b"
     );
@@ -160,7 +160,7 @@ class HomomorphismServiceTest {
   }
   
   @Test
-  void createHomomorphismTest_createsRange() throws ValidationException {
+  void createHomomorphismTest_createsRange() {
     Group s3 = symmetryGroupGenerator.createSymmetryGroup(3);
     Function<Integer, String> act = a -> {
       if (s3.display(a).equals("d")) {

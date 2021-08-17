@@ -14,7 +14,7 @@ public class MonoidValidator implements Validator<Monoid> {
   }
   
   @Override
-  public void validate(Monoid item) throws ValidationException {
+  public void validate(Monoid item) {
     semigroupValidator.validate(item);
     for (String a: item.getElementsDisplay()) {
       if (!item.prod(item.getIdentityDisplay(), a).equals(a) || !item.prod(a, item.getIdentityDisplay()).equals(a)) {

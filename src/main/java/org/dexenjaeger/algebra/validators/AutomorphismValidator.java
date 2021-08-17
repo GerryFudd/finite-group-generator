@@ -14,7 +14,7 @@ public class AutomorphismValidator implements Validator<Automorphism> {
   }
   
   @Override
-  public void validate(Automorphism item) throws ValidationException {
+  public void validate(Automorphism item) {
     isomorphismValidator.validate(item);
   }
 }

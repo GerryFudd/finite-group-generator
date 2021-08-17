@@ -25,7 +25,7 @@ class IsomorphismServiceTest {
   private final IsomorphismService isomorphismService = injector.getInstance(IsomorphismService.class);
   
   @Test
-  void createIsomorphismTest_domainAndFunc() throws ValidationException {
+  void createIsomorphismTest_domainAndFunc() {
     Map<Integer, String> functionMap = Map.of(
       0, "E",
       1, "x",

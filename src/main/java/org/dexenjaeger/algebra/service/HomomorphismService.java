@@ -33,7 +33,7 @@ public class HomomorphismService {
   
   private Homomorphism doCreateHomomorphism(
     Group domain, Group range, Group kernel, Function<Integer, Integer> act
-  ) throws ValidationException {
+  ) {
     Homomorphism result;
     try {
       result = Homomorphism.builder()
@@ -56,7 +56,7 @@ public class HomomorphismService {
   
   public Homomorphism createHomomorphism(
     Group domain, Group range, Group kernel, Function<Integer, Integer> act
-  ) throws ValidationException {
+  ) {
     groupValidator.validate(domain);
     groupValidator.validate(range);
     groupValidator.validate(kernel);
@@ -66,7 +66,7 @@ public class HomomorphismService {
   public Homomorphism createHomomorphism(
     Group domain,
     Function<Integer, String> act
-  ) throws ValidationException {
+  ) {
     groupValidator.validate(domain);
     HomomorphismSummary summary = constructRangeAndKernel(
       domain, act

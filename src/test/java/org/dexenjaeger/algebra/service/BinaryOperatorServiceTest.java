@@ -55,7 +55,7 @@ class BinaryOperatorServiceTest {
   }
   
   @Test
-  void validInverses() throws ValidationException {
+  void validInverses() {
     BinaryOperatorSummary summary = binaryOperatorService.getSortedAndPrettifiedBinaryOperator(
       List.of(
         new Mapping(new int[]{0, 1, 2, 3}),
@@ -108,7 +108,7 @@ class BinaryOperatorServiceTest {
   }
   
   @Test
-  void getMultiplicationTableTest() throws ValidationException {
+  void getMultiplicationTableTest() {
     assertEquals(
       new StringBuilder("\n")
         .append("_+_|_a_b_c_\n")
