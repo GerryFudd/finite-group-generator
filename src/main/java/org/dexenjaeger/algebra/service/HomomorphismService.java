@@ -5,7 +5,6 @@ import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.HomomorphismSummary;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
-import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -17,7 +16,6 @@ public class HomomorphismService {
   private final Validator<Group> groupValidator;
   private final Validator<Homomorphism> homomorphismValidator;
   private final GroupService groupService;
-  private final BinaryOperatorUtil binaryOperatorUtil;
   private final FunctionsUtil functionsUtil;
   
   @Inject
@@ -25,13 +23,11 @@ public class HomomorphismService {
     Validator<Group> groupValidator,
     Validator<Homomorphism> homomorphismValidator,
     GroupService groupService,
-    BinaryOperatorUtil binaryOperatorUtil,
     FunctionsUtil functionsUtil
   ) {
     this.groupValidator = groupValidator;
     this.homomorphismValidator = homomorphismValidator;
     this.groupService = groupService;
-    this.binaryOperatorUtil = binaryOperatorUtil;
     this.functionsUtil = functionsUtil;
   }
   

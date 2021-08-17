@@ -1,7 +1,6 @@
 package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
-import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,10 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 public class Remapper {
-  private final CycleUtils cycleUtils = new CycleUtils();
   @Getter
   private int currentIndex = 0;
   @Getter
@@ -59,20 +56,5 @@ public class Remapper {
   
   public BiFunction<Integer, Integer, Integer> remapBiFunc(BiFunction<Integer, Integer, Integer> biFunction) {
     return (a, b) -> inverseRemap[biFunction.apply(remap[a], remap[b])];
-  }
-  
-  public Set<IntCycle> remapCycles(Set<IntCycle> oldCycles) {
-    return oldCycles.stream()
-             .map(oldCycle -> cycleUtils.convertToIntCycle(i -> inverseRemap[i], oldCycle))
-             .collect(Collectors.toSet());
-  }
-  
-  public Map<Integer, Integer> remapInverses(Map<Integer, Integer> inversesMap) {
-    return inversesMap.entrySet()
-      .stream()
-      .collect(Collectors.toMap(
-        entry -> inverseRemap[entry.getKey()],
-        entry -> inverseRemap[entry.getValue()]
-      ));
   }
 }
