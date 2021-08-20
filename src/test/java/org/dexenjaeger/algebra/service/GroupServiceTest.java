@@ -48,7 +48,7 @@ class GroupServiceTest {
       ));
     
     assertTrue(
-      Pattern.compile("The inverse of element [ab] not found in inverses map for Group\n\n" +
+      Pattern.compile("The inverse of element [12] not found in inverses map for Group\n\n" +
                         "_\\*_\\|_I_a_b_c_\n" +
                         " I \\| I a b c \n" +
                         " a \\| a a a a \n" +
@@ -72,7 +72,7 @@ class GroupServiceTest {
       ));
     
     assertEquals(
-      "The inverse of element a not found in inverses map for Group\n" +
+      "The value 2 is not the inverse of the element 1 in Group\n" +
         "\n" +
         "_*_|_I_a_\n" +
         " I | I a \n" +

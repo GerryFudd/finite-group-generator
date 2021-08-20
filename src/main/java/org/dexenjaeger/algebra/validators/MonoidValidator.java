@@ -16,8 +16,8 @@ public class MonoidValidator implements Validator<Monoid> {
   @Override
   public void validate(Monoid item) {
     semigroupValidator.validate(item);
-    for (String a: item.getElementsDisplay()) {
-      if (!item.prod(item.getIdentityDisplay(), a).equals(a) || !item.prod(a, item.getIdentityDisplay()).equals(a)) {
+    for (int i = 0; i < item.getSize(); i++) {
+      if (item.prod(item.getIdentity(), i) != i || item.prod(i, item.getIdentity()) != i) {
         throw new ValidationException(String.format(
           "The element %s is not an identity in this Monoid\n%s",
           item.getIdentityDisplay(), item.printMultiplicationTable()

@@ -69,24 +69,30 @@ public class GroupValidator implements Validator<Group> {
   }
   
   private void validateInverses(Group item) {
-    for (String a: item.getElementsDisplay()) {
-      String inverse;
+    for (int i = 0; i < item.getSize(); i++) {
+      int inverse;
       try {
-        inverse = item.getInverse(a);
+        inverse = item.getInverse(i);
       } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
         throw new ValidationException(String.format(
-          "The inverse of element %s not found in inverses map for Group\n%s",
-          a, item
+          "The inverse of element %d not found in inverses map for Group\n%s",
+          i, item
         ));
       }
       
-      if (
-        !item.getIdentityDisplay().equals(item.prod(a, inverse))
-          || !item.getIdentityDisplay().equals(item.prod(inverse, a))
+      if (inverse >= item.getSize()) {
+        throw new ValidationException(String.format(
+          "The value %d is not the inverse of the element %d in Group\n%s",
+          inverse, i, item.printMultiplicationTable()
+        ));
+      }
+      
+      if (item.getIdentity() != item.prod(i, inverse)
+          || item.getIdentity() != item.prod(inverse, i)
       ) {
         throw new ValidationException(String.format(
           "The value %s is not the inverse of the element %s in Group\n%s",
-          inverse, a, item.printMultiplicationTable()
+          item.display(inverse), item.display(i), item.printMultiplicationTable()
         ));
       }
     }
