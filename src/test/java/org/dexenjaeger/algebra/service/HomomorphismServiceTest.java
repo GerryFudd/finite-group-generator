@@ -176,16 +176,32 @@ class HomomorphismServiceTest {
       s3, act
     );
     
+    Group range = homomorphism.getRange();
+    Group kernel = homomorphism.getKernel();
+    
     assertEquals(
-      "\n" +
-        "_x__|_I__a__b__c__f__f2_\n" +
-        " I  | I  a  b  c  f  f2 \n" +
-        " a  | a  I  f  f2 b  c  \n" +
-        " b  | b  f2 I  f  c  a  \n" +
-        " c  | c  f  f2 I  a  b  \n" +
-        " f  | f  c  a  b  f2 I  \n" +
-        " f2 | f2 b  c  a  I  f  \n",
-      homomorphism.getRange().printMultiplicationTable()
+      new TrivialGroup(),
+      kernel
+    );
+  
+    assertEquals(
+      4,
+      range.getMaximalCycles().size()
+    );
+  
+    assertEquals(
+      1,
+      range.getNCycles(1).size()
+    );
+  
+    assertEquals(
+      3,
+      range.getNCycles(2).size()
+    );
+  
+    assertEquals(
+      1,
+      range.getNCycles(3).size()
     );
   }
 }

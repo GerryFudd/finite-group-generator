@@ -7,6 +7,7 @@ import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,8 +85,9 @@ class InnerAutomorphismServiceTest {
     );
   }
   
+  @Disabled("This test is disabled because it takes 20 minutes to run.")
   @Test
-  void createOuterAutomorphismServiceTest_moreComplex() {
+  void createOuterAutomorphismServiceTest_s4() {
     assertEquals(
       new TrivialGroup("[I]"),
       innerAutomorphismService.createOuterAutomorphismGroup(

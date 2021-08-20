@@ -58,4 +58,18 @@ public class FunctionsUtil {
   public Mapping composeMappings(Mapping a, Mapping b) {
     return new Mapping(composeMappings(a.getArray(), b.getArray()));
   }
+  
+  public static Mapping getNextFunction(int domainSize, int rangeSize, int currentIndex) {
+    int placeMultiplier = 1;
+    int[] newMapping = new int[domainSize];
+    for (int j = domainSize - 1; 0 <= j; j--) {
+      newMapping[j] = (currentIndex / placeMultiplier) % rangeSize;
+      placeMultiplier *= rangeSize;
+    }
+    return new Mapping(newMapping);
+  }
+  
+  public static Iterable<Mapping> getFunctionIterable(int domainSize, int rangeSize) {
+    return new IndexedIterable<>(MoreMath.pow(rangeSize, domainSize), i -> getNextFunction(domainSize, rangeSize, i));
+  }
 }

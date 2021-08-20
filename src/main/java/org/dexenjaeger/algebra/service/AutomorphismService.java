@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.service;
 
+import com.google.common.collect.Sets;
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.AutomorphismBuilder;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
@@ -9,7 +10,6 @@ import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
-import org.dexenjaeger.algebra.utils.PermutationUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -140,26 +141,48 @@ public class AutomorphismService {
     return result;
   }
   
-  private Optional<Automorphism> createPotentialAutomorphism(Group group, Mapping mapping) {
-    try {
-      return Optional.of(createAutomorphism(
-        group, i -> {
-          if (i == group.getIdentity()) {
-            return i;
-          }
-          if (i < group.getIdentity()) {
-            if (mapping.get(i) < group.getIdentity()) {
-              return mapping.get(i);
-            }
-            return mapping.get(i) + 1;
-          }
-          if (mapping.get(i - 1) < group.getIdentity()) {
-            return mapping.get(i - 1);
-          }
-          return mapping.get(i - 1) + 1;
+  private Optional<Automorphism> createPossibleAutomorphism(
+    Group group,
+    Map<Integer, Integer> cycleGeneratorMapping
+  ) {
+    int[] newMapping = new int[group.getSize()];
+    newMapping[group.getIdentity()] = group.getIdentity();
+    Set<Integer> mapped = Sets.newHashSet(group.getIdentity());
+    Set<Integer> mappedTo = Sets.newHashSet(group.getIdentity());
+    for (Map.Entry<Integer, Integer> generatorMapping:cycleGeneratorMapping.entrySet()) {
+      int mappedGenerator = generatorMapping.getKey();
+      int imageGenerator = generatorMapping.getValue();
+      if (!mappedTo.add(imageGenerator)) {
+        return Optional.empty();
+      }
+      if (mapped.add(mappedGenerator)) {
+        newMapping[mappedGenerator] = imageGenerator;
+      } else if (newMapping[mappedGenerator] != imageGenerator) {
+        return Optional.empty();
+      }
+      int nextCycleElement = group.prod(mappedGenerator, mappedGenerator);
+      int nextImageElement = group.prod(imageGenerator, imageGenerator);
+      while (nextCycleElement != group.getIdentity()) {
+        if (!mappedTo.add(nextImageElement)) {
+          return Optional.empty();
         }
-      ));
-    } catch (ValidationException e) {
+        if (mapped.add(nextCycleElement)) {
+          newMapping[nextCycleElement] = nextImageElement;
+        } else {
+          if (newMapping[nextCycleElement] != nextImageElement) {
+            return Optional.empty();
+          }
+        }
+        nextCycleElement = group.prod(mappedGenerator, nextCycleElement);
+        nextImageElement = group.prod(imageGenerator, nextImageElement);
+      }
+    }
+    if (mapped.size() < group.getSize()) {
+      return Optional.empty();
+    }
+    try {
+      return Optional.of(createAutomorphism(group, x -> newMapping[x]));
+    } catch (ValidationException | NullPointerException e) {
       return Optional.empty();
     }
   }
@@ -170,9 +193,13 @@ public class AutomorphismService {
     }
     LinkedList<Automorphism> automorphisms = new LinkedList<>();
     
-    for (Mapping potentialMapping:PermutationUtil.getPermutationList(group.getSize() - 1)) {
-      createPotentialAutomorphism(group, potentialMapping)
-        .ifPresent(automorphisms::addLast);
+    AutomorphismSeedIterable automorphismSeedIterable = AutomorphismSeedIterable.init(group.getMaximalCycles());
+    
+    for (Map<Integer, Integer> automorphismSeed:automorphismSeedIterable) {
+      Optional<Automorphism> possibleAutomorphism = createPossibleAutomorphism(
+        group, automorphismSeed
+      );
+      possibleAutomorphism.ifPresent(automorphisms::addLast);
     }
     
     return groupService.createSortedGroup(

@@ -58,6 +58,7 @@ public abstract class BaseBinaryOperator implements BinaryOperator {
     return elements[i];
   }
   
+  @Override
   public String toString() {
     return printMultiplicationTable();
   }
