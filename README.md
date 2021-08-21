@@ -9,4 +9,16 @@ This app is intended to calculate finite groups from permutation sets. It has me
 
 ## Next steps
 
+### Usability
+
 There are only tests of the various group generators, but no way to interact with a deployed version of the code. I am planning to set up methods that can export results in csv or json format.
+
+I would also like to make this into an exportable jar file so that people could import this library into their own projects.
+
+### Performance
+
+I have brute-forced the computation of Automorphisms because I wanted to see how much I could optimize this computation before looking up the best approach (this was originally a learning exercise). I now plan to find some more theory about the computation of automorphism groups and apply those to see how much I can optimize this computation.
+
+### Additional features
+
+I plan to add methods that will compute the subgroups and normal subgroups of provided finite groups.
