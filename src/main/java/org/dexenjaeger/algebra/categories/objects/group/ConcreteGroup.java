@@ -4,11 +4,13 @@ import lombok.Getter;
 import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ConcreteGroup extends BaseBinaryOperator implements Group {
@@ -72,9 +74,9 @@ public class ConcreteGroup extends BaseBinaryOperator implements Group {
   @Override
   public Set<Integer> getNCycleGenerators(int n) {
     return getNCycleStream(n)
-      .map(IntCycle::getGenerators)
-      .flatMap(Set::stream)
-      .collect(Collectors.toSet());
+             .map(IntCycle::getGenerators)
+             .flatMap(Set::stream)
+             .collect(Collectors.toSet());
   }
   
   @Override
@@ -85,10 +87,19 @@ public class ConcreteGroup extends BaseBinaryOperator implements Group {
   @Override
   public Optional<IntCycle> getCycleGeneratedBy(int x) {
     return maximalCycles.stream()
-      .map(cycle -> cycle.getSubCycleGeneratedBy(x))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
-      .findAny();
+             .map(cycle -> cycle.getSubCycleGeneratedBy(x))
+             .filter(Optional::isPresent)
+             .map(Optional::get)
+             .findAny();
+  }
+  
+  @Override
+  public List<List<Integer>> getMultiplicationTable() {
+    return Arrays.stream(multiplicationTable)
+             .map(Arrays::stream)
+             .map(IntStream::boxed)
+             .map(s -> s.collect(Collectors.toList()))
+             .collect(Collectors.toList());
   }
   
   @Override

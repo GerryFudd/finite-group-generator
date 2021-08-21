@@ -19,4 +19,6 @@ public interface Group extends Monoid {
   static GroupBuilder builder() {
     return new GroupBuilder();
   }
+  
+  List<List<Integer>> getMultiplicationTable();
 }

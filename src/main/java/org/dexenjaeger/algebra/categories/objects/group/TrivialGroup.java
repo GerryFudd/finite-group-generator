@@ -66,6 +66,11 @@ public class TrivialGroup implements Group {
   }
   
   @Override
+  public List<List<Integer>> getMultiplicationTable() {
+    return List.of(List.of(0));
+  }
+  
+  @Override
   public Set<String> getElementsDisplay() {
     return Set.of(identityDisplay);
   }
