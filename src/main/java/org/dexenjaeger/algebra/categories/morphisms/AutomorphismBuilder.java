@@ -18,18 +18,18 @@ public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
     return this;
   }
   
-  private final Set<ElementCycle> stringCycles = new HashSet<>();
+  private final Set<ElementCycle> elementCycles = new HashSet<>();
   @Override
   public AutomorphismBuilder range(Group range) {
     throw new RuntimeException("Not implemented.");
   }
   
-  public AutomorphismBuilder withStringCycles(ElementCycle... cycles) {
-    return withStringCycles(Set.of(cycles));
+  public AutomorphismBuilder withElementCycles(ElementCycle... cycles) {
+    return withElementCycles(Set.of(cycles));
   }
   
-  public AutomorphismBuilder withStringCycles(Collection<ElementCycle> cycles) {
-    stringCycles.addAll(cycles);
+  public AutomorphismBuilder withElementCycles(Collection<ElementCycle> cycles) {
+    elementCycles.addAll(cycles);
     return this;
   }
   
@@ -45,7 +45,7 @@ public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
     return new ConcreteAutomorphism(
       domain, mapping, image, inverseMapping,
       fixedElements,
-      new CyclePresentation(stringCycles.stream()
+      new CyclePresentation(elementCycles.stream()
                               .sorted(Comparator.comparing(ElementCycle::toString))
                               .sorted(Comparator.comparing(AbstractCycle::getSize))
                               .collect(Collectors.toList())),

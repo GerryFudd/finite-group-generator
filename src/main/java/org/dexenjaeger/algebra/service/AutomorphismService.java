@@ -15,9 +15,11 @@ import org.dexenjaeger.algebra.validators.ValidationException;
 import org.dexenjaeger.algebra.validators.Validator;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -67,6 +69,23 @@ public class AutomorphismService {
     return result;
   }
   
+  private ElementCycle createArrangedCycle(List<Element> elements) {
+    // Put the cycle in the same order as the underlying
+    // group
+    Element firstElement = elements.stream()
+                             .sorted()
+                             .findFirst()
+                             .orElseThrow();
+    List<Element> rearrangedCycle = new ArrayList<>();
+    rearrangedCycle.addAll(
+      elements.subList(elements.indexOf(firstElement), elements.size())
+    );
+    rearrangedCycle.addAll(
+      elements.subList(0, elements.indexOf(firstElement))
+    );
+    return cycleUtils.createElementCycle(rearrangedCycle);
+  }
+  
   private Automorphism doCreateAutomorphism(Group domain, Function<Integer, Integer> act) {
     Mapping mapping = functionsUtil.createMapping(domain.getSize(), act);
     
@@ -84,9 +103,11 @@ public class AutomorphismService {
         remainingElements.remove(current);
         current = domain.display(act.apply(domain.eval(current)));
       }
+      // Put the cycle in the same order as the underlying
+      // group
       if (currentCycle.size() > 1) {
-        resultBuilder.withStringCycles(
-          cycleUtils.createElementCycle(currentCycle)
+        resultBuilder.withElementCycles(
+          createArrangedCycle(currentCycle)
         );
       }
     }
@@ -108,6 +129,7 @@ public class AutomorphismService {
   }
   
   private Set<ElementCycle> convertCycles(Collection<ElementCycle> cycles, Function<Element, Element> func) {
+    
     return cycles.stream()
              .map(cycle -> cycle.getElements()
                              .stream()
@@ -119,7 +141,7 @@ public class AutomorphismService {
   
   public Automorphism getInverse(Automorphism automorphism) {
     Automorphism result =  Automorphism.builder()
-                             .withStringCycles(convertCycles(
+                             .withElementCycles(convertCycles(
                                automorphism.getCyclePresentation().getCycles(),
                                automorphism::unApply
                              ))
