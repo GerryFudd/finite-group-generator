@@ -1,32 +1,25 @@
 package org.dexenjaeger.algebra.converter;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.Element;
-import org.dexenjaeger.algebra.model.cycle.Cycle;
-import org.dexenjaeger.algebra.model.dto.CycleDto;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.dto.ElementDto;
 import org.dexenjaeger.algebra.model.dto.GroupDto;
 import org.dexenjaeger.algebra.utils.io.latex.GroupAsLatex;
 import org.dexenjaeger.algebra.utils.io.latex.LatexCellSpec;
 
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class GroupConverter {
   public static GroupDto toDto(Group group) {
     return new GroupDto()
-             .setOperatorSymbol(group.getOperatorSymbol().getAscii())
+             .setOperatorSymbol(group.getOperatorSymbol().getJson())
              .setMultiplicationTable(group.getMultiplicationTable())
-             .setMaximalCycles(
-               group.getMaximalCycles()
+             .setElements(
+               group.getSortedElements()
                  .stream()
-                 .sorted(Comparator.comparing(Cycle::getSize))
-                 .map(cycle -> new CycleDto()
-                                 .setSize(cycle.getSize())
-                                 .setGenerator(cycle.get(0))
-                                 .setGeneratorSymbol(
-                                   group.display(cycle.get(0))
-                                     .getAscii()
-                                 ))
+                 .map(el -> new ElementDto()
+                                 .setPow(el.getPow())
+                                 .setBase(el.getBase()))
                  .collect(Collectors.toList())
              );
   }

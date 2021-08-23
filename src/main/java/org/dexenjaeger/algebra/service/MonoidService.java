@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.validators.Validator;
 

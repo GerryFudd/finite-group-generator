@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.categories.objects.semigroup;
 
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 
 import java.util.Map;

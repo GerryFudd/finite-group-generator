@@ -1,9 +1,9 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.AbstractCycle;
 import org.dexenjaeger.algebra.model.cycle.MappingCycle;

@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.Set;

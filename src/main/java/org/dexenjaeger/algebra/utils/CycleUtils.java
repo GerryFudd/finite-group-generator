@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.Mapping;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.cycle.Cycle;
 import org.dexenjaeger.algebra.model.cycle.ElementCycle;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;

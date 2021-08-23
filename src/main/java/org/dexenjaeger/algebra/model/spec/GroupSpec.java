@@ -2,7 +2,7 @@ package org.dexenjaeger.algebra.model.spec;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 

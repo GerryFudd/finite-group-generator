@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.validators;
 
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 public class BinaryOperatorValidator implements Validator<BinaryOperator>{
   

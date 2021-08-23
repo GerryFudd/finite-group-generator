@@ -1,8 +1,8 @@
 package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import javax.inject.Inject;
 

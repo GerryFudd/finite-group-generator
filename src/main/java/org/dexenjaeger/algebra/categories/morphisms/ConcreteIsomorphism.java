@@ -2,7 +2,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 public class ConcreteIsomorphism extends ConcreteHomomorphism implements Isomorphism {
   protected final int[] inverseMapping;

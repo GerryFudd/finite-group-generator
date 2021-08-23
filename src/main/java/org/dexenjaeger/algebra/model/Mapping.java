@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.Arrays;
 

@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.Arrays;

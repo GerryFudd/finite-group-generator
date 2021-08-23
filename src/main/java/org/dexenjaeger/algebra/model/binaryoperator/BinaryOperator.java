@@ -1,7 +1,5 @@
 package org.dexenjaeger.algebra.model.binaryoperator;
 
-import org.dexenjaeger.algebra.model.Element;
-
 import java.util.List;
 import java.util.Set;
 

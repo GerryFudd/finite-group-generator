@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 public interface Homomorphism {
   Group getDomain();

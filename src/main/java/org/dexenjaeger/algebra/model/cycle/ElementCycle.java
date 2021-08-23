@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.model.cycle;
 
 import lombok.EqualsAndHashCode;
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.List;
 import java.util.Map;

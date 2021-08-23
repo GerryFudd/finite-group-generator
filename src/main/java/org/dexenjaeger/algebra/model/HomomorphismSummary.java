@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.model;
 
 import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.HashMap;
 import java.util.Map;

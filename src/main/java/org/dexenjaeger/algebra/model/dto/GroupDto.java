@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class GroupDto {
   private String operatorSymbol;
-  private List<CycleDto> maximalCycles;
+  private List<ElementDto> elements;
   private int[][] multiplicationTable;
 }

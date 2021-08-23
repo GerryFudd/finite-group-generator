@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.model.cycle;
 
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 public class ElementCycleBuilder extends AbstractCycleBuilder<Element, ElementCycle> {
   

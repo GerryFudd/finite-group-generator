@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 public class HomomorphismValidator implements Validator<Homomorphism> {
   private ValidationException getNotFunctionException(

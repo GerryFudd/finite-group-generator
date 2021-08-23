@@ -1,7 +1,6 @@
 package org.dexenjaeger.algebra.model.binaryoperator;
 
 import lombok.Getter;
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 
 import java.util.Arrays;

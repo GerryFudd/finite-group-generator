@@ -1,4 +1,4 @@
-package org.dexenjaeger.algebra.model;
+package org.dexenjaeger.algebra.model.binaryoperator;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,11 +10,13 @@ public class Element implements Comparable<Element> {
   
   @EqualsAndHashCode.Include
   private final String ascii;
-  private final String latex;
+  private final String base;
+  private final int pow;
   
-  public Element(String ascii, String latex) {
+  public Element(String ascii, String base, int pow) {
     this.ascii = ascii;
-    this.latex = latex;
+    this.base = base;
+    this.pow = pow;
   }
   
   public static Element from(String base) {
@@ -23,22 +25,29 @@ public class Element implements Comparable<Element> {
   
   public static Element from(String base, int power) {
     if (power == 1) {
-      return new Element(base, base);
+      return new Element(base, base, 1);
     }
     if (power == 0) {
       throw new RuntimeException("Cannot construct elements with 0 power.");
     }
     return new Element(
       base + power,
-      String.format("%s^{%d}", base, power)
+      base, power
     );
   }
   
   public Element equivalenceClass() {
     return new Element(
       String.format("[%s]", ascii),
-      String.format("\\left[%s\\right]", latex)
+      base, pow
     );
+  }
+  
+  public String getLatex() {
+    if (pow == 1) {
+      return base;
+    }
+    return String.format("%s^%d", base, pow);
   }
   
   @Override

@@ -1,6 +1,6 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
-import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 public interface Isomorphism extends Homomorphism {
   int unApply(int j);

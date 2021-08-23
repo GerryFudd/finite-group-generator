@@ -2,8 +2,8 @@ package org.dexenjaeger.algebra.service;
 
 import com.google.common.collect.Sets;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
