@@ -1,25 +1,17 @@
 {
-  "operatorSymbol": "&#8902;",
-  "elements": [
-    {
-      "addition": false,
-      "base": "I",
-      "pow": 1
-    },
-    {
-      "addition": false,
-      "base": "a",
-      "pow": 1
-    },
-    {
-      "addition": false,
-      "base": "a",
-      "pow": 2
-    }
-  ],
-  "multiplicationTable": [
-    [0, 1, 2],
-    [1, 2, 0],
-    [2, 0, 1]
-  ]
+  "operatorSymbol" : "&#8902;",
+  "elements" : [ {
+    "addition" : false,
+    "base" : "I",
+    "pow" : 1
+  }, {
+    "addition" : false,
+    "base" : "a",
+    "pow" : 1
+  }, {
+    "addition" : false,
+    "base" : "a",
+    "pow" : 2
+  } ],
+  "multiplicationTable" : [ [ 0, 1, 2 ], [ 1, 2, 0 ], [ 2, 0, 1 ] ]
 }

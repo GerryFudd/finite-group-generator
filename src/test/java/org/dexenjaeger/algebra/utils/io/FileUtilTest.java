@@ -14,7 +14,6 @@ import org.dexenjaeger.algebra.model.spec.SymmetryGroupExportSpec;
 import org.dexenjaeger.algebra.service.GroupService;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +28,9 @@ class FileUtilTest {
   private final GroupService groupService = injector.getInstance(GroupService.class);
   private final SymmetryGroupGenerator symmetryGroupGenerator = injector.getInstance(SymmetryGroupGenerator.class);
   
-  private final String snapshotJsonFile = "/output-snapshots/testJsonGroup.json";
+  private final String snapshotsDir = "src/test/resources/output-snapshots";
+  
+  private final String snapshotJsonFile = "testJsonGroup.json";
   
   private final String testOutputDir = "build/test-generated/";
   
@@ -98,7 +99,7 @@ class FileUtilTest {
           {2, 0, 1}
         }),
       fileUtil.readAsType(
-        getClass().getResourceAsStream(snapshotJsonFile),
+        getClass().getResourceAsStream("/output-snapshots/" + snapshotJsonFile),
         GroupDto.class
       ).orElseGet(() -> {
         fail("Should be able to read file.");
@@ -121,17 +122,11 @@ class FileUtilTest {
       testOutputDir
     );
     
-    assertEquals(
-      fileUtil.readAsType(
-        getClass().getResourceAsStream(snapshotJsonFile),
-        GroupDto.class
-      ),
-      fileUtil.readAsType(
-        new FileInputStream(Paths.get(
-          testOutputDir,
-          FileType.JSON.getFullFileName(testOutputFile)
-        ).toFile()),
-        GroupDto.class
+    compareToSnapshot(
+      Paths.get(snapshotsDir, snapshotJsonFile),
+      Paths.get(
+        testOutputDir,
+        FileType.JSON.getFullFileName(testOutputFile)
       )
     );
   }
@@ -149,11 +144,11 @@ class FileUtilTest {
       testOutputFile,
       testOutputDir
     );
-  
-    String snapshotLatexFile = "testLatexGroup.tex";
+    
+    String snapshotLatexFile = "snapshotLatexGroup.tex";
     compareToSnapshot(
       Paths.get(
-        "src/test/resources/output-snapshots",
+        snapshotsDir,
         snapshotLatexFile
       ),
       Paths.get(
@@ -172,11 +167,11 @@ class FileUtilTest {
       testSymmetryOutputFile,
       testOutputDir
     );
-  
-    String snapshotSymmetryGroupFile = "snapshotSymmetryGroupFile";
+    
+    String snapshotSymmetryGroupFile = "snapshotSymmetryGroupFile.tex";
     compareToSnapshot(
       Paths.get(
-        "src/test/resources/output-snapshots",
+        snapshotsDir,
         snapshotSymmetryGroupFile
       ),
       Paths.get(
