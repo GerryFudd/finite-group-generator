@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.converter;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
-import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.dto.ElementDto;
 import org.dexenjaeger.algebra.model.dto.GroupDto;
 import org.dexenjaeger.algebra.utils.io.latex.GroupAsLatex;
@@ -17,7 +17,10 @@ public class GroupConverter {
              .setElements(
                group.getSortedElements()
                  .stream()
-                 .map(el -> new ElementDto()
+                 .map(el -> new ElementDto(
+                   group.getOperatorSymbol()
+                     == OperatorSymbol.ADDITION
+                 )
                                  .setPow(el.getPow())
                                  .setBase(el.getBase()))
                  .collect(Collectors.toList())
@@ -31,7 +34,9 @@ public class GroupConverter {
       )
              .setLatexElements(
                group.getSortedElements().stream()
-               .map(Element::getLatex)
+               .map(el -> el.getLatex(
+                 group.getOperatorSymbol()
+               ))
                .map(LatexCellSpec::new)
                .toArray(LatexCellSpec[]::new)
              )

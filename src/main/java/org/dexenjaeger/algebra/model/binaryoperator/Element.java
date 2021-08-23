@@ -44,9 +44,18 @@ public class Element implements Comparable<Element> {
   }
   
   public String getLatex() {
+    return getLatex(OperatorSymbol.DEFAULT);
+  }
+  
+  public String getLatex(OperatorSymbol operatorSymbol) {
     if (pow == 1) {
       return base;
     }
+    
+    if (operatorSymbol == OperatorSymbol.ADDITION) {
+      return String.format("%d%s", pow, base);
+    }
+    
     return String.format("%s^%d", base, pow);
   }
   
