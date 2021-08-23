@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.converter.GroupConverter;
-import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
-import org.dexenjaeger.algebra.model.spec.SymmetryGroupExportSpec;
 import org.dexenjaeger.algebra.utils.io.latex.GroupAsLatex;
 import org.dexenjaeger.algebra.utils.io.latex.LatexAlign;
 import org.dexenjaeger.algebra.utils.io.latex.LatexCellSpec;
@@ -15,7 +13,6 @@ import org.dexenjaeger.algebra.utils.io.latex.LatexColumnSpec;
 import org.dexenjaeger.algebra.utils.io.latex.LatexRowSpec;
 import org.dexenjaeger.algebra.utils.io.latex.LatexTableWriter;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,24 +26,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class FileUtil {
-  private final SymmetryGroupGenerator symmetryGroupGenerator;
-  
-  @Inject
-  public FileUtil(SymmetryGroupGenerator symmetryGroupGenerator) {
-    this.symmetryGroupGenerator = symmetryGroupGenerator;
-  }
-  
-  public void writeSymmetryGroupFromSpec(
-    SymmetryGroupExportSpec spec, String outputDir
+  public void writeGroupAsType(
+    Group group, FileType type, String fileName, String outputDir
   ) throws IOException {
-    Group group = symmetryGroupGenerator.createSymmetryGroup(
-      spec.getElementsCount(), spec.getOperatorSymbol()
-    );
     Path output = Paths.get(
-      outputDir, spec.getFileType().getFullFileName(spec.getFileName())
+      outputDir, type.getFullFileName(fileName)
     );
-    log.info("Processing spec {}", spec);
-    switch (spec.getFileType()) {
+    switch (type) {
       case JSON:
         writeToJsonFile(output, GroupConverter.toDto(group));
         break;
@@ -55,13 +41,27 @@ public class FileUtil {
         break;
       default:
         throw new RuntimeException(String.format(
-          "File type %s not implemented", spec.getFileType().name()
+          "File type %s not implemented", type.name()
         ));
     }
   }
   
   private ObjectMapper mapper() {
     return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+  }
+  
+  public <T> Optional<T> readAsType(
+    InputStream in, Class<T> type
+  ) {
+    try {
+      log.debug("Reading stream of type {}[]", type.getName());
+      T result = mapper().readValue(in, type);
+      log.debug("Result read as array.");
+      return Optional.of(result);
+    } catch (IOException e) {
+      log.warn(e.getMessage());
+      return Optional.empty();
+    }
   }
   
   public <T> Optional<List<T>> readAsListOfType(

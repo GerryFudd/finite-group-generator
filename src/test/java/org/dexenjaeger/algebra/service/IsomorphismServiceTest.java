@@ -6,6 +6,7 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.spec.CyclicGroupSpec;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -30,11 +31,11 @@ class IsomorphismServiceTest {
     Map<Integer, Element> functionMap = Map.of(
       0, Element.from("E"),
       1, Element.from("x"),
-      2, Element.from("y"),
-      3, Element.from("z")
+      2, Element.from("x", 2),
+      3, Element.from("x", 3)
     );
     Isomorphism isomorphism = isomorphismService.createIsomorphism(
-      groupService.createCyclicGroup("I", "a", "b", "c"),
+      groupService.createCyclicGroup("a", 4),
       functionMap::get
     );
     
@@ -70,7 +71,12 @@ class IsomorphismServiceTest {
   void createIsomorphismTest_InvalidDomainAndRange() {
     ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
       new TrivialGroup(),
-      groupService.createCyclicGroup("E", "a"),
+      groupService.createCyclicGroup(
+        new CyclicGroupSpec()
+        .setBase("a")
+          .setN(2)
+        .setIdentityElement(Element.from("E"))
+      ),
       x -> 0,
       y -> 0
     ));
@@ -83,8 +89,13 @@ class IsomorphismServiceTest {
   @Test
   void createIsomorphismTest_InvalidInverse() {
     ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
-      groupService.createCyclicGroup("I", "a"),
-      groupService.createCyclicGroup("E", "x"),
+      groupService.createCyclicGroup("a", 2),
+      groupService.createCyclicGroup(
+        new CyclicGroupSpec()
+        .setBase("x")
+        .setN(2)
+        .setIdentityElement(Element.from("E"))
+      ),
       Function.identity(),
       y -> 0
     ));
@@ -97,8 +108,13 @@ class IsomorphismServiceTest {
   @Test
   void createIsomorphismTest_notInjection() {
     ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
-      groupService.createCyclicGroup("I", "a"),
-      groupService.createCyclicGroup("E", "x"),
+      groupService.createCyclicGroup("a", 2),
+      groupService.createCyclicGroup(
+        new CyclicGroupSpec()
+          .setBase("x")
+          .setN(2)
+          .setIdentityElement(Element.from("E"))
+      ),
       x -> 0,
       Function.identity()
     ));

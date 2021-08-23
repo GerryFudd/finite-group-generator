@@ -6,6 +6,7 @@ import org.dexenjaeger.algebra.model.SortedGroupResult;
 import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.model.spec.CyclicGroupSpec;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.CycleUtils;
@@ -43,44 +44,35 @@ public class GroupService {
     this.binaryOperatorUtil = binaryOperatorUtil;
   }
   
-  public Group createCyclicGroup(String... elements) {
-    return createCyclicGroup(
-      elements, OperatorSymbol.DEFAULT
-    );
+  public Group createCyclicGroup(String base, int n) {
+    return createCyclicGroup(new CyclicGroupSpec()
+    .setBase(base)
+    .setN(n));
   }
   
-  public Group createCyclicGroup(String[] elements, OperatorSymbol operatorSymbol) {
-    return createCyclicGroup(
-      Stream.of(elements).map(Element::from).toArray(Element[]::new),
-      operatorSymbol
-    );
-  }
-  
-  public Group createCyclicGroup(Element... elements) {
-    return createCyclicGroup(elements, OperatorSymbol.DEFAULT);
-  }
-  
-  public Group createCyclicGroup(Element[] elements, OperatorSymbol operatorSymbol) {
-    int n = elements.length;
+  public Group createCyclicGroup(CyclicGroupSpec spec) {
     LinkedList<Integer> cycle = new LinkedList<>();
     Map<Integer, Integer> inverses = new HashMap<>();
-    for (int i = 1; i < n; i++) {
-      inverses.put(i, n - i);
+    Element[] elements = new Element[spec.getN()];
+    for (int i = 1; i < spec.getN(); i++) {
+      inverses.put(i, spec.getN() - i);
       cycle.addLast(i);
+      elements[i] = Element.from(spec.getBase(), i);
     }
+    elements[0] = spec.getIdentityElement();
     inverses.put(0, 0);
     cycle.addLast(0);
     return Group.builder()
              .inversesMap(inverses)
              .maximalCycles(Set.of(cycleUtils.createIntCycle(cycle)))
              .identity(0)
-             .operatorSymbol(operatorSymbol)
+             .operatorSymbol(spec.getOperatorSymbol())
              .elements(elements)
-             .size(n)
+             .size(spec.getN())
              .lookup(binaryOperatorUtil.createLookup(elements))
              .multiplicationTable(
                binaryOperatorUtil.getMultiplicationTable(
-                 n, (a, b) -> (a + b) % n
+                 spec.getN(), (a, b) -> (a + b) % spec.getN()
                )
              )
              .build();
@@ -182,16 +174,6 @@ public class GroupService {
           .setElements(remapper.getElements())
           .setOperator(remapper.remapBiFunc(spec.getOperator()))
       ), remapper
-    );
-  }
-  
-  public Group constructGroupFromElementsAndMultiplicationTable(
-    String[] elements,
-    int[][] multiplicationTable
-  ) {
-    return constructGroupFromElementsAndMultiplicationTable(
-      Stream.of(elements).map(Element::from).toArray(Element[]::new),
-      multiplicationTable
     );
   }
   

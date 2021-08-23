@@ -3,6 +3,7 @@ package org.dexenjaeger.algebra;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
+import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
 import org.dexenjaeger.algebra.model.spec.SymmetryGroupExportSpec;
 import org.dexenjaeger.algebra.utils.env.EnvUtils;
 import org.dexenjaeger.algebra.utils.io.FileUtil;
@@ -20,6 +21,8 @@ public class Main {
     Injector injector = Guice.createInjector(
       new AlgebraModule()
     );
+  
+    SymmetryGroupGenerator symmetryGroupGenerator = injector.getInstance(SymmetryGroupGenerator.class);
     FileUtil fileUtil = injector.getInstance(FileUtil.class);
     
     for (SymmetryGroupExportSpec spec:fileUtil.readAsListOfType(
@@ -29,7 +32,16 @@ public class Main {
       SymmetryGroupExportSpec.class
     )
                                             .orElseThrow(() -> new RuntimeException("Couldn't locate symmetry groups spec file."))) {
-      fileUtil.writeSymmetryGroupFromSpec(spec, OUT_DIR);
+      log.info("Processing spec {}", spec);
+      
+      fileUtil.writeGroupAsType(
+        symmetryGroupGenerator.createSymmetryGroup(
+          spec.getElementsCount(), spec.getOperatorSymbol()
+        ),
+        spec.getFileType(),
+        spec.getFileName(),
+        OUT_DIR
+      );
     }
   }
 }

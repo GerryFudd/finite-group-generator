@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
 import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.spec.CyclicGroupSpec;
 import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.dexenjaeger.algebra.service.GroupService;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,10 @@ class TrivialGroupTest {
   @Test
   void behavesLikeEquivalentGroup() {
     TrivialGroup trivialGroup = new TrivialGroup(Element.from("a"));
-    Group byAnotherName = groupService.createCyclicGroup(Element.from("a"));
+    Group byAnotherName = groupService.createCyclicGroup(
+      new CyclicGroupSpec()
+        .setIdentityElement(Element.from("a"))
+    );
     assertEquals(
       byAnotherName.getSize(),
       trivialGroup.getSize()

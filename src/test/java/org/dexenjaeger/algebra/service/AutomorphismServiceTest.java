@@ -24,12 +24,12 @@ public class AutomorphismServiceTest {
   @Test
   void createAutomorphism() {
     Automorphism automorphism = automorphismService.createAutomorphism(
-      groupService.createCyclicGroup("I", "a", "b", "c"),
+      groupService.createCyclicGroup("a", 4),
       i -> (3 * i) % 4
     );
     
     assertEquals(
-      "(ac)",
+      "(aa3)",
       automorphism.toString()
     );
     
@@ -44,7 +44,7 @@ public class AutomorphismServiceTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> automorphismService.createAutomorphism(
-      groupService.createCyclicGroup("I", "a", "b", "c"),
+      groupService.createCyclicGroup("a", 4),
       i -> (2 * i) % 4
     )
     );
@@ -75,15 +75,13 @@ public class AutomorphismServiceTest {
   
   @Test
   void createAutomorphismGroupForCyclicGroup3() {
-    Group result = automorphismService.createAutomorphismGroup(groupService.createCyclicGroup(
-      "I", "a", "b"
-    ));
+    Group result = automorphismService.createAutomorphismGroup(groupService.createCyclicGroup("a", 3));
     
     assertEquals(
       groupService.createGroup(
         new GroupSpec()
         .setIdentity(0)
-        .setElements(new Element[]{Element.I, Element.from("(ab)")})
+        .setElements(new Element[]{Element.I, Element.from("(aa2)")})
         .setOperator((i, j) -> (i + j) % 2)
       ),
       result

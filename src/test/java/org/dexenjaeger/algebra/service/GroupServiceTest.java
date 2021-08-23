@@ -8,6 +8,7 @@ import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.spec.CyclicGroupSpec;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.validators.ValidationException;
@@ -335,7 +336,10 @@ class GroupServiceTest {
     
     assertEquals(
       groupService.createCyclicGroup(
-        Element.from("[I]"), Element.from("[a]")
+        new CyclicGroupSpec()
+        .setBase("[a]")
+        .setIdentityElement(Element.from("[I]"))
+        .setN(2)
       ),
       quotientGroup
     );
