@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -26,11 +27,11 @@ class IsomorphismServiceTest {
   
   @Test
   void createIsomorphismTest_domainAndFunc() {
-    Map<Integer, String> functionMap = Map.of(
-      0, "E",
-      1, "x",
-      2, "y",
-      3, "z"
+    Map<Integer, Element> functionMap = Map.of(
+      0, Element.from("E"),
+      1, Element.from("x"),
+      2, Element.from("y"),
+      3, Element.from("z")
     );
     Isomorphism isomorphism = isomorphismService.createIsomorphism(
       groupService.createCyclicGroup("I", "a", "b", "c"),
@@ -68,7 +69,7 @@ class IsomorphismServiceTest {
   @Test
   void createIsomorphismTest_InvalidDomainAndRange() {
     ValidationException e = assertThrows(ValidationException.class, () -> isomorphismService.createIsomorphism(
-      new TrivialGroup("I"),
+      new TrivialGroup(),
       groupService.createCyclicGroup("E", "a"),
       x -> 0,
       y -> 0

@@ -1,8 +1,9 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.OrderedPair;
+import org.dexenjaeger.algebra.model.cycle.ElementCycle;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -207,9 +208,15 @@ public class CycleUtilsTest {
     delimiter = ':'
   )
   void getGeneratorsTest_String(String elements, String generators) {
-    StringCycle cycle = cycleUtils.createStringCycle(List.of(elements.split(",")));
+    ElementCycle cycle = cycleUtils.createElementCycle(
+      Stream.of(elements.split(","))
+      .map(Element::from)
+      .collect(Collectors.toList())
+    );
     assertEquals(
-      Set.of(generators.split(",")),
+      Stream.of(generators.split(","))
+        .map(Element::from)
+        .collect(Collectors.toSet()),
       cycle.getGenerators()
     );
   }
@@ -226,22 +233,24 @@ public class CycleUtilsTest {
     delimiter = ':'
   )
   void getSubCyclesTest_String(String elements, String subCycleGenerators) {
-    List<String> elementList = List.of(elements.split(","));
-    StringCycle cycle = cycleUtils.createStringCycle(elementList);
-    Set<StringCycle> expectedSubCycles = new HashSet<>();
+    List<Element> elementList = Stream.of(elements.split(","))
+      .map(Element::from)
+      .collect(Collectors.toList());
+    ElementCycle cycle = cycleUtils.createElementCycle(elementList);
+    Set<ElementCycle> expectedSubCycles = new HashSet<>();
     List<Integer> subCycleGeneratorList = subCycleGenerators == null ? List.of() : Stream.of(
       subCycleGenerators.split(",")
     ).map(Integer::parseInt).collect(Collectors.toList());
     
     for (Integer subCycleGenerator:subCycleGeneratorList) {
       int i = subCycleGenerator;
-      List<String> subCycleElements = new ArrayList<>();
+      List<Element> subCycleElements = new ArrayList<>();
       while (i % elementList.size() != 0) {
         subCycleElements.add(elementList.get(i % elementList.size() - 1));
         i += subCycleGenerator;
       }
       subCycleElements.add(elementList.get(elementList.size() - 1));
-      expectedSubCycles.add(cycleUtils.createStringCycle(subCycleElements));
+      expectedSubCycles.add(cycleUtils.createElementCycle(subCycleElements));
     }
     
     assertEquals(
@@ -262,9 +271,11 @@ public class CycleUtilsTest {
     delimiter = ':'
   )
   void getSubCycleOfSizeTest_String(String elements, String subCycleGenerators) {
-    List<String> elementList = List.of(elements.split(","));
-    StringCycle cycle = cycleUtils.createStringCycle(elementList);
-    Map<Integer, List<String>> subCyclesBySize;
+    List<Element> elementList = Stream.of(elements.split(","))
+      .map(Element::from)
+      .collect(Collectors.toList());
+    ElementCycle cycle = cycleUtils.createElementCycle(elementList);
+    Map<Integer, List<Element>> subCyclesBySize;
     if (subCycleGenerators == null) {
       subCyclesBySize = Map.of();
     } else {
@@ -279,19 +290,21 @@ public class CycleUtilsTest {
                           })
                           .collect(Collectors.toMap(
                             OrderedPair::getLeft,
-                            OrderedPair::getRight
+                            op -> op.getRight().stream()
+                            .map(Element::from)
+                            .collect(Collectors.toList())
                           ));
     }
     
     for (int i = 1; i <= elementList.size(); i++) {
-      List<String> subCycleElements = subCyclesBySize.get(i);
-      Optional<StringCycle> subCycle = cycle.getSubCycleOfSize(i);
+      List<Element> subCycleElements = subCyclesBySize.get(i);
+      Optional<ElementCycle> subCycle = cycle.getSubCycleOfSize(i);
       
       if (subCycleElements == null) {
         assertTrue(subCycle.isEmpty());
       } else {
         assertEquals(
-          cycleUtils.createStringCycle(subCycleElements),
+          cycleUtils.createElementCycle(subCycleElements),
           subCycle.orElseThrow()
         );
       }
@@ -300,7 +313,11 @@ public class CycleUtilsTest {
   
   @Test
   void getSubCycleSizesTest_String() {
-    StringCycle cycle = cycleUtils.createStringCycle("a", "b", "c", "d", "e", "f");
+    ElementCycle cycle = cycleUtils.createElementCycle(
+      Stream.of("a", "b", "c", "d", "e", "f")
+      .map(Element::from)
+      .toArray(Element[]::new)
+    );
     
     assertEquals(
       List.of(1, 2, 3),
@@ -310,20 +327,28 @@ public class CycleUtilsTest {
   
   @Test
   void getSubCycleOfSizeTest_String() {
-    StringCycle cycle = cycleUtils.createStringCycle("a", "b", "c", "d", "e", "f");
+    ElementCycle cycle = cycleUtils.createElementCycle(
+      Stream.of("a", "b", "c", "d", "e", "f")
+      .map(Element::from)
+      .toArray(Element[]::new)
+    );
     
     assertEquals(
-      List.of("f"),
+      List.of(Element.from("f")),
       cycle.getSubCycleOfSize(1).orElseThrow().getElements()
     );
     
     assertEquals(
-      List.of("c", "f"),
+      Stream.of("c", "f")
+        .map(Element::from)
+        .collect(Collectors.toList()),
       cycle.getSubCycleOfSize(2).orElseThrow().getElements()
     );
     
     assertEquals(
-      List.of("b", "d", "f"),
+      Stream.of("b", "d", "f")
+      .map(Element::from)
+      .collect(Collectors.toList()),
       cycle.getSubCycleOfSize(3).orElseThrow().getElements()
     );
     
@@ -332,26 +357,36 @@ public class CycleUtilsTest {
   
   @Test
   void getSubCycleGeneratedByTest_String() {
-    StringCycle cycle = cycleUtils.createStringCycle("a", "b", "c", "d", "e", "f");
-    
-    assertEquals(
-      List.of("f"),
-      cycle.getSubCycleGeneratedBy("f").orElseThrow().getElements()
+    ElementCycle cycle = cycleUtils.createElementCycle(
+      Stream.of("a", "b", "c", "d", "e", "f")
+      .map(Element::from)
+      .collect(Collectors.toList())
     );
     
     assertEquals(
-      List.of("c", "f"),
-      cycle.getSubCycleGeneratedBy("c").orElseThrow().getElements()
+      List.of(Element.from("f")),
+      cycle.getSubCycleGeneratedBy(Element.from("f")).orElseThrow().getElements()
     );
     
     assertEquals(
-      List.of("b", "d", "f"),
-      cycle.getSubCycleGeneratedBy("b").orElseThrow().getElements()
+      Stream.of("c", "f")
+      .map(Element::from)
+      .collect(Collectors.toList()),
+      cycle.getSubCycleGeneratedBy(Element.from("c")).orElseThrow().getElements()
     );
     
     assertEquals(
-      List.of("e", "d", "c", "b", "a", "f"),
-      cycle.getSubCycleGeneratedBy("e")
+      Stream.of("b", "d", "f")
+      .map(Element::from)
+      .collect(Collectors.toList()),
+      cycle.getSubCycleGeneratedBy(Element.from("b")).orElseThrow().getElements()
+    );
+    
+    assertEquals(
+      Stream.of("e", "d", "c", "b", "a", "f")
+      .map(Element::from)
+      .collect(Collectors.toList()),
+      cycle.getSubCycleGeneratedBy(Element.from("e"))
         .orElseThrow().getElements()
     );
   }

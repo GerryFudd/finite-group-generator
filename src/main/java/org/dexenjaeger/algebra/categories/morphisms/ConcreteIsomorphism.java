@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
+import org.dexenjaeger.algebra.model.Element;
 
 public class ConcreteIsomorphism extends ConcreteHomomorphism implements Isomorphism {
   protected final int[] inverseMapping;
@@ -10,7 +11,7 @@ public class ConcreteIsomorphism extends ConcreteHomomorphism implements Isomorp
     Group domain,
     Group range,
     int[] mapping,
-    String[] image,
+    Element[] image,
     int[] inverseMapping
   ) {
     super(
@@ -27,7 +28,7 @@ public class ConcreteIsomorphism extends ConcreteHomomorphism implements Isomorp
   }
   
   @Override
-  public String unApply(String j) {
+  public Element unApply(Element j) {
     return domain.display(inverseMapping[range.eval(j)]);
   }
 }

@@ -1,5 +1,6 @@
 package org.dexenjaeger.algebra.utils;
 
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.Mapping;
 
 import java.util.HashSet;
@@ -8,14 +9,14 @@ import java.util.Set;
 import java.util.function.Function;
 
 public class FunctionsUtil {
-  public String[] createImage(int size, Function<Integer, String> imageFunc) {
-    LinkedList<String> imageList = new LinkedList<>();
+  public Element[] createImage(int size, Function<Integer, Element> imageFunc) {
+    LinkedList<Element> imageList = new LinkedList<>();
     
     while (imageList.size() < size) {
       imageList.addLast(imageFunc.apply(imageList.size()));
     }
     
-    return imageList.toArray(new String[0]);
+    return imageList.toArray(new Element[0]);
   }
   
   public Mapping createMapping(int size, Function<Integer, Integer> act) {

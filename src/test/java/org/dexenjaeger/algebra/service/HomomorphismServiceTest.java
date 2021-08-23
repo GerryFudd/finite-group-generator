@@ -7,6 +7,8 @@ import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -28,11 +30,11 @@ class HomomorphismServiceTest {
   void createHomomorphismTest() {
     Homomorphism validatedHomomorphism = homomorphismService.createHomomorphism(
       new TrivialGroup(),
-      a -> "E"
+      a -> Element.from("E")
     );
     
     assertEquals(
-      "I", validatedHomomorphism.getDomain().getIdentityDisplay()
+      Element.I, validatedHomomorphism.getDomain().getIdentityDisplay()
     );
     
     assertEquals(
@@ -41,7 +43,7 @@ class HomomorphismServiceTest {
     );
     
     assertEquals(
-      Set.of("E"), validatedHomomorphism.getRange().getElementsDisplay()
+      Set.of(Element.from("E")), validatedHomomorphism.getRange().getElementsDisplay()
     );
   }
   
@@ -51,7 +53,7 @@ class HomomorphismServiceTest {
       ValidationException.class,
       () -> homomorphismService.createHomomorphism(
         groupService.createCyclicGroup("I", "a", "b"),
-        (a) -> a == 2 ? "B" : "E"
+        (a) -> a == 2 ? Element.from("B") : Element.from("E")
       )
     );
   }
@@ -101,7 +103,7 @@ class HomomorphismServiceTest {
       ValidationException.class,
       () -> homomorphismService.createHomomorphism(
         groupService.createCyclicGroup(elements),
-        new TrivialGroup("E"),
+        new TrivialGroup(Element.from("E")),
         groupService.constructGroupFromElementsAndMultiplicationTable(
           elements, kernelMult
         ),
@@ -120,7 +122,7 @@ class HomomorphismServiceTest {
       "I", "a", "b"
     );
     Homomorphism result = homomorphismService.createHomomorphism(
-      group, (a) -> "E"
+      group, (a) -> Element.from("E")
     );
     
     assertEquals(
@@ -134,7 +136,7 @@ class HomomorphismServiceTest {
     Group domain = groupService.createCyclicGroup("I", "a");
     ValidationException e = assertThrows(ValidationException.class, () -> homomorphismService.createHomomorphism(
       domain,
-      new TrivialGroup("I"),
+      new TrivialGroup(),
       domain,
       Function.identity()
     ));
@@ -149,8 +151,8 @@ class HomomorphismServiceTest {
     String[] rangeElements = {"I", "a", "b"};
     ValidationException e = assertThrows(ValidationException.class, () -> homomorphismService.createHomomorphism(
       groupService.createCyclicGroup("I", "a"),
-      groupService.createCyclicGroup(rangeElements, "x"),
-      new TrivialGroup("I"),
+      groupService.createCyclicGroup(rangeElements, OperatorSymbol.ALTERNATE),
+      new TrivialGroup(),
       Function.identity()
     ));
     
@@ -162,12 +164,12 @@ class HomomorphismServiceTest {
   @Test
   void createHomomorphismTest_createsRange() {
     Group s3 = symmetryGroupGenerator.createSymmetryGroup(3);
-    Function<Integer, String> act = a -> {
-      if (s3.display(a).equals("d")) {
-        return "f2";
+    Function<Integer, Element> act = a -> {
+      if (s3.display(a).equals(Element.from("d"))) {
+        return Element.from("f", 2);
       }
-      if (s3.display(a).equals("d2")) {
-        return "f";
+      if (s3.display(a).equals(Element.from("d", 2))) {
+        return Element.from("f");
       }
       return s3.display(a);
     };

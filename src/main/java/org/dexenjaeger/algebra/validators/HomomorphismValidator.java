@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
+import org.dexenjaeger.algebra.model.Element;
 
 public class HomomorphismValidator implements Validator<Homomorphism> {
   private ValidationException getNotFunctionException(
@@ -39,7 +40,7 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
   }
   
   private void validateInverseImageOfId(Homomorphism item) {
-    for (String a:item.getDomain().getElementsDisplay()) {
+    for (Element a:item.getDomain().getElementsDisplay()) {
       if (item.getKernel().getElementsDisplay().contains(a)
             != item.getRange()
                  .display(item.apply(item.getDomain().eval(a)))
@@ -50,9 +51,9 @@ public class HomomorphismValidator implements Validator<Homomorphism> {
   }
   
   public static void validateSubgroup(Homomorphism item) {
-    for (String a:item.getKernel().getElementsDisplay()) {
-      for (String b:item.getKernel().getElementsDisplay()) {
-        String c = item.getDomain().prod(a, b);
+    for (Element a:item.getKernel().getElementsDisplay()) {
+      for (Element b:item.getKernel().getElementsDisplay()) {
+        Element c = item.getDomain().prod(a, b);
         if (!c.equals(item.getKernel().prod(a, b))) {
           throw new ValidationException("Kernel binary operator doesn't match group binary operator.");
         }

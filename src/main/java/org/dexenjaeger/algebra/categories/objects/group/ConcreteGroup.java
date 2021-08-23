@@ -1,16 +1,16 @@
 package org.dexenjaeger.algebra.categories.objects.group;
 
 import lombok.Getter;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ConcreteGroup extends BaseBinaryOperator implements Group {
@@ -20,13 +20,13 @@ public class ConcreteGroup extends BaseBinaryOperator implements Group {
   private final Set<IntCycle> maximalCycles;
   
   ConcreteGroup(
-    String operatorSymbol,
+    OperatorSymbol operatorSymbol,
     int size,
-    String[] elements,
+    Element[] elements,
     int identity,
     Map<Integer, Integer> inversesMap,
     Set<IntCycle> maximalCycles,
-    Map<String, Integer> lookup,
+    Map<Element, Integer> lookup,
     int[][] multiplicationTable
   ) {
     super(
@@ -94,21 +94,17 @@ public class ConcreteGroup extends BaseBinaryOperator implements Group {
   }
   
   @Override
-  public List<List<Integer>> getMultiplicationTable() {
-    return Arrays.stream(multiplicationTable)
-             .map(Arrays::stream)
-             .map(IntStream::boxed)
-             .map(s -> s.collect(Collectors.toList()))
-             .collect(Collectors.toList());
+  public int[][] getMultiplicationTable() {
+    return multiplicationTable;
   }
   
   @Override
-  public String getIdentityDisplay() {
+  public Element getIdentityDisplay() {
     return elements[identity];
   }
   
   @Override
-  public String getInverse(String element) {
+  public Element getInverse(Element element) {
     return elements[getInverse(lookup.get(element))];
   }
 }

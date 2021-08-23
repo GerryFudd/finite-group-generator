@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.categories.objects.group;
 
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface Group extends Monoid {
-  String getInverse(String element);
+  Element getInverse(Element element);
   int getInverse(int element);
   List<Integer> getCycleSizes();
   Set<IntCycle> getNCycles(int n);
@@ -20,5 +21,5 @@ public interface Group extends Monoid {
     return new GroupBuilder();
   }
   
-  List<List<Integer>> getMultiplicationTable();
+  int[][] getMultiplicationTable();
 }

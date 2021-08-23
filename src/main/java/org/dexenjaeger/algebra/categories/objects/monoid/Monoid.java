@@ -1,9 +1,10 @@
 package org.dexenjaeger.algebra.categories.objects.monoid;
 
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
+import org.dexenjaeger.algebra.model.Element;
 
 public interface Monoid extends Semigroup {
-  String getIdentityDisplay();
+  Element getIdentityDisplay();
   int getIdentity();
   
   static MonoidBuilder builder() {

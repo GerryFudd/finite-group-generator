@@ -5,8 +5,9 @@ import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.morphisms.AutomorphismBuilder;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.Mapping;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.ElementCycle;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
@@ -71,13 +72,13 @@ public class AutomorphismService {
     
     AutomorphismBuilder resultBuilder = Automorphism.builder();
     
-    Set<String> remainingElements = new HashSet<>(domain.getElementsDisplay());
+    Set<Element> remainingElements = new HashSet<>(domain.getElementsDisplay());
     while (!remainingElements.isEmpty()) {
-      String seed = remainingElements.stream().findAny().orElseThrow();
-      LinkedList<String> currentCycle = new LinkedList<>();
+      Element seed = remainingElements.stream().findAny().orElseThrow();
+      LinkedList<Element> currentCycle = new LinkedList<>();
       currentCycle.addLast(seed);
       remainingElements.remove(seed);
-      String current = domain.display(act.apply(domain.eval(seed)));
+      Element current = domain.display(act.apply(domain.eval(seed)));
       while (!seed.equals(current) && !domain.getIdentityDisplay().equals(current)) {
         currentCycle.addLast(current);
         remainingElements.remove(current);
@@ -85,7 +86,7 @@ public class AutomorphismService {
       }
       if (currentCycle.size() > 1) {
         resultBuilder.withStringCycles(
-          cycleUtils.createStringCycle(currentCycle)
+          cycleUtils.createElementCycle(currentCycle)
         );
       }
     }
@@ -106,13 +107,13 @@ public class AutomorphismService {
              .build();
   }
   
-  private Set<StringCycle> convertCycles(Collection<StringCycle> cycles, Function<String, String> func) {
+  private Set<ElementCycle> convertCycles(Collection<ElementCycle> cycles, Function<Element, Element> func) {
     return cycles.stream()
              .map(cycle -> cycle.getElements()
                              .stream()
                              .map(func)
                              .collect(Collectors.toList()))
-             .map(cycleUtils::createStringCycle)
+             .map(cycleUtils::createElementCycle)
              .collect(Collectors.toSet());
   }
   
@@ -204,7 +205,10 @@ public class AutomorphismService {
     
     return groupService.createSortedGroup(
       new GroupSpec()
-        .setElements(automorphisms.stream().map(Automorphism::toString).toArray(String[]::new))
+        .setElements(automorphisms.stream()
+                       .map(Automorphism::toString)
+          .map(Element::from)
+                       .toArray(Element[]::new))
         .setOperator((i, j) -> automorphisms.indexOf(doCompose(
           automorphisms.get(i), automorphisms.get(j)
         )))

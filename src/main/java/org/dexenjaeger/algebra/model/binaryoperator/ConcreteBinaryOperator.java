@@ -1,13 +1,15 @@
 package org.dexenjaeger.algebra.model.binaryoperator;
 
+import org.dexenjaeger.algebra.model.Element;
+
 import java.util.Map;
 
 public class ConcreteBinaryOperator extends BaseBinaryOperator {
   ConcreteBinaryOperator(
-    String operatorSymbol,
+    OperatorSymbol operatorSymbol,
     int size,
-    String[] elements,
-    Map<String, Integer> lookup,
+    Element[] elements,
+    Map<Element, Integer> lookup,
     int[][] multiplicationTable
   ) {
     super(

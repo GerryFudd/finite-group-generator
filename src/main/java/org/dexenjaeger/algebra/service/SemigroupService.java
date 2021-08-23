@@ -1,6 +1,8 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
+import org.dexenjaeger.algebra.model.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.validators.Validator;
 
@@ -21,13 +23,13 @@ public class SemigroupService {
   }
   
   public Semigroup createSemigroup(
-    String[] elements, BiFunction<Integer, Integer, Integer> operator
+    Element[] elements, BiFunction<Integer, Integer, Integer> operator
   ) {
-    return createSemigroup("*", elements, operator);
+    return createSemigroup(OperatorSymbol.DEFAULT, elements, operator);
   }
   
   public Semigroup createSemigroup(
-    String operatorSymbol, String[] elements, BiFunction<Integer, Integer, Integer> operator
+    OperatorSymbol operatorSymbol, Element[] elements, BiFunction<Integer, Integer, Integer> operator
   ) {
     Semigroup result = Semigroup.builder()
                          .operatorSymbol(operatorSymbol)

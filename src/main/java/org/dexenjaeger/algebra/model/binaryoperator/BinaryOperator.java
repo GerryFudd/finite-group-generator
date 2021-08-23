@@ -1,18 +1,20 @@
 package org.dexenjaeger.algebra.model.binaryoperator;
 
+import org.dexenjaeger.algebra.model.Element;
+
 import java.util.List;
 import java.util.Set;
 
 public interface BinaryOperator {
-  String getOperatorSymbol();
-  Set<String> getElementsDisplay();
+  OperatorSymbol getOperatorSymbol();
+  Set<Element> getElementsDisplay();
   int getSize();
-  String prod(String a, String b);
+  Element prod(Element a, Element b);
   int prod(int a, int b);
-  Integer eval(String a);
-  String display(int i);
+  Integer eval(Element a);
+  Element display(int i);
   String printMultiplicationTable();
-  List<String> getSortedElements();
+  List<Element> getSortedElements();
   
   static BinaryOperatorBuilder builder() {
     return new BinaryOperatorBuilder();

@@ -9,12 +9,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class HomomorphismSummary {
   private final Group domain;
-  private final Map<String, Integer> rangeLookup = new HashMap<>();
-  private final Map<String, Integer> kernelLookup = new HashMap<>();
+  private final Map<Element, Integer> rangeLookup = new HashMap<>();
+  private final Map<Element, Integer> kernelLookup = new HashMap<>();
   private final Map<Integer, Integer> actionBuilder = new HashMap<>();
   private final Map<Integer, Integer> inverseActionBuilder = new HashMap<>();
   
-  public void addRangeValue(String a, int x) {
+  public void addRangeValue(Element a, int x) {
     if (rangeLookup.containsKey(a)) {
       return;
     }
@@ -25,22 +25,22 @@ public class HomomorphismSummary {
   }
   
   public void addKernelValue(int x) {
-    String display = domain.display(x);
+    Element display = domain.display(x);
     if (kernelLookup.containsKey(display)) {
       return;
     }
     kernelLookup.put(domain.display(x), kernelLookup.size());
   }
   
-  private String[] getElements(Map<String, Integer> lookup) {
-    String[] result = new String[lookup.size()];
-    for (Map.Entry<String, Integer> entry:lookup.entrySet()) {
+  private Element[] getElements(Map<Element, Integer> lookup) {
+    Element[] result = new Element[lookup.size()];
+    for (Map.Entry<Element, Integer> entry:lookup.entrySet()) {
       result[entry.getValue()] = entry.getKey();
     }
     return result;
   }
   
-  public String[] getRangeElementsArray() {
+  public Element[] getRangeElementsArray() {
     return getElements(rangeLookup);
   }
   
@@ -51,9 +51,9 @@ public class HomomorphismSummary {
     ));
   }
   
-  private String[] kernelElementsArray;
+  private Element[] kernelElementsArray;
   
-  public synchronized String[] getKernelElementsArray() {
+  public synchronized Element[] getKernelElementsArray() {
     if (kernelElementsArray == null) {
       kernelElementsArray = getElements(kernelLookup);
     }
@@ -61,7 +61,7 @@ public class HomomorphismSummary {
   }
   
   public int kernelProd(int i, int j) {
-    String[] elements = getKernelElementsArray();
+    Element[] elements = getKernelElementsArray();
     return kernelLookup.get(
       domain.prod(elements[i], elements[j])
     );

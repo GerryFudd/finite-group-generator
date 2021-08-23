@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.Element;
 
 import java.util.Set;
 
@@ -16,7 +17,7 @@ public class ConcreteAutomorphism extends ConcreteIsomorphism implements Automor
   ConcreteAutomorphism(
     Group domain,
     int[] mapping,
-    String[] image,
+    Element[] image,
     int[] inverseMapping,
     Set<Integer> fixedElements,
     CyclePresentation cyclePresentation,

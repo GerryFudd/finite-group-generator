@@ -8,5 +8,5 @@ import java.util.List;
 public class GroupDto {
   private String operatorSymbol;
   private List<CycleDto> maximalCycles;
-  private List<List<Integer>> multiplicationTable;
+  private int[][] multiplicationTable;
 }

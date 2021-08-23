@@ -2,8 +2,10 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.morphisms.Homomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.HomomorphismSummary;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.ValidationException;
@@ -65,7 +67,7 @@ public class HomomorphismService {
   
   public Homomorphism createHomomorphism(
     Group domain,
-    Function<Integer, String> act
+    Function<Integer, Element> act
   ) {
     groupValidator.validate(domain);
     HomomorphismSummary summary = constructRangeAndKernel(
@@ -73,7 +75,7 @@ public class HomomorphismService {
     );
     SortedGroupResult sortedRange = groupService.createSortedGroup(
       new GroupSpec()
-      .setOperatorSymbol("x")
+      .setOperatorSymbol(OperatorSymbol.ALTERNATE)
       .setElements(summary.getRangeElementsArray())
       .setOperator(summary::rangeProd)
     );
@@ -94,11 +96,11 @@ public class HomomorphismService {
     );
   }
   
-  private HomomorphismSummary constructRangeAndKernel(Group domain, Function<Integer, String> act) {
+  private HomomorphismSummary constructRangeAndKernel(Group domain, Function<Integer, Element> act) {
     HomomorphismSummary summary = new HomomorphismSummary(domain);
-    String rangeIdentity = act.apply(domain.getIdentity());
+    Element rangeIdentity = act.apply(domain.getIdentity());
     for (int x = 0; x < domain.getSize(); x++) {
-      String y = act.apply(x);
+      Element y = act.apply(x);
       summary.addRangeValue(y, x);
       if (y.equals(rangeIdentity)) {
         summary.addKernelValue(x);

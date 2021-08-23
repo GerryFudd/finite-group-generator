@@ -1,14 +1,15 @@
 package org.dexenjaeger.algebra.model.binaryoperator;
 
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.utils.Builder;
 
 import java.util.Map;
 
 public abstract class BaseBinaryOperatorBuilder<T extends BinaryOperator> implements Builder<T> {
-  protected String operatorSymbol = "*";
+  protected OperatorSymbol operatorSymbol = OperatorSymbol.DEFAULT;
   protected int size = 0;
-  protected String[] elements;
-  protected Map<String, Integer> lookup;
+  protected Element[] elements;
+  protected Map<Element, Integer> lookup;
   protected int[][] multiplicationTable;
   
   public BaseBinaryOperatorBuilder<T> size(int size) {
@@ -16,17 +17,17 @@ public abstract class BaseBinaryOperatorBuilder<T extends BinaryOperator> implem
     return this;
   }
   
-  public BaseBinaryOperatorBuilder<T> operatorSymbol(String operatorSymbol) {
+  public BaseBinaryOperatorBuilder<T> operatorSymbol(OperatorSymbol operatorSymbol) {
     this.operatorSymbol = operatorSymbol;
     return this;
   }
   
-  public BaseBinaryOperatorBuilder<T> elements(String... elements) {
+  public BaseBinaryOperatorBuilder<T> elements(Element... elements) {
     this.elements = elements;
     return this;
   }
   
-  public BaseBinaryOperatorBuilder<T> lookup(Map<String, Integer> lookup) {
+  public BaseBinaryOperatorBuilder<T> lookup(Map<Element, Integer> lookup) {
     this.lookup = lookup;
     return this;
   }

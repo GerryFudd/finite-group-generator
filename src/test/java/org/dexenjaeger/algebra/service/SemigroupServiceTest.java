@@ -3,10 +3,12 @@ package org.dexenjaeger.algebra.service;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,7 +31,9 @@ class SemigroupServiceTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> semigroupService.createSemigroup(
-        new String[]{"x", "y", "z"},
+        Stream.of("x", "y", "z")
+          .map(Element::from)
+          .toArray(Element[]::new),
         this::nonAssociative
       ));
     

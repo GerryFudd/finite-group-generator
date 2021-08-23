@@ -1,8 +1,10 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.Mapping;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.AbstractCycle;
 import org.dexenjaeger.algebra.model.cycle.MappingCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
@@ -46,8 +48,10 @@ public class BinaryOperatorService {
     );
   }
   
-  private String[] getElements(List<Mapping> mappings) {
-    return mappings.stream().map(Mapping::toString).toArray(String[]::new);
+  private Element[] getElements(List<Mapping> mappings) {
+    return mappings.stream()
+             .map(Mapping::getDisplay)
+             .toArray(Element[]::new);
   }
   
   public BinaryOperatorSummary getSortedAndPrettifiedBinaryOperator(
@@ -133,13 +137,13 @@ public class BinaryOperatorService {
   }
   
   public BinaryOperator createBinaryOperator(
-    String[] elements, BiFunction<Integer, Integer, Integer> operator
+    Element[] elements, BiFunction<Integer, Integer, Integer> operator
   ) {
-    return createBinaryOperator("*", elements, operator);
+    return createBinaryOperator(OperatorSymbol.DEFAULT, elements, operator);
   }
   
   public BinaryOperator createBinaryOperator(
-    String operatorSymbol, String[] elements, BiFunction<Integer, Integer, Integer> operator
+    OperatorSymbol operatorSymbol, Element[] elements, BiFunction<Integer, Integer, Integer> operator
   ) {
     
     BinaryOperator result = BinaryOperator.builder()

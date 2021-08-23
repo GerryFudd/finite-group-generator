@@ -7,6 +7,7 @@ import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.dexenjaeger.algebra.model.Element;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,7 @@ public class AutomorphismServiceTest {
       groupService.createGroup(
         new GroupSpec()
         .setIdentity(0)
-        .setElements(new String[]{"I", "(ab)"})
+        .setElements(new Element[]{Element.I, Element.from("(ab)")})
         .setOperator((i, j) -> (i + j) % 2)
       ),
       result
@@ -97,7 +98,11 @@ public class AutomorphismServiceTest {
       groupService.createGroup(
         new GroupSpec()
         .setIdentity(0)
-        .setElements(new String[]{"I", "(ab)(dd2)", "(ac)(dd2)", "(bc)(dd2)", "(abc)", "(acb)"})
+        .setElements(new Element[]{
+          Element.I, Element.from("(ab)(dd2)"),
+          Element.from("(ac)(dd2)"), Element.from("(bc)(dd2)"),
+          Element.from("(abc)"), Element.from("(acb)")
+        })
         .setOperator((i, j) -> new int[][]{
           {0, 1, 2, 3, 4, 5},
           {1, 0, 5, 4, 3, 2},
