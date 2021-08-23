@@ -1,9 +1,11 @@
 package org.dexenjaeger.algebra.converter;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.dto.ElementDto;
 import org.dexenjaeger.algebra.model.dto.GroupDto;
+import org.dexenjaeger.algebra.utils.io.csv.GroupAsCsv;
 import org.dexenjaeger.algebra.utils.io.latex.GroupAsLatex;
 import org.dexenjaeger.algebra.utils.io.latex.LatexCellSpec;
 
@@ -40,6 +42,15 @@ public class GroupConverter {
                .map(LatexCellSpec::new)
                .toArray(LatexCellSpec[]::new)
              )
+      .setMultiplicationTable(group.getMultiplicationTable());
+  }
+  
+  public static GroupAsCsv toCsv(Group group) {
+    return new GroupAsCsv()
+      .setAsciiElements(group.getSortedElements().stream()
+                          .map(Element::getAscii)
+                          .toArray(String[]::new))
+      .setAsciiOperatorSymbol(group.getOperatorSymbol().getAscii())
       .setMultiplicationTable(group.getMultiplicationTable());
   }
 }

@@ -1,7 +1,7 @@
 package org.dexenjaeger.algebra.utils.io;
 
 public enum FileType {
-  JSON("json"), LATEX("tex");
+  JSON("json"), LATEX("tex"), CSV("csv");
   
   private final String extension;
   

@@ -180,4 +180,27 @@ class FileUtilTest {
       )
     );
   }
+  
+  @Test
+  void writesCsvFile_fromSymmetryGroup() throws IOException {
+    String testSymmetryOutputFile = "generatedSymmetryGroup";
+    fileUtil.writeGroupAsType(
+      symmetryGroupGenerator.createSymmetryGroup(3),
+      FileType.CSV,
+      testSymmetryOutputFile,
+      testOutputDir
+    );
+    
+    String snapshotSymmetryGroupFile = "snapshotSymmetryGroupFile.csv";
+    compareToSnapshot(
+      Paths.get(
+        snapshotsDir,
+        snapshotSymmetryGroupFile
+      ),
+      Paths.get(
+        testOutputDir,
+        FileType.CSV.getFullFileName(testSymmetryOutputFile)
+      )
+    );
+  }
 }

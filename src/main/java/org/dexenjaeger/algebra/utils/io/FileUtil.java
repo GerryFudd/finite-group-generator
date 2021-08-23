@@ -3,9 +3,12 @@ package org.dexenjaeger.algebra.utils.io;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.converter.GroupConverter;
+import org.dexenjaeger.algebra.utils.io.csv.GroupAsCsv;
 import org.dexenjaeger.algebra.utils.io.latex.GroupAsLatex;
 import org.dexenjaeger.algebra.utils.io.latex.LatexAlign;
 import org.dexenjaeger.algebra.utils.io.latex.LatexCellSpec;
@@ -16,6 +19,7 @@ import org.dexenjaeger.algebra.utils.io.latex.LatexTableWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -38,6 +42,9 @@ public class FileUtil {
         break;
       case LATEX:
         writeToLaTeXFile(output, GroupConverter.toLatex(group));
+        break;
+      case CSV:
+        writeCsvFile(output, GroupConverter.toCsv(group));
         break;
       default:
         throw new RuntimeException(String.format(
@@ -139,6 +146,31 @@ public class FileUtil {
                                      .setRowSpecs(rowSpecs)
                                      .build()) {
       writer.writeTable();
+    }
+  }
+  
+  private void writeCsvFile(Path output, GroupAsCsv group) throws IOException {
+    String[] header = new String[group.getAsciiElements().length + 1];
+    header[0] = group.getAsciiOperatorSymbol();
+    System.arraycopy(
+      group.getAsciiElements(),
+      0, header,
+      1,
+      group.getAsciiElements().length
+    );
+    CSVFormat format = CSVFormat.DEFAULT.builder()
+                                 .setHeader(header)
+      .setAutoFlush(true)
+      .build();
+    try (CSVPrinter printer = format.print(output, StandardCharsets.UTF_8)) {
+      for (int j = 0; j < group.getMultiplicationTable().length; j++) {
+        LinkedList<String> cells = new LinkedList<>();
+        cells.addLast(group.getAsciiElements()[j]);
+        for (int k = 0; k < group.getMultiplicationTable().length; k++) {
+          cells.add(group.getAsciiElements()[group.getMultiplicationTable()[j][k]]);
+        }
+        printer.printRecord(cells);
+      }
     }
   }
 }
