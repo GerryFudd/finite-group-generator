@@ -1,0 +1,7 @@
+o,I,a,b,c,d,d2
+I,I,a,b,c,d,d2
+a,a,I,d,d2,b,c
+b,b,d2,I,d,c,a
+c,c,d,d2,I,a,b
+d,d,c,a,b,d2,I
+d2,d2,b,c,a,I,d
