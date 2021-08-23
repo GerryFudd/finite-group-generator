@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.converter.GroupConverter;
+import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.dexenjaeger.algebra.model.spec.SymmetryGroupExportSpec;
 import org.dexenjaeger.algebra.utils.io.latex.GroupAsLatex;
 import org.dexenjaeger.algebra.utils.io.latex.LatexAlign;
 import org.dexenjaeger.algebra.utils.io.latex.LatexCellSpec;
@@ -11,10 +15,12 @@ import org.dexenjaeger.algebra.utils.io.latex.LatexColumnSpec;
 import org.dexenjaeger.algebra.utils.io.latex.LatexRowSpec;
 import org.dexenjaeger.algebra.utils.io.latex.LatexTableWriter;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +29,37 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class FileUtil {
+  private final SymmetryGroupGenerator symmetryGroupGenerator;
+  
+  @Inject
+  public FileUtil(SymmetryGroupGenerator symmetryGroupGenerator) {
+    this.symmetryGroupGenerator = symmetryGroupGenerator;
+  }
+  
+  public void writeSymmetryGroupFromSpec(
+    SymmetryGroupExportSpec spec, String outputDir
+  ) throws IOException {
+    Group group = symmetryGroupGenerator.createSymmetryGroup(
+      spec.getElementsCount(), spec.getOperatorSymbol()
+    );
+    Path output = Paths.get(
+      outputDir, spec.getFileType().getFullFileName(spec.getFileName())
+    );
+    log.info("Processing spec {}", spec);
+    switch (spec.getFileType()) {
+      case JSON:
+        writeToJsonFile(output, GroupConverter.toDto(group));
+        break;
+      case LATEX:
+        writeToLaTeXFile(output, GroupConverter.toLatex(group));
+        break;
+      default:
+        throw new RuntimeException(String.format(
+          "File type %s not implemented", spec.getFileType().name()
+        ));
+    }
+  }
+  
   private ObjectMapper mapper() {
     return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
   }
@@ -41,7 +78,7 @@ public class FileUtil {
     }
   }
   
-  public <T> void writeToJsonFile(
+  private  <T> void writeToJsonFile(
     Path fileName, T content
   ) throws IOException {
     File parent = fileName.getParent().toFile();
@@ -58,7 +95,7 @@ public class FileUtil {
     }
   }
   
-  public void writeToLaTeXFile(Path output, GroupAsLatex groupAsLatex) throws IOException {
+  private void writeToLaTeXFile(Path output, GroupAsLatex groupAsLatex) throws IOException {
     File parentDirectory = output.getParent().toFile();
     if (!parentDirectory.exists() && !parentDirectory.mkdirs()) {
       throw new IOException("Couldn't create parent directory.");
