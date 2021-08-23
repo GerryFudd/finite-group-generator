@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.validators;
 
 import org.dexenjaeger.algebra.categories.objects.semigroup.Semigroup;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import javax.inject.Inject;
 
@@ -16,9 +17,9 @@ public class SemigroupValidator implements Validator<Semigroup> {
   @Override
   public void validate(Semigroup item) {
     binaryOperatorValidator.validate(item);
-    for (String a:item.getElementsDisplay()) {
-      for (String b:item.getElementsDisplay()) {
-        for (String c:item.getElementsDisplay()) {
+    for (Element a:item.getElementsDisplay()) {
+      for (Element b:item.getElementsDisplay()) {
+        for (Element c:item.getElementsDisplay()) {
           if (
             !item.prod(item.prod(a, b), c).equals(item.prod(a, item.prod(b, c)))
           ) {

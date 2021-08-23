@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.categories.morphisms;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.utils.Builder;
 
 public abstract class BaseHomomorphismBuilder<T> implements Builder<T> {
@@ -32,9 +33,9 @@ public abstract class BaseHomomorphismBuilder<T> implements Builder<T> {
     return this;
   }
   
-  protected String[] image;
+  protected Element[] image;
   
-  public BaseHomomorphismBuilder<T> image(String[] image) {
+  public BaseHomomorphismBuilder<T> image(Element[] image) {
     this.image = image;
     return this;
   }

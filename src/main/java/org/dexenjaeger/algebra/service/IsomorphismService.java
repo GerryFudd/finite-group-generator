@@ -3,6 +3,8 @@ package org.dexenjaeger.algebra.service;
 import org.dexenjaeger.algebra.categories.morphisms.Isomorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.Mapping;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.FunctionsUtil;
 import org.dexenjaeger.algebra.validators.Validator;
@@ -47,12 +49,12 @@ public class IsomorphismService {
   }
   
   public Isomorphism createIsomorphism(
-    Group domain, Function<Integer, String> func
+    Group domain, Function<Integer, Element> func
   ) {
-    Map<String, Integer> rangeLookup = new HashMap<>();
-    String[] elements = new String[domain.getSize()];
+    Map<Element, Integer> rangeLookup = new HashMap<>();
+    Element[] elements = new Element[domain.getSize()];
     for (int i = 0; i < domain.getSize(); i++) {
-      String y = func.apply(i);
+      Element y = func.apply(i);
       elements[i] = y;
       rangeLookup.put(y, i);
     }
@@ -66,7 +68,7 @@ public class IsomorphismService {
       domain,
       groupService.createGroup(
         new GroupSpec()
-        .setOperatorSymbol("x")
+        .setOperatorSymbol(OperatorSymbol.ALTERNATE)
         .setIdentity(domain.getIdentity())
         .setElements(elements)
         .setInversesMap(rangeInverseMap)

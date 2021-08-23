@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.model.Mapping;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class SymbolsUtil {
   public Mapping applySymbol(Mapping mapping) {
     String symbol = getNextSymbol();
     usageCount.put(symbol, 1);
-    mapping.setDisplay(symbol);
+    mapping.setDisplay(Element.from(symbol));
     return mapping;
   }
   
@@ -25,9 +26,9 @@ public class SymbolsUtil {
     Optional.ofNullable(usageCount.computeIfPresent(
       symbol, (key, count) -> count + 1
       )).ifPresentOrElse(
-        count -> mapping.setDisplay(String.format("%s%d", symbol, count)),
+        count -> mapping.setDisplay(Element.from(symbol, count)),
         () -> {
-          mapping.setDisplay(symbol);
+          mapping.setDisplay(Element.from(symbol));
           usageCount.put(symbol, 1);
         }
       );

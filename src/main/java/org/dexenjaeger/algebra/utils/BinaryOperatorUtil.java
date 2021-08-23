@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.Arrays;
@@ -60,16 +61,16 @@ public class BinaryOperatorUtil {
     BinaryOperator binaryOperator
   ) {
     return printMultiplicationTable(
-      binaryOperator.getOperatorSymbol(),
+      binaryOperator.getOperatorSymbol().getAscii(),
       binaryOperator.getSortedElements(),
       getSafeOperator(binaryOperator)
     );
   }
   
-  private static BiFunction<String, String, String> getSafeOperator(BinaryOperator binaryOperator) {
+  private static BiFunction<Element, Element, String> getSafeOperator(BinaryOperator binaryOperator) {
     return (a, b) -> {
       try {
-        return binaryOperator.prod(a, b);
+        return binaryOperator.prod(a, b).toString();
       } catch (RuntimeException e) {
         System.out.printf("Couldn't find product of %s and %s while printing table.", a, b);
       }
@@ -93,10 +94,10 @@ public class BinaryOperatorUtil {
   
   private static String printMultiplicationTable(
     String operatorSymbol,
-    List<String> elementsList,
-    BiFunction<String, String, String> safeOperator
+    List<Element> elementsList,
+    BiFunction<Element, Element, String> safeOperator
   ) {
-    Map<String, List<String>> rowMap = elementsList.stream()
+    Map<Element, List<String>> rowMap = elementsList.stream()
       .collect(Collectors.toMap(
         Function.identity(),
         a -> elementsList.stream()
@@ -113,12 +114,12 @@ public class BinaryOperatorUtil {
     sb.append(padOperator(operatorSymbol, '_', width));
     sb.append("_|_");
     sb.append(elementsList.stream()
-                .map(n -> padOperator(n, '_', width))
+                .map(n -> padOperator(n.getAscii(), '_', width))
                 .collect(Collectors.joining("_")));
     sb.append("_\n");
-    for (String a: elementsList) {
+    for (Element a: elementsList) {
       appendLine(
-        sb, a, width, rowMap.get(a)
+        sb, a.toString(), width, rowMap.get(a)
       );
     }
     return sb.toString();
@@ -159,8 +160,8 @@ public class BinaryOperatorUtil {
     }
   }
   
-  public Map<String, Integer> createLookup(String[] elements) {
-    Map<String, Integer> lookup = new HashMap<>();
+  public Map<Element, Integer> createLookup(Element[] elements) {
+    Map<Element, Integer> lookup = new HashMap<>();
     for (int i = 0; i < elements.length; i++) {
       lookup.put(elements[i], i);
     }

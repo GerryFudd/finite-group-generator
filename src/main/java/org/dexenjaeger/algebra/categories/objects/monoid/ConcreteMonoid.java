@@ -2,6 +2,8 @@ package org.dexenjaeger.algebra.categories.objects.monoid;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 
 import java.util.Map;
 
@@ -10,11 +12,11 @@ public class ConcreteMonoid extends BaseBinaryOperator implements Monoid {
   private final int identity;
   
   ConcreteMonoid(
-    String operatorSymbol,
+    OperatorSymbol operatorSymbol,
     int size,
-    String[] elements,
+    Element[] elements,
     int identity,
-    Map<String, Integer> lookup,
+    Map<Element, Integer> lookup,
     int[][] multiplicationTable
   ) {
     super(
@@ -25,7 +27,7 @@ public class ConcreteMonoid extends BaseBinaryOperator implements Monoid {
   }
   
   @Override
-  public String getIdentityDisplay() {
+  public Element getIdentityDisplay() {
     return elements[identity];
   }
 }

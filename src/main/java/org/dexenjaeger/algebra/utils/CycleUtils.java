@@ -1,10 +1,11 @@
 package org.dexenjaeger.algebra.utils;
 
 import org.dexenjaeger.algebra.model.Mapping;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.cycle.Cycle;
+import org.dexenjaeger.algebra.model.cycle.ElementCycle;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.model.cycle.MappingCycle;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
 import org.dexenjaeger.algebra.model.spec.CycleSpec;
 
 import java.util.HashMap;
@@ -80,18 +81,18 @@ public class CycleUtils {
              .build();
   }
   
-  public StringCycle createStringCycle(String... elements) {
-    return createStringCycle(List.of(elements));
+  public ElementCycle createElementCycle(Element... elements) {
+    return createElementCycle(List.of(elements));
   }
   
-  public StringCycle createStringCycle(List<String> elements) {
-    CycleSpec<String> spec = resolveGenerators(elements);
-    return StringCycle.builder()
+  public ElementCycle createElementCycle(List<Element> elements) {
+    CycleSpec<Element> spec = resolveGenerators(elements);
+    return ElementCycle.builder()
              .elements(elements)
              .generators(spec.getGeneratorArray())
              .subCycleGenerators(spec.getSubCycleGenerators())
              .lookup(spec.getLookup())
-             .maker(this::createStringCycle)
+             .maker(this::createElementCycle)
              .build();
   }
   

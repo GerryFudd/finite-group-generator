@@ -2,7 +2,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.cycle.AbstractCycle;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.ElementCycle;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -18,18 +18,18 @@ public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
     return this;
   }
   
-  private final Set<StringCycle> stringCycles = new HashSet<>();
+  private final Set<ElementCycle> elementCycles = new HashSet<>();
   @Override
   public AutomorphismBuilder range(Group range) {
     throw new RuntimeException("Not implemented.");
   }
   
-  public AutomorphismBuilder withStringCycles(StringCycle... cycles) {
-    return withStringCycles(Set.of(cycles));
+  public AutomorphismBuilder withElementCycles(ElementCycle... cycles) {
+    return withElementCycles(Set.of(cycles));
   }
   
-  public AutomorphismBuilder withStringCycles(Collection<StringCycle> cycles) {
-    stringCycles.addAll(cycles);
+  public AutomorphismBuilder withElementCycles(Collection<ElementCycle> cycles) {
+    elementCycles.addAll(cycles);
     return this;
   }
   
@@ -45,8 +45,8 @@ public class AutomorphismBuilder extends BaseIsomorphismBuilder<Automorphism> {
     return new ConcreteAutomorphism(
       domain, mapping, image, inverseMapping,
       fixedElements,
-      new CyclePresentation(stringCycles.stream()
-                              .sorted(Comparator.comparing(StringCycle::toString))
+      new CyclePresentation(elementCycles.stream()
+                              .sorted(Comparator.comparing(ElementCycle::toString))
                               .sorted(Comparator.comparing(AbstractCycle::getSize))
                               .collect(Collectors.toList())),
       identity

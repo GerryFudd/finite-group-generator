@@ -2,6 +2,8 @@ package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.validators.ValidationException;
 
@@ -35,16 +37,19 @@ public class InnerAutomorphismService {
   
   public Group createInnerAutomorphismGroup(Group group) {
     List<Automorphism> elements = group.getElementsDisplay().stream()
-      .map(group::eval)
-      .map(i -> createInnerAutomorphism(group, i))
-      .collect(Collectors.toList());
+                                    .map(group::eval)
+                                    .map(i -> createInnerAutomorphism(group, i))
+                                    .collect(Collectors.toList());
     return groupService.createSortedGroup(
       new GroupSpec()
-      .setOperatorSymbol("o")
-      .setElements(elements.stream().map(Automorphism::toString).toArray(String[]::new))
-      .setOperator((i, j) -> elements.indexOf(automorphismService.compose(
-        elements.get(i), elements.get(j)
-      )))
+        .setOperatorSymbol(OperatorSymbol.COMPOSITION)
+        .setElements(elements.stream()
+                       .map(Automorphism::toString)
+                       .map(Element::from)
+                       .toArray(Element[]::new))
+        .setOperator((i, j) -> elements.indexOf(automorphismService.compose(
+          elements.get(i), elements.get(j)
+        )))
     ).getGroup();
   }
   

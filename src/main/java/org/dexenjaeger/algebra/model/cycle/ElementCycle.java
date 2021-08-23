@@ -1,18 +1,21 @@
 package org.dexenjaeger.algebra.model.cycle;
 
 import lombok.EqualsAndHashCode;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-public class StringCycle extends AbstractCycle<String, StringCycle> {
+public class ElementCycle extends AbstractCycle<Element, ElementCycle> {
   
-  public StringCycle(
-    int size, String[] elements, Map<String, Integer> lookup,
+  public ElementCycle(
+    int size, Element[] elements, Map<Element, Integer> lookup,
     int[] generators, Map<Integer, Integer> subCycleGenerators,
-    Function<List<String>, StringCycle> make
+    Function<List<Element>, ElementCycle> make
     ) {
     super(
       size, elements, lookup, generators, subCycleGenerators,
@@ -20,14 +23,14 @@ public class StringCycle extends AbstractCycle<String, StringCycle> {
     );
   }
   
-  public static StringCycleBuilder builder() {
-    return new StringCycleBuilder();
+  public static ElementCycleBuilder builder() {
+    return new ElementCycleBuilder();
   }
   
   @Override
   public String toString() {
     return new StringBuilder("(")
-      .append(String.join("", elements))
+      .append(Stream.of(elements).map(Element::toString).collect(Collectors.joining()))
       .append(")")
       .toString();
   }

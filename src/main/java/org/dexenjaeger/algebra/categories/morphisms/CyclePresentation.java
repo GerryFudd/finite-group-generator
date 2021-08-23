@@ -3,7 +3,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dexenjaeger.algebra.model.cycle.StringCycle;
+import org.dexenjaeger.algebra.model.cycle.ElementCycle;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class CyclePresentation {
   @EqualsAndHashCode.Include
   @Getter
-  private final List<StringCycle> cycles;
+  private final List<ElementCycle> cycles;
   
   @Override
   public String toString() {
@@ -21,7 +21,7 @@ public class CyclePresentation {
       return "I";
     }
     return cycles.stream()
-      .map(StringCycle::toString)
+      .map(ElementCycle::toString)
       .collect(Collectors.joining());
   }
 }

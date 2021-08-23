@@ -3,7 +3,10 @@ package org.dexenjaeger.algebra.service;
 import com.google.common.collect.Sets;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.SortedGroupResult;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
+import org.dexenjaeger.algebra.model.spec.CyclicGroupSpec;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.CycleUtils;
@@ -41,31 +44,35 @@ public class GroupService {
     this.binaryOperatorUtil = binaryOperatorUtil;
   }
   
-  public Group createCyclicGroup(String... elements) {
-    return createCyclicGroup(elements, "*");
+  public Group createCyclicGroup(String base, int n) {
+    return createCyclicGroup(new CyclicGroupSpec()
+    .setBase(base)
+    .setN(n));
   }
   
-  public Group createCyclicGroup(String[] elements, String operatorSymbol) {
-    int n = elements.length;
+  public Group createCyclicGroup(CyclicGroupSpec spec) {
     LinkedList<Integer> cycle = new LinkedList<>();
     Map<Integer, Integer> inverses = new HashMap<>();
-    for (int i = 1; i < n; i++) {
-      inverses.put(i, n - i);
+    Element[] elements = new Element[spec.getN()];
+    for (int i = 1; i < spec.getN(); i++) {
+      inverses.put(i, spec.getN() - i);
       cycle.addLast(i);
+      elements[i] = Element.from(spec.getBase(), i);
     }
+    elements[0] = spec.getIdentityElement();
     inverses.put(0, 0);
     cycle.addLast(0);
     return Group.builder()
              .inversesMap(inverses)
              .maximalCycles(Set.of(cycleUtils.createIntCycle(cycle)))
              .identity(0)
-             .operatorSymbol(operatorSymbol)
+             .operatorSymbol(spec.getOperatorSymbol())
              .elements(elements)
-             .size(n)
+             .size(spec.getN())
              .lookup(binaryOperatorUtil.createLookup(elements))
              .multiplicationTable(
                binaryOperatorUtil.getMultiplicationTable(
-                 n, (a, b) -> (a + b) % n
+                 spec.getN(), (a, b) -> (a + b) % spec.getN()
                )
              )
              .build();
@@ -171,17 +178,17 @@ public class GroupService {
   }
   
   public Group constructGroupFromElementsAndMultiplicationTable(
-    String[] elements,
+    Element[] elements,
     int[][] multiplicationTable
   ) {
     return constructGroupFromElementsAndMultiplicationTable(
-      "*", elements, multiplicationTable
+      OperatorSymbol.DEFAULT, elements, multiplicationTable
     );
   }
   
   public Group constructGroupFromElementsAndMultiplicationTable(
-    String operatorSymbol,
-    String[] elements,
+    OperatorSymbol operatorSymbol,
+    Element[] elements,
     int[][] multiplicationTable
   ) {
     if (elements.length != multiplicationTable.length) {
@@ -198,7 +205,7 @@ public class GroupService {
     return result;
   }
   
-  private void validateSubGroup(Group group, List<String> subset) {
+  private void validateSubGroup(Group group, List<Element> subset) {
     if (subset.isEmpty()) {
       throw new ValidationException("Subgroups may not be empty.");
     }
@@ -206,11 +213,11 @@ public class GroupService {
       "The set %s is not a subgroup.",
       subset
     ));
-    for (String x:subset) {
+    for (Element x:subset) {
       if (!subset.contains(group.getInverse(x))) {
         throw e;
       }
-      for (String y:subset) {
+      for (Element y:subset) {
         if (!subset.contains(group.prod(x, y))) {
           throw e;
         }
@@ -218,14 +225,14 @@ public class GroupService {
     }
   }
   
-  private Map<String, Set<String>> getValidatedCosets(Group group, List<String> subgroup) {
-    Map<String, Set<String>> leftCosets = new HashMap<>();
-    for (String a:group.getElementsDisplay()) {
+  private Map<Element, Set<Element>> getValidatedCosets(Group group, List<Element> subgroup) {
+    Map<Element, Set<Element>> leftCosets = new HashMap<>();
+    for (Element a:group.getElementsDisplay()) {
       if (leftCosets.containsKey(a)) {
         continue;
       }
       boolean inCoset = false;
-      for (String b:subgroup) {
+      for (Element b:subgroup) {
         if (leftCosets.containsKey(group.prod(a, b))) {
           leftCosets.computeIfPresent(group.prod(a, b), (key, val) -> {
             val.add(a);
@@ -240,8 +247,8 @@ public class GroupService {
       }
       leftCosets.computeIfAbsent(a, key -> Sets.newHashSet(a));
     }
-    for (Map.Entry<String, Set<String>> leftCoset: leftCosets.entrySet()) {
-      for (String el:leftCoset.getValue()) {
+    for (Map.Entry<Element, Set<Element>> leftCoset: leftCosets.entrySet()) {
+      for (Element el:leftCoset.getValue()) {
         if (subgroup.stream().noneMatch(x -> leftCoset.getKey().equals(group.prod(x, el)))) {
           throw new ValidationException(String.format(
             "The value %s belongs to [%sH] but not [H%s] for subgroup H=%s.",
@@ -253,15 +260,15 @@ public class GroupService {
     return leftCosets;
   }
   
-  public Group createQuotientGroup(Group group, List<String> normalSubgroup) {
+  public Group createQuotientGroup(Group group, List<Element> normalSubgroup) {
     validateSubGroup(group, normalSubgroup);
-    Map<String, Set<String>> cosets = getValidatedCosets(group, normalSubgroup);
-    List<String> elements = new ArrayList<>(cosets.size());
-    Map<String, Integer> lookup = new HashMap<>();
-    String id = group.display(group.getIdentity());
-    for (Map.Entry<String, Set<String>> entry:cosets.entrySet()) {
-      String representative = null;
-      for (String member:entry.getValue().stream().sorted().toArray(String[]::new)) {
+    Map<Element, Set<Element>> cosets = getValidatedCosets(group, normalSubgroup);
+    List<Element> elements = new ArrayList<>(cosets.size());
+    Map<Element, Integer> lookup = new HashMap<>();
+    Element id = group.display(group.getIdentity());
+    for (Map.Entry<Element, Set<Element>> entry:cosets.entrySet()) {
+      Element representative = null;
+      for (Element member:entry.getValue().stream().sorted().toArray(Element[]::new)) {
         if (representative == null) {
           representative = member;
         }
@@ -276,7 +283,9 @@ public class GroupService {
     return createSortedGroup(
       new GroupSpec()
       .setOperatorSymbol(group.getOperatorSymbol())
-      .setElements(elements.stream().map(el -> String.format("[%s]", el)).toArray(String[]::new))
+      .setElements(elements.stream()
+                     .map(Element::equivalenceClass)
+                     .toArray(Element[]::new))
       .setOperator((i, j) -> lookup.get(group.prod(elements.get(i), elements.get(j))))
     ).getGroup();
   }

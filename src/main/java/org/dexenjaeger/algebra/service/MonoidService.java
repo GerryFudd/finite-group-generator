@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.service;
 
 import org.dexenjaeger.algebra.categories.objects.monoid.Monoid;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.validators.Validator;
 
@@ -21,7 +22,7 @@ public class MonoidService {
   }
   
   public Monoid createMonoid(
-    int identity, String[] elements,
+    int identity, Element[] elements,
     BiFunction<Integer, Integer, Integer> operator
     ) {
     Monoid result = Monoid.builder()

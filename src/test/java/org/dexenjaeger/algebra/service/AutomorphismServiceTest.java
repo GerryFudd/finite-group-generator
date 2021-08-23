@@ -7,6 +7,7 @@ import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -23,12 +24,12 @@ public class AutomorphismServiceTest {
   @Test
   void createAutomorphism() {
     Automorphism automorphism = automorphismService.createAutomorphism(
-      groupService.createCyclicGroup("I", "a", "b", "c"),
+      groupService.createCyclicGroup("a", 4),
       i -> (3 * i) % 4
     );
     
     assertEquals(
-      "(ac)",
+      "(aa3)",
       automorphism.toString()
     );
     
@@ -43,7 +44,7 @@ public class AutomorphismServiceTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> automorphismService.createAutomorphism(
-      groupService.createCyclicGroup("I", "a", "b", "c"),
+      groupService.createCyclicGroup("a", 4),
       i -> (2 * i) % 4
     )
     );
@@ -74,15 +75,13 @@ public class AutomorphismServiceTest {
   
   @Test
   void createAutomorphismGroupForCyclicGroup3() {
-    Group result = automorphismService.createAutomorphismGroup(groupService.createCyclicGroup(
-      "I", "a", "b"
-    ));
+    Group result = automorphismService.createAutomorphismGroup(groupService.createCyclicGroup("a", 3));
     
     assertEquals(
       groupService.createGroup(
         new GroupSpec()
         .setIdentity(0)
-        .setElements(new String[]{"I", "(ab)"})
+        .setElements(new Element[]{Element.I, Element.from("(aa2)")})
         .setOperator((i, j) -> (i + j) % 2)
       ),
       result
@@ -97,7 +96,11 @@ public class AutomorphismServiceTest {
       groupService.createGroup(
         new GroupSpec()
         .setIdentity(0)
-        .setElements(new String[]{"I", "(ab)(dd2)", "(ac)(dd2)", "(bc)(dd2)", "(abc)", "(acb)"})
+        .setElements(new Element[]{
+          Element.I, Element.from("(ab)(dd2)"),
+          Element.from("(ac)(dd2)"), Element.from("(bc)(dd2)"),
+          Element.from("(abc)"), Element.from("(acb)")
+        })
         .setOperator((i, j) -> new int[][]{
           {0, 1, 2, 3, 4, 5},
           {1, 0, 5, 4, 3, 2},

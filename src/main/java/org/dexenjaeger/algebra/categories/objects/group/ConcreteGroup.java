@@ -2,6 +2,8 @@ package org.dexenjaeger.algebra.categories.objects.group;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.model.binaryoperator.BaseBinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 
 import java.util.List;
@@ -18,13 +20,13 @@ public class ConcreteGroup extends BaseBinaryOperator implements Group {
   private final Set<IntCycle> maximalCycles;
   
   ConcreteGroup(
-    String operatorSymbol,
+    OperatorSymbol operatorSymbol,
     int size,
-    String[] elements,
+    Element[] elements,
     int identity,
     Map<Integer, Integer> inversesMap,
     Set<IntCycle> maximalCycles,
-    Map<String, Integer> lookup,
+    Map<Element, Integer> lookup,
     int[][] multiplicationTable
   ) {
     super(
@@ -72,9 +74,9 @@ public class ConcreteGroup extends BaseBinaryOperator implements Group {
   @Override
   public Set<Integer> getNCycleGenerators(int n) {
     return getNCycleStream(n)
-      .map(IntCycle::getGenerators)
-      .flatMap(Set::stream)
-      .collect(Collectors.toSet());
+             .map(IntCycle::getGenerators)
+             .flatMap(Set::stream)
+             .collect(Collectors.toSet());
   }
   
   @Override
@@ -85,19 +87,24 @@ public class ConcreteGroup extends BaseBinaryOperator implements Group {
   @Override
   public Optional<IntCycle> getCycleGeneratedBy(int x) {
     return maximalCycles.stream()
-      .map(cycle -> cycle.getSubCycleGeneratedBy(x))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
-      .findAny();
+             .map(cycle -> cycle.getSubCycleGeneratedBy(x))
+             .filter(Optional::isPresent)
+             .map(Optional::get)
+             .findAny();
   }
   
   @Override
-  public String getIdentityDisplay() {
+  public int[][] getMultiplicationTable() {
+    return multiplicationTable;
+  }
+  
+  @Override
+  public Element getIdentityDisplay() {
     return elements[identity];
   }
   
   @Override
-  public String getInverse(String element) {
+  public Element getInverse(Element element) {
     return elements[getInverse(lookup.get(element))];
   }
 }

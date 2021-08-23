@@ -10,17 +10,17 @@ import java.util.Set;
 
 public abstract class BaseBinaryOperator implements BinaryOperator {
   @Getter
-  protected final String operatorSymbol;
+  protected final OperatorSymbol operatorSymbol;
   @Getter
   protected final int size;
-  protected final String[] elements;
-  protected final Map<String, Integer> lookup;
+  protected final Element[] elements;
+  protected final Map<Element, Integer> lookup;
   protected final int[][] multiplicationTable;
   protected BaseBinaryOperator(
-    String operatorSymbol,
+    OperatorSymbol operatorSymbol,
     int size,
-    String[] elements,
-    Map<String, Integer> lookup,
+    Element[] elements,
+    Map<Element, Integer> lookup,
     int[][] multiplicationTable
   ) {
     this.operatorSymbol = operatorSymbol;
@@ -31,15 +31,15 @@ public abstract class BaseBinaryOperator implements BinaryOperator {
   }
   
   @Override
-  public Set<String> getElementsDisplay() {
+  public Set<Element> getElementsDisplay() {
     return Set.of(elements);
   }
   
   @Override
-  public List<String> getSortedElements() { return List.of(elements); }
+  public List<Element> getSortedElements() { return List.of(elements); }
   
   @Override
-  public String prod(String a, String b) {
+  public Element prod(Element a, Element b) {
     return elements[prod(lookup.get(a), lookup.get(b))];
   }
   
@@ -49,12 +49,12 @@ public abstract class BaseBinaryOperator implements BinaryOperator {
   }
   
   @Override
-  public Integer eval(String a) {
+  public Integer eval(Element a) {
     return lookup.get(a);
   }
   
   @Override
-  public String display(int i) {
+  public Element display(int i) {
     return elements[i];
   }
   

@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.categories.morphisms;
 
 import lombok.Getter;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.Arrays;
 
@@ -13,14 +14,14 @@ public class ConcreteHomomorphism implements Homomorphism {
   @Getter
   protected final Group kernel;
   protected final int[] mapping;
-  protected final String[] image;
+  protected final Element[] image;
   
   ConcreteHomomorphism(
     Group domain,
     Group range,
     Group kernel,
     int[] mapping,
-    String[] image
+    Element[] image
   ) {
     this.domain = domain;
     this.range = range;
@@ -35,7 +36,7 @@ public class ConcreteHomomorphism implements Homomorphism {
   }
   
   @Override
-  public String apply(String x) {
+  public Element apply(Element x) {
     return range.display(mapping[domain.eval(x)]);
   }
   

@@ -6,11 +6,15 @@ import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.Mapping;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.validators.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,7 +37,9 @@ class BinaryOperatorServiceTest {
     
     assertEquals(
       "L, L2, a, b",
-      String.join(", ", result.getElements())
+      Stream.of(result.getElements())
+      .map(Element::toString)
+      .collect(Collectors.joining(", "))
     );
   }
   
@@ -50,7 +56,9 @@ class BinaryOperatorServiceTest {
     
     assertEquals(
       "I, a, b, c",
-      String.join(", ", result.getElements())
+      Stream.of(result.getElements())
+        .map(Element::toString)
+        .collect(Collectors.joining(", "))
     );
   }
   
@@ -97,7 +105,7 @@ class BinaryOperatorServiceTest {
     ValidationException e = assertThrows(
       ValidationException.class,
       () -> binaryOperatorService
-              .createBinaryOperator(new String[]{"a"}, (a, b) -> 1)
+              .createBinaryOperator(new Element[]{Element.from("a")}, (a, b) -> 1)
     );
     
     assertEquals(
@@ -117,7 +125,8 @@ class BinaryOperatorServiceTest {
         .append(" c | c a b \n")
         .toString(),
       binaryOperatorService.createBinaryOperator(
-        "+", new String[]{"a", "b", "c"},
+        OperatorSymbol.ADDITION, new Element[]{
+          Element.from("a"), Element.from("b"), Element.from("c")},
         (i, j) -> (i + j) % 3
       ).printMultiplicationTable()
     );
@@ -126,7 +135,7 @@ class BinaryOperatorServiceTest {
   @Test
   void validateBinaryOperator() {
     ValidationException e = assertThrows(ValidationException.class, () -> binaryOperatorService.createBinaryOperator(
-      new String[]{"a"}, (a, b) -> 1
+      new Element[]{Element.from("a")}, (a, b) -> 1
     ));
     
     assertEquals(
@@ -139,7 +148,9 @@ class BinaryOperatorServiceTest {
   @Test
   void validateBinaryOperator_functionNotDefinedOnDomain() {
     RuntimeException e = assertThrows(RuntimeException.class, () -> binaryOperatorService.createBinaryOperator(
-      new String[]{"a", "b", "c"}, (a, b) -> new int[][]{
+      new Element[]{
+        Element.from("a"), Element.from("b"), Element.from("c")
+      }, (a, b) -> new int[][]{
         {0, 1},
         {1, 2}
       }[a][b]

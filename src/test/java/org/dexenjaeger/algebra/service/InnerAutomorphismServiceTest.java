@@ -7,6 +7,7 @@ import org.dexenjaeger.algebra.categories.morphisms.Automorphism;
 import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.categories.objects.group.TrivialGroup;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -78,7 +79,7 @@ class InnerAutomorphismServiceTest {
   @Test
   void createOuterAutomorphismServiceTest() {
     assertEquals(
-      new TrivialGroup("[I]"),
+      new TrivialGroup(Element.I.equivalenceClass()),
       innerAutomorphismService.createOuterAutomorphismGroup(
         symmetryGroupGenerator.createSymmetryGroup(3)
       )
@@ -89,7 +90,7 @@ class InnerAutomorphismServiceTest {
   @Test
   void createOuterAutomorphismServiceTest_s4() {
     assertEquals(
-      new TrivialGroup("[I]"),
+      new TrivialGroup(Element.I.equivalenceClass()),
       innerAutomorphismService.createOuterAutomorphismGroup(
         symmetryGroupGenerator.createSymmetryGroup(4)
       )

@@ -7,6 +7,8 @@ import org.dexenjaeger.algebra.categories.objects.group.Group;
 import org.dexenjaeger.algebra.generators.SymmetryGroupGenerator;
 import org.dexenjaeger.algebra.model.BinaryOperatorSummary;
 import org.dexenjaeger.algebra.model.Mapping;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.spec.CyclicGroupSpec;
 import org.dexenjaeger.algebra.model.spec.GroupSpec;
 import org.dexenjaeger.algebra.utils.CycleUtils;
 import org.dexenjaeger.algebra.validators.ValidationException;
@@ -65,7 +67,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a"})
+          .setElements(new Element[]{Element.I, Element.from("a")})
           .setInversesMap(Map.of(0, 0, 1, 2))
           .setMaximalCycles(Set.of(cycleUtils.createIntCycle(1, 0)))
           .setOperator((a, b) -> (a + b) % 2)
@@ -87,7 +89,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a", "b"})
+          .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b")})
           .setMaximalCycles(Set.of(
             cycleUtils.createIntCycle(2, 0)
           ))
@@ -107,7 +109,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a", "b"})
+          .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b")})
           .setMaximalCycles(Set.of(
             cycleUtils.createIntCycle(List.of())
           ))
@@ -127,7 +129,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a", "b"})
+          .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b")})
           .setMaximalCycles(Set.of(
             cycleUtils.createIntCycle(1, 2)
           ))
@@ -147,7 +149,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a", "b", "c"})
+          .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b"), Element.from("c")})
           .setMaximalCycles(Set.of(
             cycleUtils.createIntCycle(1, 3, 0)
           ))
@@ -167,7 +169,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a", "b", "c"})
+          .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b"), Element.from("c")})
           .setMaximalCycles(Set.of(
             cycleUtils.createIntCycle(4)
           ))
@@ -187,7 +189,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a", "b", "c"})
+          .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b"), Element.from("c")})
           .setMaximalCycles(Set.of(
             cycleUtils.createIntCycle(1, 2, 3, 0),
             cycleUtils.createIntCycle(2, 0)
@@ -208,7 +210,7 @@ class GroupServiceTest {
       () -> groupService.createGroup(
         new GroupSpec()
           .setIdentity(0)
-          .setElements(new String[]{"I", "a", "b", "c"})
+          .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b"), Element.from("c")})
           .setMaximalCycles(Set.of(
             cycleUtils.createIntCycle(2, 0)
           ))
@@ -226,7 +228,7 @@ class GroupServiceTest {
     Group group = groupService.createGroup(
       new GroupSpec()
         .setIdentity(0)
-        .setElements(new String[]{"I", "a", "b"})
+        .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b")})
         .setOperator((i, j) -> (i + j) % 3)
     );
     
@@ -249,13 +251,13 @@ class GroupServiceTest {
       1, group.getInverse(2)
     );
     assertEquals(
-      "I", group.display(0)
+      Element.I, group.display(0)
     );
     assertEquals(
-      "a", group.display(1)
+      Element.from("a"), group.display(1)
     );
     assertEquals(
-      "b", group.display(2)
+      Element.from("b"), group.display(2)
     );
     
     assertEquals(
@@ -269,7 +271,7 @@ class GroupServiceTest {
     Group group = groupService.createGroup(
       new GroupSpec()
         .setIdentity(0)
-        .setElements(new String[]{"I", "a", "b", "c"})
+        .setElements(new Element[]{Element.I, Element.from("a"), Element.from("b"), Element.from("c")})
         .setOperator((i, j) -> new int[][]{
           {0, 1, 2, 3},
           {1, 0, 3, 2},
@@ -301,16 +303,16 @@ class GroupServiceTest {
       3, group.getInverse(3)
     );
     assertEquals(
-      "I", group.display(0)
+      Element.I, group.display(0)
     );
     assertEquals(
-      "a", group.display(1)
+      Element.from("a"), group.display(1)
     );
     assertEquals(
-      "b", group.display(2)
+      Element.from("b"), group.display(2)
     );
     assertEquals(
-      "c", group.display(3)
+      Element.from("c"), group.display(3)
     );
     
     assertEquals(
@@ -327,11 +329,18 @@ class GroupServiceTest {
   void createQuotientGroupTest() {
     Group quotientGroup = groupService.createQuotientGroup(
       symmetryGroupGenerator.createSymmetryGroup(3),
-      List.of("I", "d", "d2")
+      List.of(
+        Element.I, Element.from("d"), Element.from("d", 2)
+      )
     );
     
     assertEquals(
-      groupService.createCyclicGroup("[I]", "[a]"),
+      groupService.createCyclicGroup(
+        new CyclicGroupSpec()
+        .setBase("[a]")
+        .setIdentityElement(Element.from("[I]"))
+        .setN(2)
+      ),
       quotientGroup
     );
   }
@@ -342,7 +351,7 @@ class GroupServiceTest {
       ValidationException.class,
       () -> groupService.createQuotientGroup(
         symmetryGroupGenerator.createSymmetryGroup(3),
-        List.of("I", "a")
+        List.of(Element.I, Element.from("a"))
       )
     );
     
@@ -364,7 +373,7 @@ class GroupServiceTest {
       ValidationException.class,
       () -> groupService.createQuotientGroup(
         symmetryGroupGenerator.createSymmetryGroup(3),
-        List.of("I", "a", "b")
+        List.of(Element.I, Element.from("a"), Element.from("b"))
       )
     );
   

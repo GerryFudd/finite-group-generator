@@ -1,6 +1,7 @@
 package org.dexenjaeger.algebra.utils;
 
 import lombok.Getter;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,14 +14,14 @@ public class Remapper {
   @Getter
   private int currentIndex = 0;
   @Getter
-  private final String[] elements;
+  private final Element[] elements;
   private final int[] remap;
   private final int[] inverseRemap;
   @Getter
-  private final Map<String, Integer> reverseLookup;
+  private final Map<Element, Integer> reverseLookup;
   private final Set<Integer> available;
   
-  private Remapper(String[] elements, int[] remap, int[] inverseRemap, Set<Integer> available, Map<String, Integer> reverseLookup) {
+  private Remapper(Element[] elements, int[] remap, int[] inverseRemap, Set<Integer> available, Map<Element, Integer> reverseLookup) {
     this.elements = elements;
     this.remap = remap;
     this.inverseRemap = inverseRemap;
@@ -34,7 +35,7 @@ public class Remapper {
       available.add(i);
     }
     return new Remapper(
-      new String[n],
+      new Element[n],
       new int[n],
       new int[n],
       available,
@@ -42,7 +43,7 @@ public class Remapper {
     );
   }
   
-  public Optional<String> map(String value, int oldIndex) {
+  public Optional<Element> map(Element value, int oldIndex) {
     if (available.remove(oldIndex)) {
       elements[currentIndex] = value;
       remap[currentIndex] = oldIndex;

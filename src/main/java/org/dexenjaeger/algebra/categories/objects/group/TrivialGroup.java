@@ -3,6 +3,8 @@ package org.dexenjaeger.algebra.categories.objects.group;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.binaryoperator.OperatorSymbol;
 import org.dexenjaeger.algebra.model.cycle.IntCycle;
 import org.dexenjaeger.algebra.utils.BinaryOperatorUtil;
 import org.dexenjaeger.algebra.utils.CycleUtils;
@@ -17,19 +19,19 @@ import java.util.Set;
 public class TrivialGroup implements Group {
   private final CycleUtils cycleUtils = new CycleUtils();
   @Getter
-  private final String operatorSymbol;
+  private final OperatorSymbol operatorSymbol;
   @Getter
-  private final String identityDisplay;
+  private final Element identityDisplay;
   
   public TrivialGroup() {
-    this("I");
+    this(Element.I);
   }
-  public TrivialGroup(String identityDisplay) {
-    this("*", identityDisplay);
+  public TrivialGroup(Element identityDisplay) {
+    this(OperatorSymbol.DEFAULT, identityDisplay);
   }
   
   @Override
-  public String getInverse(String element) {
+  public Element getInverse(Element element) {
     return identityDisplay;
   }
   
@@ -66,7 +68,12 @@ public class TrivialGroup implements Group {
   }
   
   @Override
-  public Set<String> getElementsDisplay() {
+  public int[][] getMultiplicationTable() {
+    return new int[][]{{0}};
+  }
+  
+  @Override
+  public Set<Element> getElementsDisplay() {
     return Set.of(identityDisplay);
   }
   
@@ -76,7 +83,7 @@ public class TrivialGroup implements Group {
   }
   
   @Override
-  public String prod(String a, String b) {
+  public Element prod(Element a, Element b) {
     return identityDisplay;
   }
   
@@ -86,12 +93,12 @@ public class TrivialGroup implements Group {
   }
   
   @Override
-  public Integer eval(String a) {
+  public Integer eval(Element a) {
     return 0;
   }
   
   @Override
-  public String display(int i) {
+  public Element display(int i) {
     return identityDisplay;
   }
   
@@ -101,7 +108,7 @@ public class TrivialGroup implements Group {
   }
   
   @Override
-  public List<String> getSortedElements() {
+  public List<Element> getSortedElements() {
     return List.of(identityDisplay);
   }
   

@@ -2,6 +2,7 @@ package org.dexenjaeger.algebra.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
 
 import java.util.Arrays;
 
@@ -10,7 +11,7 @@ public class Mapping {
   private final int[] array;
   @Getter
   @Setter
-  private String display;
+  private Element display;
   
   public Mapping(int[] array) {
     this.array = array;
@@ -51,7 +52,7 @@ public class Mapping {
   @Override
   public String toString() {
     if (display != null) {
-      return display;
+      return display.toString();
     }
     return arrayString();
   }

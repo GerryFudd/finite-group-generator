@@ -4,6 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.dexenjaeger.algebra.AlgebraModule;
 import org.dexenjaeger.algebra.model.binaryoperator.BinaryOperator;
+import org.dexenjaeger.algebra.model.binaryoperator.Element;
+import org.dexenjaeger.algebra.model.spec.CyclicGroupSpec;
 import org.dexenjaeger.algebra.service.BinaryOperatorService;
 import org.dexenjaeger.algebra.service.GroupService;
 import org.junit.jupiter.api.Test;
@@ -26,34 +28,37 @@ class TrivialGroupTest {
   @Test
   void doesNotEqualIfIdentityDiffers() {
     assertNotEquals(
-      new TrivialGroup("a"),
-      new TrivialGroup("b")
+      new TrivialGroup(Element.from("a")),
+      new TrivialGroup(Element.from("b"))
     );
   }
   
   @Test
   void equalsEquivalentBinaryOperator() {
     BinaryOperator byAnotherName = binaryOperatorService.createBinaryOperator(
-      new String[]{"a"}, (i, j) -> 0
+      new Element[]{Element.from("a")}, (i, j) -> 0
     );
     assertEquals(
       byAnotherName,
-      new TrivialGroup("a")
+      new TrivialGroup(Element.from("a"))
     );
     assertEquals(
-      new TrivialGroup("a"),
+      new TrivialGroup(Element.from("a")),
       byAnotherName
     );
     assertEquals(
       byAnotherName.hashCode(),
-      new TrivialGroup("a").hashCode()
+      new TrivialGroup(Element.from("a")).hashCode()
     );
   }
   
   @Test
   void behavesLikeEquivalentGroup() {
-    TrivialGroup trivialGroup = new TrivialGroup("a");
-    Group byAnotherName = groupService.createCyclicGroup("a");
+    TrivialGroup trivialGroup = new TrivialGroup(Element.from("a"));
+    Group byAnotherName = groupService.createCyclicGroup(
+      new CyclicGroupSpec()
+        .setIdentityElement(Element.from("a"))
+    );
     assertEquals(
       byAnotherName.getSize(),
       trivialGroup.getSize()
